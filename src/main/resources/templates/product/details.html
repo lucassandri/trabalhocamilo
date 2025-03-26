@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title th:text="${product.name} + ' - RPG Market'">Detalhes do Item - RPG Market</title>
+</head>
+<body>
+    <div th:replace="~{layout/main :: content}">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="rpg-font" th:text="${product.name}">Nome do Item</h1>
+            <div>
+                <a th:href="@{/mercado}" class="btn btn-outline-dark">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar ao Mercado
+                </a>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Imagem e Detalhes -->
+            <div class="col-lg-8 mb-4">
+                <div class="card border-gold h-100">
+                    <div class="row g-0">
+                        <div class="col-md-6">
+                            <div class="product-img-container h-100">
+                                <img th:if="${product.imageUrl}" th:src="@{/images/{name}(name=${product.imageUrl})}" class="img-fluid rounded-start h-100 w-100 object-fit-cover" alt="Imagem do Produto">
+                                <img th:unless="${product.imageUrl}" th:src="@{/images/default-product.jpg}" class="img-fluid rounded-start h-100 w-100 object-fit-cover" alt="Imagem Padrão">
+                                <span class="badge product-category-badge bg-dark" th:text="${product.category.displayName}">Categoria</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card-body">
+                                <h5 class="card-title rpg-font" th:text="${product.name}">Nome do Item</h5>
+                                <p class="mb-2">
+                                    <span class="badge" th:classappend="${product.type.name() == 'DIRECT_SALE' ? 'bg-primary' : 'bg-danger'}" th:text="${product.type.name() == 'DIRECT_SALE' ? 'Venda Direta' : 'Leilão'}">Tipo</span>
+                                    <span class="badge" th:classappend="${product.status.name() == 'AVAILABLE' ? 'bg-success' : (product.status.name() == 'AUCTION_ACTIVE' ? 'bg-warning' : 'bg-secondary')}" th:text="${product.status.name() == 'AVAILABLE' ? 'Disponível' : (product.status.name() == 'AUCTION_ACTIVE' ? 'Leilão Ativo' : 'Vendido')}">Status</span>
+                                </p>
+                                
+                                <!-- Contador para leilão -->
+                                <div th:if="${product.type.name() == 'AUCTION' && product.status.name() == 'AUCTION_ACTIVE'}" class="alert alert-warning mb-3">
+                                    <input type="hidden" id="endDate" th:value="${#temporals.format(product.auctionEndDate, 'yyyy-MM-dd\'T\'HH:mm:ss')}">
+                                    <i class="fas fa-hourglass-half me-2"></i>Termina em: <span id="countdown">Calculando...</span>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <h6 class="fw-bold">Descrição:</h6>
+                                    <p class="card-text" th:text="${product.description ?: 'Sem descrição'}">Descrição do item...</p>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <h6 class="fw-bold">Vendido por:</h6>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-user-circle fa-2x me-2"></i>
+                                        <div>
+                                            <p class="mb-0" th:text="${product.seller.username}">Vendedor</p>
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge bg-success me-1">Nv. <span th:text="${product.seller.level}">10</span></span>
+                                                <span class="small text-muted" th:text="${product.seller.characterClass}">Classe</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <h6 class="fw-bold">Data de Publicação:</h6>
+                                    <p class="mb-0" th:text="${#temporals.format(product.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2023 14:30</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Preço e Ações -->
+            <div class="col-lg-4 mb-4">
+                <div class="card border-gold">
+                    <div class="card-header bg-dark text-light">
+                        <h3 class="rpg-font mb-0">
+                            <i class="fas fa-coins me-2"></i>Preço e Ações
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Venda Direta -->
+                        <div th:if="${product.type.name() == 'DIRECT_SALE' && product.status.name() == 'AVAILABLE'}" class="text-center mb-4">
+                            <h2 class="product-price display-6 mb-3" th:text="${'$' + #numbers.formatDecimal(product.price, 0, 'POINT', 2, 'COMMA')}">$99.99</h2>
+                            
+                            <form th:action="@{/item/{id}/comprar(id=${product.id})}" method="post" sec:authorize="isAuthenticated()" 
+                                  th:if="${#authentication.name != product.seller.username}">
+                                <button type="submit" class="btn btn-gold btn-lg w-100 mb-2">
+                                    <i class="fas fa-shopping-cart me-2"></i>Comprar Agora
+                                </button>
+                            </form>
+                            
+                            <a th:if="${#authentication.name == product.seller.username}" th:href="@{/item/{id}/editar(id=${product.id})}" class="btn btn-outline-primary btn-lg w-100 mb-2">
+                                <i class="fas fa-edit me-2"></i>Editar Item
+                            </a>
+                            
+                            <div sec:authorize="!isAuthenticated()" class="alert alert-info">
+                                <a th:href="@{/login}" class="alert-link">Entre</a> ou <a th:href="@{/aventureiro/registrar}" class="alert-link">registre-se</a> para comprar este item.
+                            </div>
+                        </div>
+                        
+                        <!-- Leilão -->
+                        <div th:if="${product.type.name() == 'AUCTION' && product.status.name() == 'AUCTION_ACTIVE'}" class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h6>Lance Atual:</h6>
+                                    <h2 class="product-price mb-0" th:text="${'$' + #numbers.formatDecimal(product.price, 0, 'POINT', 2, 'COMMA')}">$99.99</h2>
+                                </div>
+                                <div th:if="${product.buyNowPrice != null}">
+                                    <h6>Compre Agora:</h6>
+                                    <h3 class="text-success mb-0" th:text="${'$' + #numbers.formatDecimal(product.buyNowPrice, 0, 'POINT', 2, 'COMMA')}">$199.99</h3>
+                                </div>
+                            </div>
+                            
+                            <!-- Form para lance -->
+                            <form th:action="@{/item/{id}/lance(id=${product.id})}" method="post" sec:authorize="isAuthenticated()" 
+                                  th:if="${#authentication.name != product.seller.username}" class="mb-3">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text"><i class="fas fa-coins"></i></span>
+                                    <input type="number" name="amount" class="form-control" 
+                                           th:min="${product.price + (product.minBidIncrement ?: 1)}" step="0.01"
+                                           th:value="${product.price + (product.minBidIncrement ?: 1)}" required>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-gavel me-1"></i>Dar Lance
+                                    </button>
+                                </div>
+                                <div class="form-text">
+                                    Lance mínimo: <span th:text="${'$' + #numbers.formatDecimal(product.price + (product.minBidIncrement ?: 1), 0, 'POINT', 2, 'COMMA')}">$100.99</span>
+                                </div>
+                            </form>
+                            
+                            <!-- Botão Comprar Agora -->
+                            <form th:if="${product.buyNowPrice != null}" th:action="@{/item/{id}/comprar(id=${product.id})}" method="post" 
+                                  sec:authorize="isAuthenticated()" th:if="${#authentication.name != product.seller.username}">
+                                <button type="submit" class="btn btn-gold w-100 mb-2">
+                                    <i class="fas fa-bolt me-2"></i>Comprar Agora
+                                </button>
+                            </form>
+                            
+                            <!-- Botão Editar para vendedor -->
+                            <a th:if="${#authentication.name == product.seller.username}" th:href="@{/item/{id}/editar(id=${product.id})}" class="btn btn-outline-primary w-100 mb-2">
+                                <i class="fas fa-edit me-2"></i>Editar Item
+                            </a>
+                            
+                            <div sec:authorize="!isAuthenticated()" class="alert alert-info">
+                                <a th:href="@{/login}" class="alert-link">Entre</a> ou <a th:href="@{/aventureiro/registrar}" class="alert-link">registre-se</a> para participar deste leilão.
+                            </div>
+                        </div>
+                        
+                        <!-- Item já vendido -->
+                        <div th:if="${product.status.name() == 'SOLD' || product.status.name() == 'AUCTION_ENDED'}" class="text-center mb-4">
+                            <div class="alert alert-secondary">
+                                <i class="fas fa-check-circle me-2"></i>Este item já foi vendido.
+                            </div>
+                            <h2 class="product-price mb-3" th:text="${'$' + #numbers.formatDecimal(product.price, 0, 'POINT', 2, 'COMMA')}">$99.99</h2>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Histórico de Lances para Leilões -->
+                <div th:if="${product.type.name() == 'AUCTION' && bids != null && !bids.empty}" class="card border-gold mt-3">
+                    <div class="card-header bg-dark text-light">
+                        <h3 class="rpg-font mb-0">
+                            <i class="fas fa-history me-2"></i>Histórico de Lances
+                        </h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush bid-history">
+                            <li th:each="bid : ${bids}" class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span th:text="${bid.bidder.username}">Usuario</span>
+                                    <small class="text-muted d-block" th:text="${#temporals.format(bid.createdAt, 'dd/MM HH:mm')}">01/01 14:30</small>
+                                </div>
+                                <span class="badge bg-primary" th:text="${'$' + #numbers.formatDecimal(bid.amount, 0, 'POINT', 2, 'COMMA')}">$99.99</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <th:block th:replace="~{layout/main :: pageScripts}">
+        <script th:if="${product.type.name() == 'AUCTION' && product.status.name() == 'AUCTION_ACTIVE'}">
+            document.addEventListener('DOMContentLoaded', function() {
+                const endDateElement = document.getElementById('endDate');
+                if (!endDateElement) return;
+                
+                const endDate = new Date(endDateElement.value);
+                const countdownElement = document.getElementById('countdown');
+                
+                function updateCountdown() {
+                    const now = new Date();
+                    const diff = endDate - now;
+                    
+                    if (diff <= 0) {
+                        countdownElement.textContent = "Leilão Encerrado";
+                        location.reload(); // Atualiza a página para mostrar o resultado do leilão
+                        return;
+                    }
+                    
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                    
+                    let displayText = "";
+                    if(days > 0) displayText += days + "d ";
+                    displayText += hours + "h " + minutes + "m " + seconds + "s";
+                    
+                    countdownElement.textContent = displayText;
+                }
+                
+                // Atualizar imediatamente e depois a cada segundo
+                updateCountdown();
+                setInterval(updateCountdown, 1000);
+            });
+        </script>
+    </th:block>
+</body>
+</html>

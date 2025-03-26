@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Meu Inventário - RPG Market</title>
+</head>
+<body>
+    <div th:replace="~{layout/main :: content}">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="rpg-font">
+                <i class="fas fa-box-open me-2"></i>Meu Inventário
+            </h1>
+            <div>
+                <a th:href="@{/item/novo}" class="btn btn-gold">
+                    <i class="fas fa-plus-circle me-2"></i>Anunciar Item
+                </a>
+            </div>
+        </div>
+        
+        <!-- Tabs para filtrar produtos -->
+        <ul class="nav nav-tabs mb-4">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" id="tab-all">
+                    <i class="fas fa-list me-1"></i>Todos
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" id="tab-available">
+                    <i class="fas fa-tag me-1"></i>Disponíveis
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" id="tab-auctions">
+                    <i class="fas fa-gavel me-1"></i>Leilões
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" id="tab-sold">
+                    <i class="fas fa-check me-1"></i>Vendidos
+                </a>
+            </li>
+        </ul>
+        
+        <!-- Lista de Produtos -->
+        <div class="row g-4">
+            <!-- Se não houver produtos -->
+            <div th:if="${products == null || products.empty}" class="col-12 inventory-empty">
+                <i class="fas fa-box-open mb-3"></i>
+                <h4>Seu inventário está vazio</h4>
+                <p class="text-muted">Comece a vender seus itens agora mesmo!</p>
+                <a th:href="@{/item/novo}" class="btn btn-gold mt-2">
+                    <i class="fas fa-plus-circle me-2"></i>Anunciar Item
+                </a>
+            </div>
+            
+            <!-- Lista de produtos -->
+            <div th:unless="${products == null || products.empty}" th:each="product : ${products}" th:class="'col-md-6 col-lg-4 product-item ' + ${product.status.name()}" th:data-type="${product.type.name()}">
+                <div class="card h-100 product-card">
+                    <div class="product-img-container">
+                        <img th:if="${product.imageUrl}" th:src="@{/images/{name}(name=${product.imageUrl})}" class="product-img" alt="Imagem do Produto">
+                        <img th:unless="${product.imageUrl}" th:src="@{/images/default-product.jpg}" class="product-img" alt="Imagem Padrão">
+                        <span class="badge product-category-badge bg-dark" th:text="${product.category.displayName}">Categoria</span>
+                        <span th:if="${product.type.name() == 'AUCTION'}" class="badge bg-danger position-absolute start-0 top-0 m-2">
+                            <i class="fas fa-gavel me-1"></i>Leilão
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title rpg-font" th:text="${product.name}">Nome do Produto</h5>
+                        <p class="card-text text-truncate" th:text="${product.description}">Descrição do produto...</p>
+                        
+                        <!-- Contador para leilão ativo -->
+                        <div th:if="${product.type.name() == 'AUCTION' && product.status.name() == 'AUCTION_ACTIVE'}" class="auction-timer p-2 mb-2">
+                            <i class="fas fa-hourglass-half me-1"></i>
+                            <span>Termina em: <span class="countdown" th:data-end-date="${#temporals.format(product.auctionEndDate, 'yyyy-MM-dd\'T\'HH:mm:ss')}">3d 12h 45m</span></span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="product-price" th:text="${'$' + #numbers.formatDecimal(product.price, 0, 'POINT', 2, 'COMMA')}">$0.00</span>
+                            <div class="btn-group">
+                                <a th:href="@{/item/{id}(id=${product.id})}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a th:href="@{/item/{id}/editar(id=${product.id})}" class="btn btn-sm btn-outline-secondary" 
+                                   th:if="${product.status.name() == 'AVAILABLE' || product.status.name() == 'AUCTION_ACTIVE'}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <span class="badge" 
+                              th:classappend="${product.status.name() == 'AVAILABLE' ? 'bg-success' : 
+                                             (product.status.name() == 'AUCTION_ACTIVE' ? 'bg-warning' : 
+                                             (product.status.name() == 'SOLD' || product.status.name() == 'AUCTION_ENDED' ? 'bg-secondary' : 'bg-info'))}" 
+                              th:text="${product.status.name() == 'AVAILABLE' ? 'Disponível' : 
+                                      (product.status.name() == 'AUCTION_ACTIVE' ? 'Leilão Ativo' : 
+                                      (product.status.name() == 'SOLD' ? 'Vendido' : 
+                                      (product.status.name() == 'AUCTION_ENDED' ? 'Leilão Finalizado' : 'Reservado')))}">
+                            Status
+                        </span>
+                        <small class="text-muted float-end" th:text="${#temporals.format(product.createdAt, 'dd/MM/yyyy')}">01/01/2023</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <th:block th:replace="~{layout/main :: pageScripts}">
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Filtro por tabs
+                const tabAll = document.getElementById('tab-all');
+                const tabAvailable = document.getElementById('tab-available');
+                const tabAuctions = document.getElementById('tab-auctions');
+                const tabSold = document.getElementById('tab-sold');
+                const productItems = document.querySelectorAll('.product-item');
+                
+                function setActiveTab(tab) {
+                    [tabAll, tabAvailable, tabAuctions, tabSold].forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                }
+                
+                tabAll.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    setActiveTab(this);
+                    productItems.forEach(item => item.style.display = '');
+                });
+                
+                tabAvailable.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    setActiveTab(this);
+                    productItems.forEach(item => {
+                        if (item.classList.contains('AVAILABLE')) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+                
+                tabAuctions.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    setActiveTab(this);
+                    productItems.forEach(item => {
+                        if (item.dataset.type === 'AUCTION') {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+                
+                tabSold.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    setActiveTab(this);
+                    productItems.forEach(item => {
+                        if (item.classList.contains('SOLD') || item.classList.contains('AUCTION_ENDED')) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+                
+                // Atualizar contadores de leilão
+                const countdowns = document.querySelectorAll('.countdown');
+                
+                function updateCountdowns() {
+                    countdowns.forEach(element => {
+                        const endDate = new Date(element.getAttribute('data-end-date'));
+                        const now = new Date();
+                        const diff = endDate - now;
+                        
+                        if (diff <= 0) {
+                            element.textContent = "Encerrado";
+                            return;
+                        }
+                        
+                        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        
+                        let displayText = "";
+                        if(days > 0) displayText += days + "d ";
+                        displayText += hours + "h " + minutes + "m";
+                        
+                        element.textContent = displayText;
+                    });
+                }
+                
+                if (countdowns.length > 0) {
+                    updateCountdowns();
+                    setInterval(updateCountdowns, 60000);
+                }
+            });
+        </script>
+    </th:block>
+</body>
+</html>

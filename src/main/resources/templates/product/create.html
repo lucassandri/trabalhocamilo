@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Criar Item - RPG Market</title>
+</head>
+<body>
+    <div th:replace="~{layout/main :: content}">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="rpg-font">
+                <i class="fas fa-plus-circle me-2"></i>Criar Novo Item
+            </h1>
+            <div>
+                <a th:href="@{/aventureiro/inventario}" class="btn btn-outline-dark">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar ao Inventário
+                </a>
+            </div>
+        </div>
+        
+        <form th:action="@{/item/novo}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <!-- Informações Básicas -->
+                    <div class="card border-gold mb-4">
+                        <div class="card-header bg-dark text-light">
+                            <h3 class="rpg-font mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Informações Básicas
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Nome do Item*</label>
+                                <input type="text" class="form-control" id="name" name="name" required
+                                       placeholder="Ex: Espada Lendária de Aço Élfico">
+                                <div class="invalid-feedback">
+                                    Por favor, informe um nome para o item.
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Descrição</label>
+                                <textarea class="form-control" id="description" name="description" rows="4"
+                                          placeholder="Descreva seu item em detalhes..."></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="category" class="form-label">Categoria*</label>
+                                    <select class="form-select" id="category" name="category" required>
+                                        <option value="" selected disabled>Selecione uma categoria</option>
+                                        <option th:each="category : ${categories}" 
+                                                th:value="${category}" 
+                                                th:text="${category.displayName}">Categoria</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Por favor, selecione uma categoria.
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="type" class="form-label">Tipo de Venda*</label>
+                                    <select class="form-select" id="type" name="type" required>
+                                        <option value="" selected disabled>Selecione um tipo</option>
+                                        <option th:each="type : ${types}" 
+                                                th:value="${type}" 
+                                                th:text="${type == T(com.programacao_web.rpg_market.model.ProductType).DIRECT_SALE ? 'Venda Direta' : 
+                                                         (type == T(com.programacao_web.rpg_market.model.ProductType).AUCTION ? 'Leilão' : 'Negociável')}">
+                                            Tipo
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Por favor, selecione um tipo de venda.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Preços -->
+                    <div class="card border-gold">
+                        <div class="card-header bg-dark text-light">
+                            <h3 class="rpg-font mb-0">
+                                <i class="fas fa-coins me-2"></i>Preços e Valores
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="price" class="form-label">Preço de Venda (Moedas de Ouro)*</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-coins"></i></span>
+                                        <input type="number" step="0.01" min="0" class="form-control" id="price" name="price" required>
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Por favor, informe um preço válido.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Campos específicos para leilão -->
+                            <div id="auctionFields" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="buyNowPrice" class="form-label">Preço de Compra Imediata (opcional)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-coins"></i></span>
+                                            <input type="number" step="0.01" min="0" class="form-control" id="buyNowPrice" name="buyNowPrice">
+                                        </div>
+                                        <div class="form-text">Deixe em branco para não permitir compra imediata.</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="minBidIncrement" class="form-label">Incremento Mínimo por Lance</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-coins"></i></span>
+                                            <input type="number" step="0.01" min="0" class="form-control" id="minBidIncrement" name="minBidIncrement" value="1.00">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="auctionEndDate" class="form-label">Data de Término do Leilão</label>
+                                    <input type="datetime-local" class="form-control" id="auctionEndDate" name="auctionEndDate">
+                                    <div class="form-text">Se não preenchido, o leilão terá duração padrão de 7 dias.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <!-- Imagem -->
+                    <div class="card border-gold">
+                        <div class="card-header bg-dark text-light">
+                            <h3 class="rpg-font mb-0">
+                                <i class="fas fa-image me-2"></i>Imagem
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <div class="text-center mb-3">
+                                    <img id="imagePreview" src="/images/default-product.jpg" alt="Pré-visualização" class="img-fluid rounded border" style="max-height: 200px;">
+                                </div>
+                                <label for="image" class="form-label">Imagem do Item</label>
+                                <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                                <div class="form-text">Tamanho máximo: 5MB. Formatos: JPG, PNG.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a th:href="@{/aventureiro/inventario}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </a>
+                <button type="submit" class="btn btn-gold">
+                    <i class="fas fa-save me-2"></i>Salvar Item
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <th:block th:replace="~{layout/main :: pageScripts}">
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Validação do formulário
+                const form = document.querySelector('.needs-validation');
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                });
+                
+                // Mostrar/esconder campos de leilão
+                const typeSelect = document.getElementById('type');
+                const auctionFields = document.getElementById('auctionFields');
+                
+                typeSelect.addEventListener('change', function() {
+                    if (this.value === 'AUCTION') {
+                        auctionFields.style.display = 'block';
+                    } else {
+                        auctionFields.style.display = 'none';
+                    }
+                });
+                
+                // Pré-visualização de imagem
+                const imageInput = document.getElementById('image');
+                const imagePreview = document.getElementById('imagePreview');
+                
+                imageInput.addEventListener('change', function() {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            imagePreview.src = e.target.result;
+                        };
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
+            });
+        </script>
+    </th:block>
+</body>
+</html>

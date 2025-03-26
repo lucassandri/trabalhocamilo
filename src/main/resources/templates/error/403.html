@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Acesso Negado - RPG Market</title>
+</head>
+<body>
+    <div th:replace="~{layout/main :: content}">
+        <div class="text-center py-5">
+            <i class="fas fa-ban fa-5x text-danger mb-4"></i>
+            <h1 class="rpg-font mb-3">Acesso Negado!</h1>
+            <p class="lead mb-4">Você não tem permissão para acessar esta área do castelo.</p>
+            <a th:href="@{/mercado}" class="btn btn-gold">
+                <i class="fas fa-home me-2"></i>Voltar ao Mercado
+            </a>
+        </div>
+    </div>
+</body>
+</html>

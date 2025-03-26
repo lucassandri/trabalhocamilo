@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Minhas Vendas - RPG Market</title>
+</head>
+<body>
+    <div th:replace="~{layout/main :: content}">
+        <h1 class="rpg-font mb-4"><i class="fas fa-coins me-2"></i>Minhas Vendas</h1>
+        
+        <div class="table-responsive" th:if="${!transactions.isEmpty()}">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Item</th>
+                        <th scope="col">Comprador</th>
+                        <th scope="col">Valor</th>
+                        <th scope="col">Data</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="transaction : ${transactions}">
+                        <th scope="row" th:text="${transaction.id}">#123</th>
+                        <td>
+                            <a th:href="@{/item/{id}(id=${transaction.product.id})}" th:text="${transaction.product.name}" class="text-decoration-none">
+                                Espada Lendária
+                            </a>
+                        </td>
+                        <td th:text="${transaction.buyer.username}">Comprador</td>
+                        <td class="product-price" th:text="${'$' + #numbers.formatDecimal(transaction.amount, 0, 'POINT', 2, 'COMMA')}">$99.99</td>
+                        <td th:text="${#temporals.format(transaction.createdAt, 'dd/MM/yyyy')}">01/01/2023</td>
+                        <td>
+                            <span th:class="'badge ' + 
+                                ${transaction.status.name() == 'COMPLETED' ? 'bg-success' : 
+                                (transaction.status.name() == 'PENDING' ? 'bg-warning' : 
+                                (transaction.status.name() == 'SHIPPED' ? 'bg-info' : 
+                                (transaction.status.name() == 'DISPUTED' ? 'bg-danger' : 'bg-secondary')))}"
+                                th:text="${transaction.status}">
+                                Status
+                            </span>
+                        </td>
+                        <td>
+                            <a th:href="@{/transacao/{id}(id=${transaction.id})}" class="btn btn-sm btn-gold">
+                                <i class="fas fa-eye me-1"></i>Detalhes
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div th:if="${transactions.isEmpty()}" class="inventory-empty">
+            <i class="fas fa-coins mb-3"></i>
+            <h4>Você ainda não vendeu nenhum item</h4>
+            <p class="text-muted">Suas vendas aparecerão aqui!</p>
+            <a th:href="@{/item/novo}" class="btn btn-gold mt-2">
+                <i class="fas fa-plus-circle me-2"></i>Anunciar Item
+            </a>
+        </div>
+    </div>
+</body>
+</html>

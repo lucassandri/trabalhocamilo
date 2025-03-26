@@ -1,0 +1,136 @@
+:root {
+    --primary-color: #6f4e37;
+    --secondary-color: #d4af37;
+    --text-color: #333;
+    --bg-color: #f5f5dc;
+}
+
+body.rpg-theme {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    background-image: url('../images/parchment-bg.jpg');
+    background-attachment: fixed;
+}
+
+.rpg-font {
+    font-family: 'MedievalSharp', cursive;
+}
+
+.btn-gold {
+    background-color: var(--secondary-color);
+    color: #333;
+    border-color: #b8860b;
+}
+
+.btn-gold:hover {
+    background-color: #b8860b;
+    color: white;
+    border-color: #8b6914;
+}
+
+.border-gold {
+    border-color: var(--secondary-color) !important;
+}
+
+.bg-gold {
+    background-color: var(--secondary-color) !important;
+    color: #333;
+}
+
+.parchment-bg {
+    background-color: rgba(255, 250, 227, 0.95);
+    border: 1px solid #d2b48c;
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.15);
+    position: relative;
+}
+
+.parchment-bg::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-image: url('../images/parchment-texture.jpg');
+    background-size: cover;
+    opacity: 0.1;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.product-card {
+    transition: transform 0.2s;
+    border: 1px solid #d2b48c;
+    overflow: hidden;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.product-img-container {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+}
+
+.product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-category-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+}
+
+.product-price {
+    font-weight: bold;
+    color: #8b6914;
+    font-size: 1.2rem;
+}
+
+.auction-timer {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.8rem;
+}
+
+.bid-history {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.profile-stat {
+    border-left: 3px solid var(--secondary-color);
+    padding-left: 1rem;
+}
+
+.inventory-empty {
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.inventory-empty i {
+    font-size: 3rem;
+    color: #ccc;
+    margin-bottom: 1rem;
+}
+
+/* Estilos para paginação */
+.pagination .page-link {
+    color: var(--primary-color);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
