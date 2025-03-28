@@ -4,71 +4,150 @@
     <title>Mercado do Reino - RPG Market</title>
 </head>
 <body>
-    <!-- Define this content as a fragment that will be included in the layout -->
-    <div th:fragment="content">
-        <h1 class="rpg-font mb-4">Mercado do Reino</h1>
-        
-        <!-- Categorias -->
-        <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h3 class="rpg-font"><i class="fas fa-tags me-2"></i>Categorias</h3>
-            </div>
-            <div class="row g-2">
-                <div class="col-6 col-md-3" th:each="category : ${categories}">
-                    <a th:href="@{/mercado/categoria/{name}(name=${category})}" class="text-decoration-none">
-                        <div class="card h-100 product-card">
-                            <div class="card-body text-center">
-                                <h5 class="mb-0" th:text="${category.displayName}">Categoria</h5>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Produtos em Destaque -->
-        <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3 class="rpg-font"><i class="fas fa-fire me-2"></i>Itens em Destaque</h3>
-                <a th:href="@{/mercado?sort=createdAt,desc}" class="btn btn-sm btn-outline-dark">Ver Todos</a>
-            </div>
-            
-            <!-- Lista de Produtos -->
-            <div class="row g-4">
-                <!-- Se não houver produtos -->
-                <div th:if="${products.empty}" class="col-12 inventory-empty">
-                    <i class="fas fa-box-open mb-3"></i>
-                    <h4>Não há itens disponíveis no momento</h4>
-                    <p class="text-muted">Volte mais tarde ou seja o primeiro a anunciar!</p>
-                    <a th:href="@{/item/novo}" sec:authorize="isAuthenticated()" class="btn btn-gold mt-2">
+    <div th:replace="~{layout/main :: layout(~{::div.content-wrapper})}">
+        <div class="content-wrapper">
+            <!-- Hero Banner -->
+            <div class="mb-4 p-4 bg-dark text-white rounded-3 shadow position-relative overflow-hidden">
+                <div class="position-relative z-1">
+                    <h1 class="display-5 fw-bold rpg-font">Bem-vindo ao Mercado do Reino</h1>
+                    <p class="col-md-8 fs-5">Descubra os mais raros e poderosos artefatos mágicos para sua aventura!</p>
+                    <a sec:authorize="isAuthenticated()" th:href="@{/item/novo}" class="btn btn-gold btn-lg">
                         <i class="fas fa-plus-circle me-2"></i>Anunciar Item
                     </a>
+                    <a sec:authorize="!isAuthenticated()" th:href="@{/login}" class="btn btn-gold btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>Entrar para Vender
+                    </a>
                 </div>
-                
-                <!-- Lista de produtos -->
-                <div th:unless="${products.empty}" th:each="product : ${products}" class="col-md-6 col-lg-4">
-                    <div class="card h-100 product-card">
-                        <div class="product-img-container">
-                            <img th:if="${product.imageUrl}" th:src="@{/images/{name}(name=${product.imageUrl})}" class="product-img" alt="Imagem do Produto">
-                            <img th:unless="${product.imageUrl}" th:src="@{/images/default-product.jpg}" class="product-img" alt="Imagem Padrão">
-                            <span class="badge product-category-badge bg-dark" th:text="${product.category.displayName}">Categoria</span>
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title rpg-font" th:text="${product.name}">Nome do Produto</h5>
-                            <p class="card-text text-truncate" th:text="${product.description}">Descrição do produto...</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="product-price" th:text="${'$' + #numbers.formatDecimal(product.price, 0, 'POINT', 2, 'COMMA')}">$0.00</span>
-                                <a th:href="@{/item/{id}(id=${product.id})}" class="btn btn-sm btn-gold">
-                                    <i class="fas fa-eye me-1"></i>Detalhes
-                                </a>
+                <div class="position-absolute top-0 end-0 h-100 d-none d-md-block" style="width: 40%;">
+                    <div class="h-100 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-dragon text-gold-translucent" style="font-size: 12rem; opacity: 0.15;"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Categorias -->
+            <div class="market-section">
+                <h2 class="rpg-font section-title">
+                    <i class="fas fa-tags me-2"></i>Categorias
+                </h2>
+                <div class="row g-3">
+                    <div class="col-6 col-md-3 col-lg-2" th:each="category : ${categories}">
+                        <a th:href="@{/mercado/categoria/{name}(name=${category})}" class="text-decoration-none">
+                            <div class="card h-100 category-card text-center p-3">
+                                <!-- Simplified icon approach -->
+                                <div class="category-icon">
+                                    <i th:if="${category.name() == 'WEAPON'}" class="fas fa-gavel"></i>
+                                    <i th:if="${category.name() == 'ARMOR'}" class="fas fa-shield-alt"></i>
+                                    <i th:if="${category.name() == 'POTION'}" class="fas fa-flask"></i>
+                                    <i th:if="${category.name() == 'SCROLL'}" class="fas fa-scroll"></i>
+                                    <i th:if="${category.name() == 'WAND'}" class="fas fa-magic"></i>
+                                    <i th:if="${category.name() == 'RING'}" class="fas fa-ring"></i>
+                                    <i th:if="${!#arrays.contains({'WEAPON', 'ARMOR', 'POTION', 'SCROLL', 'WAND', 'RING'}, category.name())}" class="fas fa-box-open"></i>
+                                </div>
+                                <h6 class="mb-0 rpg-font" th:text="${category.displayName}">Categoria</h6>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Links Rápidos -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <a th:href="@{/mercado/masmorra-dos-leiloes}" class="text-decoration-none">
+                        <div class="card h-100 category-card bg-danger text-white">
+                            <div class="card-body text-center p-4">
+                                <i class="fas fa-gavel fa-3x mb-3"></i>
+                                <h4 class="rpg-font mb-0">Masmorra dos Leilões</h4>
+                                <p class="mb-0 mt-2">Faça seus lances nos itens mais raros!</p>
                             </div>
                         </div>
-                        <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
-                            <small class="text-muted">
-                                <i class="fas fa-user me-1"></i>
-                                <span th:text="${product.seller.username}">Vendedor</span>
-                            </small>
-                            <small class="text-muted" th:text="${#temporals.format(product.createdAt, 'dd/MM/yyyy')}">01/01/2023</small>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a th:href="@{/mercado/ranking-dos-nobres}" class="text-decoration-none">
+                        <div class="card h-100 category-card bg-warning text-dark">
+                            <div class="card-body text-center p-4">
+                                <i class="fas fa-crown fa-3x mb-3"></i>
+                                <h4 class="rpg-font mb-0">Ranking dos Nobres</h4>
+                                <p class="mb-0 mt-2">Veja os melhores comerciantes do reino!</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4" sec:authorize="isAuthenticated()">
+                    <a th:href="@{/aventureiro/inventario}" class="text-decoration-none">
+                        <div class="card h-100 category-card bg-success text-white">
+                            <div class="card-body text-center p-4">
+                                <i class="fas fa-box-open fa-3x mb-3"></i>
+                                <h4 class="rpg-font mb-0">Meu Inventário</h4>
+                                <p class="mb-0 mt-2">Gerencie seus itens e vendas!</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4" sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/aventureiro/registrar}" class="text-decoration-none">
+                        <div class="card h-100 category-card bg-primary text-white">
+                            <div class="card-body text-center p-4">
+                                <i class="fas fa-user-plus fa-3x mb-3"></i>
+                                <h4 class="rpg-font mb-0">Registrar-se</h4>
+                                <p class="mb-0 mt-2">Torne-se um aventureiro do reino!</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Produtos em Destaque -->
+            <div class="market-section">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="rpg-font section-title"><i class="fas fa-fire me-2"></i>Itens em Destaque</h2>
+                    <a th:href="@{/mercado?sort=createdAt,desc}" class="btn btn-sm btn-outline-dark">Ver Todos</a>
+                </div>
+                
+                <!-- Lista de Produtos -->
+                <div class="row g-4">
+                    <!-- Se não houver produtos -->
+                    <div th:if="${products.empty}" class="col-12 inventory-empty">
+                        <i class="fas fa-box-open mb-3"></i>
+                        <h4>Não há itens disponíveis no momento</h4>
+                        <p class="text-muted">Volte mais tarde ou seja o primeiro a anunciar!</p>
+                        <a th:href="@{/item/novo}" sec:authorize="isAuthenticated()" class="btn btn-gold mt-2">
+                            <i class="fas fa-plus-circle me-2"></i>Anunciar Item
+                        </a>
+                    </div>
+                    
+                    <!-- Lista de produtos -->
+                    <div th:unless="${products.empty}" th:each="product : ${products}" class="col-md-6 col-lg-4 col-xl-3">
+                        <div class="card h-100 product-card">
+                            <div class="product-img-container">
+                                <img th:if="${product.imageUrl}" th:src="@{/images/{name}(name=${product.imageUrl})}" class="product-img" alt="Imagem do Produto">
+                                <img th:unless="${product.imageUrl}" th:src="@{/images/default-product.jpg}" class="product-img" alt="Imagem Padrão">
+                                <span class="badge product-category-badge bg-dark" th:text="${product.category.displayName}">Categoria</span>
+                                
+                                <!-- Badge de leilão se aplicável -->
+                                <span th:if="${product.type.name() == 'AUCTION'}" class="badge bg-danger position-absolute start-0 top-0 m-2">
+                                    <i class="fas fa-gavel me-1"></i>Leilão
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title rpg-font" th:text="${product.name}">Nome do Produto</h5>
+                                <p class="card-text text-truncate" th:text="${product.description}">Descrição do produto...</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="product-price" th:text="${'$' + #numbers.formatDecimal(product.price, 0, 'POINT', 2, 'COMMA')}">$0.00</span>
+                                    <a th:href="@{/item/{id}(id=${product.id})}" class="btn btn-sm btn-gold">
+                                        <i class="fas fa-eye me-1"></i>Detalhes
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-user me-1"></i>
+                                    <span th:text="${product.seller.username}">Vendedor</span>
+                                </small>
+                                <small class="text-muted" th:text="${#temporals.format(product.createdAt, 'dd/MM/yyyy')}">01/01/2023</small>
+                            </div>
                         </div>
                     </div>
                 </div>

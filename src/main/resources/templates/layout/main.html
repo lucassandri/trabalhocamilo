@@ -11,137 +11,121 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- CSS personalizado -->
+    <!-- Google Fonts - Medieval Sharp -->
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    
+    <!-- CSS personalizado - Use absolute path to ensure it's found -->
     <link th:href="@{/css/style.css}" rel="stylesheet">
-
-        <!-- Estilos adicionais específicos da página -->
-    <th:block th:replace="${pageStyles} ?: ~{}"></th:block>
 </head>
 <body class="rpg-theme">
-    <header class="mb-4">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container">
-                <a class="navbar-brand rpg-font" th:href="@{/mercado}">
-                    <i class="fas fa-dragon me-2"></i>RPG Market
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarMain">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/mercado}">
-                                <i class="fas fa-store me-1"></i>Mercado do Reino
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/mercado/masmorra-dos-leiloes}">
-                                <i class="fas fa-gavel me-1"></i>Masmorra dos Leilões
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/mercado/ranking-dos-nobres}">
-                                <i class="fas fa-crown me-1"></i>Ranking dos Nobres
-                            </a>
-                        </li>
-                    </ul>
-                    
-                    <form class="d-flex me-3" th:action="@{/mercado/buscar}" method="get">
-                        <div class="input-group">
-                            <input class="form-control" type="search" name="keyword" placeholder="Buscar itens..." th:value="${keyword ?: ''}">
-                            <button class="btn btn-gold" type="submit"><i class="fas fa-search"></i></button>
-                        </div>
-                    </form>
-                    
-                    <!-- Menu do usuário não logado -->
-                    <ul class="navbar-nav" sec:authorize="!isAuthenticated()">
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/login}">
-                                <i class="fas fa-sign-in-alt me-1"></i>Entrar
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/aventureiro/registrar}">
-                                <i class="fas fa-user-plus me-1"></i>Registrar
-                            </a>
-                        </li>
-                    </ul>
-                    
-                    <!-- Menu do usuário logado -->
-                    <div class="dropdown" sec:authorize="isAuthenticated()">
-                        <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle me-1"></i>
-                            <span sec:authentication="name">Aventureiro</span>
-                            <span class="badge bg-gold ms-1">Nv. <span sec:authentication="principal.level">1</span></span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" th:href="@{/aventureiro/perfil}">
-                                    <i class="fas fa-user me-2"></i>Meu Perfil
-                                </a>
+    <!-- Define layout fragment -->
+    <div th:fragment="layout(content)" class="rpg-theme-wrapper">
+        <header class="mb-4">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container">
+                    <a class="navbar-brand rpg-font" th:href="@{/mercado}">
+                        <i class="fas fa-dragon me-2"></i>RPG Market
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarMain">
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/mercado}"><i class="fas fa-store me-1"></i>Mercado</a>
                             </li>
-                            <li>
-                                <a class="dropdown-item" th:href="@{/aventureiro/inventario}">
-                                    <i class="fas fa-box-open me-2"></i>Meu Inventário
-                                </a>
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/mercado/masmorra-dos-leiloes}"><i class="fas fa-gavel me-1"></i>Leilões</a>
                             </li>
-                            <li>
-                                <a class="dropdown-item" th:href="@{/item/novo}">
-                                    <i class="fas fa-plus-circle me-2"></i>Anunciar Item
-                                </a>
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/mercado/ranking-dos-nobres}"><i class="fas fa-crown me-1"></i>Ranking</a>
                             </li>
-                            <li>
-                                <a class="dropdown-item" th:href="@{/aventureiro/compras}">
-                                    <i class="fas fa-shopping-bag me-2"></i>Minhas Compras
-                                </a>
+                        </ul>
+                        
+                        <!-- Search Form -->
+                        <form class="d-flex search-form me-3" action="/mercado/buscar" method="get">
+                            <div class="input-group">
+                                <input class="form-control search-input" type="search" name="keyword" placeholder="Buscar itens mágicos..." aria-label="Search">
+                                <button class="btn btn-gold search-btn" type="submit"><i class="fas fa-search"></i></button>
+                            </div>
+                        </form>
+                        
+                        <ul class="navbar-nav">
+                            <li class="nav-item" sec:authorize="!isAuthenticated()">
+                                <a class="nav-link" th:href="@{/login}"><i class="fas fa-sign-in-alt me-1"></i>Entrar</a>
                             </li>
-                            <li>
-                                <a class="dropdown-item" th:href="@{/aventureiro/vendas}">
-                                    <i class="fas fa-coins me-2"></i>Minhas Vendas
+                            <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user-circle me-1"></i><span sec:authentication="name">User</span>
                                 </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form th:action="@{/logout}" method="post">
-                                    <button type="submit" class="dropdown-item">
-                                        <i class="fas fa-sign-out-alt me-2"></i>Sair
-                                    </button>
-                                </form>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" th:href="@{/perfil}"><i class="fas fa-user me-2"></i>Meu Perfil</a></li>
+                                    <li><a class="dropdown-item" th:href="@{/aventureiro/inventario}"><i class="fas fa-box-open me-2"></i>Inventário</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i>Sair</a></li>
+                                </ul>
                             </li>
                         </ul>
                     </div>
                 </div>
+            </nav>
+        </header>
+        
+        <main class="container py-4">
+            <div th:replace="${content}">
+                <!-- Content will be inserted here -->
             </div>
-        </nav>
-    </header>
-
-    <main class="container py-4">
-        <div th:fragment="content">
-            <!-- O conteúdo de cada página será inserido aqui -->
-            Conteúdo padrão
-        </div>
-    </main>
-
-    <footer class="bg-dark text-white py-4 mt-5">
-        <div class="container">
-            <div class="text-center">
-                <p class="mb-0">&copy; 2025 RPG Market - Todos os direitos reservados</p>
+        </main>
+        
+        <footer class="bg-dark text-white py-4 mt-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <h5 class="rpg-font mb-3">RPG Market</h5>
+                        <p class="mb-0">O melhor mercado de itens mágicos do reino!</p>
+                    </div>
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <h5 class="mb-3">Links Rápidos</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="/mercado" class="text-white text-decoration-none">Mercado</a></li>
+                            <li><a href="/mercado/masmorra-dos-leiloes" class="text-white text-decoration-none">Leilões</a></li>
+                            <li><a href="/mercado/ranking-dos-nobres" class="text-white text-decoration-none">Ranking</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h5 class="mb-3">Conecte-se</h5>
+                        <div class="d-flex gap-2">
+                            <a href="#" class="text-white fs-5"><i class="fab fa-discord"></i></a>
+                            <a href="#" class="text-white fs-5"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="text-white fs-5"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <p class="mb-0">&copy; 1564 RPG Market - Em caso de dúvida, mande um pombo para a Guilda Central </p>
+                </div>
+            </div>
+        </footer>
+        
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        
+        <!-- Custom JS -->
+        <script th:src="@{/js/script.js}"></script>
+    </div>
+    
+    <!-- Define content fragment as an alias for backward compatibility -->
+    <div th:fragment="content">
+        <div th:replace="~{layout/main :: layout(~{::div.content-wrapper})}">
+            <div class="content-wrapper">
+                <!-- Content here -->
             </div>
         </div>
-    </footer>
+    </div>
     
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Scripts específicos da página -->
+    <!-- Add the missing pageScripts fragment -->
     <th:block th:fragment="pageScripts">
-        <!-- Scripts padrão ou compartilhados vão aqui -->
+        <!-- This fragment is meant to be replaced with page-specific scripts -->
     </th:block>
-    
-    <!-- Custom JS -->
-    <script th:src="@{/js/script.js}"></script>
-    
-    <!-- Slot para scripts adicionais específicos da página -->
-    <th:block th:replace="${pageScripts} ?: ~{}"></th:block>
 </body>
 </html>

@@ -31,6 +31,7 @@ public class MarketController {
         model.addAttribute("products", productService.findAvailable(pageable));
         model.addAttribute("categories", ProductCategory.values());
         // Explicitly set view name with suffix
+        model.addAttribute("title", "Mercado do Reino - RPG Market");
         return "market/index";
     }
     

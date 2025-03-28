@@ -1,32 +1,41 @@
 :root {
-    --primary-color: #6f4e37;
-    --secondary-color: #d4af37;
+    --primary-color: #6f4e37;     /* Brown for wood themes */
+    --secondary-color: #d4af37;   /* Gold for accents */
     --text-color: #333;
-    --bg-color: #f5f5dc;
+    --bg-color: #f5f5dc;          /* Beige parchment background */
+    --accent-red: #8b0000;        /* Dark red for special elements */
+    --accent-green: #2e8b57;      /* Forest green */
 }
 
+/* Base styles */
 body.rpg-theme {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
     background-image: url('../images/parchment-bg.jpg');
     background-attachment: fixed;
+    position: relative;
 }
 
 .rpg-font {
     font-family: 'MedievalSharp', cursive;
 }
 
+/* RPG-themed UI components */
 .btn-gold {
     background-color: var(--secondary-color);
     color: #333;
     border-color: #b8860b;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s;
 }
 
 .btn-gold:hover {
     background-color: #b8860b;
     color: white;
     border-color: #8b6914;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 .border-gold {
@@ -38,48 +47,110 @@ body.rpg-theme {
     color: #333;
 }
 
-.parchment-bg {
-    background-color: rgba(255, 250, 227, 0.95);
-    border: 1px solid #d2b48c;
-    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.15);
-    position: relative;
+.text-gold-translucent {
+    color: var(--secondary-color);
+    opacity: 0.3;
 }
 
-.parchment-bg::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-image: url('../images/parchment-texture.jpg');
-    background-size: cover;
-    opacity: 0.1;
-    pointer-events: none;
-    z-index: -1;
+/* Layout components */
+.navbar {
+    background-image: linear-gradient(to bottom, #2d2d2d, #1a1a1a) !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    border-bottom: 2px solid var(--secondary-color);
+}
+
+.navbar-brand {
+    font-family: 'MedievalSharp', cursive;
+    font-size: 1.8rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Card styling for RPG theme */
+.card {
+    border: 1px solid #d2b48c;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.category-card {
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: 1px solid #d2b48c;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    border-color: var(--secondary-color);
+}
+
+.category-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+/* Additional icon mappings for categories */
+.category-icon .fas.fa-box-open {
+    color: var(--primary-color);
+    font-size: 2rem;
+}
+
+/* Category specific icons */
+[href*="ARMADURA_VESTIMENTA"] .category-icon i {
+    color: #8b4513;
+}
+
+[href*="ARMAS"] .category-icon i:before {
+    content: "\f6de"; /* fa-swords */
+    color: #696969;
+}
+
+[href*="POCOES_ELIXIRES"] .category-icon i:before {
+    content: "\f0c3"; /* fa-flask */
+    color: #ff7f50;
+}
+
+[href*="PERGAMINHOS_LIVROS"] .category-icon i:before {
+    content: "\f518"; /* fa-scroll */
+    color: #bdb76b;
+}
+
+[href*="JOIAS_ARTEFATOS"] .category-icon i:before {
+    content: "\f3a5"; /* fa-gem */
+    color: #9370db;
 }
 
 .product-card {
-    transition: transform 0.2s;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    transition: all 0.3s;
     border: 1px solid #d2b48c;
-    overflow: hidden;
 }
 
 .product-card:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
 .product-img-container {
     height: 200px;
     overflow: hidden;
     position: relative;
+    border-radius: 10px 10px 0 0;
 }
 
 .product-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.5s;
+}
+
+.product-card:hover .product-img {
+    transform: scale(1.05);
 }
 
 .product-category-badge {
@@ -87,12 +158,38 @@ body.rpg-theme {
     top: 10px;
     right: 10px;
     z-index: 1;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.8rem;
+    border-radius: 20px;
 }
 
 .product-price {
     font-weight: bold;
     color: #8b6914;
     font-size: 1.2rem;
+}
+
+.section-title {
+    border-bottom: 2px solid var(--secondary-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.section-title::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 80px;
+    height: 2px;
+    background-color: var(--primary-color);
+}
+
+/* Medieval styled elements */
+footer {
+    background-image: linear-gradient(to bottom, #2d2d2d, #1a1a1a) !important;
+    border-top: 2px solid var(--secondary-color);
 }
 
 .auction-timer {
@@ -103,16 +200,7 @@ body.rpg-theme {
     font-size: 0.8rem;
 }
 
-.bid-history {
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.profile-stat {
-    border-left: 3px solid var(--secondary-color);
-    padding-left: 1rem;
-}
-
+/* Inventory and profile elements */
 .inventory-empty {
     text-align: center;
     padding: 3rem 0;
@@ -124,6 +212,26 @@ body.rpg-theme {
     margin-bottom: 1rem;
 }
 
+.profile-stat {
+    border-left: 3px solid var(--secondary-color);
+    padding-left: 1rem;
+}
+
+/* Search bar styling */
+.search-form {
+    max-width: 400px;
+}
+
+.search-input {
+    border-radius: 20px 0 0 20px;
+    border: 1px solid #ccc;
+    padding-left: 1rem;
+}
+
+.search-btn {
+    border-radius: 0 20px 20px 0;
+}
+
 /* Estilos para paginação */
 .pagination .page-link {
     color: var(--primary-color);
@@ -133,4 +241,14 @@ body.rpg-theme {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
     color: white;
+}
+
+/* Z-index utilities */
+.z-1 {
+    z-index: 1;
+}
+
+/* Special icon classes for categories */
+.fas.fa-sword:before {
+    content: "\f71b"; /* This is fa-sword but fallback to another icon */
 }
