@@ -15,6 +15,31 @@ document.addEventListener('DOMContentLoaded', function() {
         return new bootstrap.Popover(popoverTriggerEl);
     });
     
+    // Inicializa dropdowns do Bootstrap de forma mais direta
+    const userDropdown = document.getElementById('userDropdown');
+    if (userDropdown) {
+        // Remover event listeners existentes para evitar conflitos
+        userDropdown.removeEventListener('click', userDropdownClickHandler);
+        
+        // Criar uma nova instância de dropdown
+        const dropdown = new bootstrap.Dropdown(userDropdown);
+        
+        // Adicionar listener de evento personalizado
+        userDropdown.addEventListener('click', userDropdownClickHandler);
+        
+        function userDropdownClickHandler(e) {
+            // Previne navegação para '#' que poderia fazer a página rolar para o topo
+            e.preventDefault();
+            // Alterna o estado do dropdown
+            dropdown.toggle();
+        }
+        
+        // Listener para foco, melhorando a acessibilidade
+        userDropdown.addEventListener('focus', function() {
+            dropdown.show();
+        });
+    }
+    
     // Funções específicas para determinadas páginas
     if (document.getElementById('countdown')) {
         updateAuctionCountdown();

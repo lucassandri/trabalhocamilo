@@ -4,6 +4,7 @@ import com.programacao_web.rpg_market.model.ProductCategory;
 import com.programacao_web.rpg_market.model.ProductStatus;
 import com.programacao_web.rpg_market.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -25,13 +26,21 @@ public class MarketController {
     @GetMapping
     public String showMarketplace(
             Model model, 
-            @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @Qualifier("products") @PageableDefault(size = 6, sort = "createdAt", direction = Sort.Direction.DESC) 
+            Pageable productPageable,
+            
+            @Qualifier("auctions") @PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) 
+            Pageable auctionPageable) {
         
         // Produtos de venda direta disponíveis
-        model.addAttribute("products", productService.findAvailable(pageable));
+        model.addAttribute("products", productService.findAvailable(productPageable).getContent());
+        
+        // Leilões ativos
+        model.addAttribute("auctions", productService.findActiveAuctions(auctionPageable).getContent());
+        
+        // Categorias para navegação
         model.addAttribute("categories", ProductCategory.values());
-        // Explicitly set view name with suffix
-        model.addAttribute("title", "Mercado do Reino - RPG Market");
+        
         return "market/index";
     }
     

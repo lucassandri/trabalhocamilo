@@ -1,0 +1,180 @@
+/* Market-specific styles */
+.market-section {
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    border-bottom: 2px solid var(--secondary-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.section-title::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 80px;
+    height: 2px;
+    background-color: var(--primary-color);
+}
+
+/* Category cards */
+.category-card {
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: 1px solid #d2b48c;
+    background: linear-gradient(to bottom, #f7f3e3, #e8d8b5);
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    border-color: var(--secondary-color);
+}
+
+.category-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--secondary-color);
+}
+
+/* Category specific icons */
+.category-icon .fas.fa-box-open {
+    color: var(--primary-color);
+    font-size: 2rem;
+}
+
+[href*="ARMADURA_VESTIMENTA"] .category-icon i {
+    color: #8b4513;
+}
+
+[href*="ARMAS"] .category-icon i:before {
+    content: "\f6de"; /* fa-swords */
+    color: #696969;
+}
+
+[href*="POCOES_ELIXIRES"] .category-icon i:before {
+    content: "\f0c3"; /* fa-flask */
+    color: #ff7f50;
+}
+
+[href*="PERGAMINHOS_LIVROS"] .category-icon i:before {
+    content: "\f518"; /* fa-scroll */
+    color: #bdb76b;
+}
+
+[href*="JOIAS_ARTEFATOS"] .category-icon i:before {
+    content: "\f3a5"; /* fa-gem */
+    color: #9370db;
+}
+
+/* Special icon classes for categories */
+.fas.fa-sword:before {
+    content: "\f71b"; /* This is fa-sword but fallback to another icon */
+}
+
+/* Inventory empty state */
+.inventory-empty {
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.inventory-empty i {
+    font-size: 3rem;
+    color: #ccc;
+    margin-bottom: 1rem;
+}
+
+/* Pagination styling */
+.pagination .page-link {
+    color: var(--primary-color);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Medieval bulletin board style */
+.bulletin-board {
+    background-color: #f5e7c1;
+    border: 15px solid #8b5a2b;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2), inset 0 0 10px rgba(0,0,0,0.1);
+    position: relative;
+    padding: 20px;
+}
+
+.auction-area {
+    background-color: #eadec0;
+    border: 15px solid #6d4423;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2), inset 0 0 10px rgba(0,0,0,0.1);
+    position: relative;
+    padding: 20px;
+}
+
+.welcome-banner {
+    background-image: url('../images/parchment-bg.jpg');
+    background-position: center;
+    background-size: cover;
+    border: 2px solid var(--secondary-color);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.market-item {
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 2px solid #d2b48c;
+    transform: rotate(0deg);
+}
+
+.market-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.auction-item {
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 2px solid #c19a6b;
+    transform: rotate(0deg);
+}
+
+.auction-item:hover {
+    transform: translateY(-5px) rotate(1deg);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.auction-timer {
+    background-color: #fff3cd;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    border-left: 4px solid #ffc107;
+}
+
+.notice-card {
+    border: 2px solid var(--secondary-color);
+    background: linear-gradient(to bottom, #f8f4e3, #eae0c9);
+    transition: all 0.3s ease;
+}
+
+.notice-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* Responsiveness adjustments */
+@media (max-width: 768px) {
+    .bulletin-board, .auction-area {
+        border-width: 10px;
+        padding: 15px;
+    }
+}

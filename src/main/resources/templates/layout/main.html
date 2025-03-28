@@ -14,12 +14,15 @@
     <!-- Google Fonts - Medieval Sharp -->
     <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
     
-    <!-- CSS personalizado - Use absolute path to ensure it's found -->
-    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <!-- CSS files -->
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <link th:href="@{/css/market.css}" rel="stylesheet">
+    <link th:href="@{/css/product.css}" rel="stylesheet">
+    <link th:href="@{/css/user.css}" rel="stylesheet">
 </head>
 <body class="rpg-theme">
-    <!-- Define layout fragment -->
-    <div th:fragment="layout(content)" class="rpg-theme-wrapper">
+    <!-- Main content fragment for layout inclusion -->
+    <div th:fragment="mainContent" class="d-flex flex-column min-vh-100">
         <header class="mb-4">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div class="container">
@@ -55,11 +58,12 @@
                                 <a class="nav-link" th:href="@{/login}"><i class="fas fa-sign-in-alt me-1"></i>Entrar</a>
                             </li>
                             <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
-                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" 
+                                   data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-user-circle me-1"></i><span sec:authentication="name">User</span>
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" th:href="@{/perfil}"><i class="fas fa-user me-2"></i>Meu Perfil</a></li>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li><a class="dropdown-item" th:href="@{/aventureiro/perfil}"><i class="fas fa-user me-2"></i>Meu Perfil</a></li>
                                     <li><a class="dropdown-item" th:href="@{/aventureiro/inventario}"><i class="fas fa-box-open me-2"></i>Inventário</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i>Sair</a></li>
@@ -71,13 +75,15 @@
             </nav>
         </header>
         
-        <main class="container py-4">
-            <div th:replace="${content}">
-                <!-- Content will be inserted here -->
+        <main class="container py-4 flex-grow-1">
+            <!-- This is where page-specific content is inserted -->
+            <div class="content-wrapper" th:replace="${content} ?: ~{}">
+                <!-- Default content if none is provided -->
+                Conteúdo padrão
             </div>
         </main>
         
-        <footer class="bg-dark text-white py-4 mt-5">
+        <footer class="bg-dark text-white py-4">
             <div class="container">
                 <div class="row">
                     <div class="col-md-4 mb-3 mb-md-0">
@@ -102,30 +108,29 @@
                     </div>
                 </div>
                 <div class="text-center mt-3">
-                    <p class="mb-0">&copy; 1564 RPG Market - Em caso de dúvida, mande um pombo para a Guilda Central </p>
+                    <p class="mb-0">&copy; 1564 RPG Market - Em caso de dúvida, mande um pombo para a Guilda Central</p>
                 </div>
             </div>
         </footer>
         
         <!-- Bootstrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        
-        <!-- Custom JS -->
         <script th:src="@{/js/script.js}"></script>
     </div>
     
-    <!-- Define content fragment as an alias for backward compatibility -->
-    <div th:fragment="content">
-        <div th:replace="~{layout/main :: layout(~{::div.content-wrapper})}">
-            <div class="content-wrapper">
-                <!-- Content here -->
-            </div>
-        </div>
+    <!-- Old layout fragment kept for backward compatibility -->
+    <div th:fragment="layout(content)">
+        <div th:replace="~{layout/main :: mainContent}"></div>
     </div>
     
-    <!-- Add the missing pageScripts fragment -->
+    <!-- Legacy content fragment -->
+    <div th:fragment="content">
+        <div th:replace="~{layout/main :: mainContent}"></div>
+    </div>
+    
+    <!-- Page scripts fragment -->
     <th:block th:fragment="pageScripts">
-        <!-- This fragment is meant to be replaced with page-specific scripts -->
+        <!-- Placeholder for page-specific scripts -->
     </th:block>
 </body>
 </html>

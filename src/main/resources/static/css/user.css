@@ -1,0 +1,70 @@
+/* User-specific styling */
+
+/* Profile stat styling */
+.profile-stat {
+    border-left: 3px solid var(--secondary-color);
+    padding-left: 1rem;
+}
+
+/* User cards - login, register, profile */
+.user-card {
+    max-width: 500px;
+    margin: 0 auto;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.user-card .card-body {
+    padding: 2.5rem;
+}
+
+.user-card .form-label {
+    font-weight: 500;
+}
+
+.user-card .input-group-text {
+    background-color: #f8f9fa;
+}
+
+.user-hero {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.user-hero .icon {
+    font-size: 3rem;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+}
+
+.user-hero .title {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Character class selector */
+.character-class-selector {
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    overflow: hidden;
+}
+
+.character-class {
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.character-class:hover {
+    background-color: #f8f9fa;
+}
+
+.character-class.selected {
+    background-color: rgba(212, 175, 55, 0.2);
+    border-left: 3px solid var(--secondary-color);
+}
+
+.character-class-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}

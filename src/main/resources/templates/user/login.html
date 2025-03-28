@@ -15,18 +15,20 @@
     <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/user.css}">
 </head>
 <body class="rpg-theme">
     <div class="container my-5">
         <div class="row justify-content-center">
             <div class="col-md-6">
-                <div class="card border-gold shadow">
+                <div class="card border-gold shadow user-card">
                     <div class="card-body p-5">
-                        <div class="text-center mb-4">
-                            <h2 class="rpg-font mb-3">
-                                <i class="fas fa-dungeon me-2"></i>RPG Market
-                            </h2>
+                        <div class="text-center mb-4 user-hero">
+                            <div class="icon">
+                                <i class="fas fa-dungeon"></i>
+                            </div>
+                            <h2 class="rpg-font title">RPG Market</h2>
                             <p class="mb-0">Entre no reino para comprar e vender itens mágicos!</p>
                         </div>
                         
