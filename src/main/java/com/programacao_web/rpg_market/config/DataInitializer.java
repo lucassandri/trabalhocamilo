@@ -34,6 +34,41 @@ public class DataInitializer {
     @Bean
     CommandLineRunner initData() {
         return args -> {
+            // Create default admin user if it doesn't exist
+            if (userRepository.findByUsername("admin").isEmpty()) {
+                User admin = new User();
+                admin.setUsername("admin");
+                admin.setPassword(passwordEncoder.encode("admin"));
+                admin.setEmail("admin@rpgmarket.com");
+                admin.setCharacterClass("Mago Supremo");
+                admin.setLevel(50);
+                admin.setExperience(5000);
+                admin.setGoldCoins(9999);
+                admin.setRole(UserRole.MESTRE); // Set admin role
+                admin = userRepository.save(admin);
+                
+                System.out.println("Admin user created with username 'admin' and password 'admin'");
+                
+                // Create sample products for the admin
+                createSampleProducts(admin);
+            }
+            
+            // Create regular test user if it doesn't exist
+            if (userRepository.findByUsername("aventureiro").isEmpty()) {
+                User regularUser = new User();
+                regularUser.setUsername("aventureiro");
+                regularUser.setPassword(passwordEncoder.encode("senha123"));
+                regularUser.setEmail("aventureiro@rpgmarket.com");
+                regularUser.setCharacterClass("Guerreiro");
+                regularUser.setLevel(5);
+                regularUser.setExperience(520);
+                regularUser.setGoldCoins(500);
+                regularUser.setRole(UserRole.AVENTUREIRO);
+                userRepository.save(regularUser);
+                
+                System.out.println("Regular user created with username 'aventureiro' and password 'senha123'");
+            }
+            
             // Verifica se já existem dados
             if (userRepository.count() > 0) {
                 return;  // Não inicializa dados novamente
@@ -42,15 +77,15 @@ public class DataInitializer {
             System.out.println("Inicializando dados de teste...");
             
             // Criar usuários
-            User admin = new User();
-            admin.setUsername("mestre");
-            admin.setPassword(passwordEncoder.encode("senha123"));
-            admin.setEmail("mestre@rpgmarket.com");
-            admin.setCharacterClass("Mestre");
-            admin.setLevel(30);
-            admin.setExperience(2950);
-            admin.setGoldCoins(5000);
-            admin.setRole(UserRole.MESTRE);
+            User mestre = new User();
+            mestre.setUsername("mestre");
+            mestre.setPassword(passwordEncoder.encode("senha123"));
+            mestre.setEmail("mestre@rpgmarket.com");
+            mestre.setCharacterClass("Mestre");
+            mestre.setLevel(30);
+            mestre.setExperience(2950);
+            mestre.setGoldCoins(5000);
+            mestre.setRole(UserRole.MESTRE);
             
             User user1 = new User();
             user1.setUsername("gandalf");
@@ -80,7 +115,7 @@ public class DataInitializer {
             user3.setGoldCoins(250);
             
             // Salva usuários
-            List<User> users = Arrays.asList(admin, user1, user2, user3);
+            List<User> users = Arrays.asList(mestre, user1, user2, user3);
             userRepository.saveAll(users);
             
             // Criar produtos para venda direta
@@ -188,5 +223,47 @@ public class DataInitializer {
             
             System.out.println("Dados de teste inicializados com sucesso!");
         };
+    }
+    
+    private void createSampleProducts(User admin) {
+        // Create some sample products
+        Product espada = new Product();
+        espada.setName("Espada Élfica Luminosa");
+        espada.setDescription("Uma espada de aura élfica que brilha na presença de inimigos. Ideal para aventuras noturnas em masmorras.");
+        espada.setPrice(BigDecimal.valueOf(299.99));
+        espada.setCategory(ProductCategory.ARMAS);
+        espada.setType(ProductType.DIRECT_SALE);
+        espada.setStatus(ProductStatus.AVAILABLE);
+        espada.setSeller(admin);
+        espada.setCreatedAt(LocalDateTime.now());
+        espada.setImageUrl("espada_elfica.jpg");
+        productRepository.save(espada);
+        
+        Product armadura = new Product();
+        armadura.setName("Armadura de Couro de Dragão");
+        armadura.setDescription("Armadura leve feita com escamas de dragão. Oferece alta proteção sem comprometer a agilidade.");
+        armadura.setPrice(BigDecimal.valueOf(599.99));
+        armadura.setCategory(ProductCategory.ARMADURA_VESTIMENTA);
+        armadura.setType(ProductType.DIRECT_SALE);
+        armadura.setStatus(ProductStatus.AVAILABLE);
+        armadura.setSeller(admin);
+        armadura.setCreatedAt(LocalDateTime.now());
+        armadura.setImageUrl("armadura_couro.jpg");
+        productRepository.save(armadura);
+        
+        Product pocao = new Product();
+        pocao.setName("Poção de Cura Superior");
+        pocao.setDescription("Recupera instantaneamente 80% da vida. Fabricada por alquimistas mestres da montanha.");
+        pocao.setPrice(BigDecimal.valueOf(49.99));
+        pocao.setCategory(ProductCategory.POCOES_ELIXIRES);
+        pocao.setType(ProductType.AUCTION);
+        pocao.setStatus(ProductStatus.AUCTION_ACTIVE);
+        pocao.setSeller(admin);
+        pocao.setCreatedAt(LocalDateTime.now());
+        pocao.setAuctionEndDate(LocalDateTime.now().plusDays(5));
+        pocao.setImageUrl("pocao_cura.jpg");
+        productRepository.save(pocao);
+        
+        System.out.println("Sample products created for admin user");
     }
 }

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil - RPG Market</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    
+    <!-- CSS arquivos -->
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link th:href="@{/css/market.css}" rel="stylesheet">
+    <link th:href="@{/css/product.css}" rel="stylesheet">
+    <link th:href="@{/css/user.css}" rel="stylesheet">
+</head>
+<body class="rpg-theme">
+    <!-- Include header fragment -->
+    <div th:insert="~{fragments/header :: header}"></div>
+    
+    <main class="container py-4 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="rpg-font">
+                <i class="fas fa-user-edit me-2"></i>Editar Perfil
+            </h1>
+            <div>
+                <a th:href="@{/aventureiro/perfil}" class="btn btn-outline-dark">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar ao Perfil
+                </a>
+            </div>
+        </div>
+        
+        <div class="card border-gold">
+            <div class="card-header bg-dark text-light">
+                <h3 class="rpg-font mb-0">
+                    <i class="fas fa-user me-2"></i>Informações do Aventureiro
+                </h3>
+            </div>
+            <div class="card-body p-4">
+                <div th:if="${success}" class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${success}">Perfil atualizado com sucesso!</span>
+                </div>
+                
+                <div th:if="${error}" class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span th:text="${error}">Erro ao atualizar perfil.</span>
+                </div>
+                
+                <form th:action="@{/aventureiro/editar-perfil}" method="post" th:object="${user}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="username" class="form-label">Nome de Aventureiro</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="username" th:field="*{username}" disabled>
+                            </div>
+                            <div class="form-text">O nome de aventureiro não pode ser alterado.</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Pergaminho Mágico (E-mail)*</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="characterClass" class="form-label">Classe do Personagem*</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-hat-wizard"></i></span>
+                                <select class="form-select" id="characterClass" th:field="*{characterClass}" required>
+                                    <option value="Guerreiro">Guerreiro</option>
+                                    <option value="Mago">Mago</option>
+                                    <option value="Clérigo">Clérigo</option>
+                                    <option value="Ladino">Ladino</option>
+                                    <option value="Druida">Druida</option>
+                                    <option value="Bardo">Bardo</option>
+                                    <option value="Paladino">Paladino</option>
+                                    <option value="Ranger">Ranger</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="level" class="form-label">Nível</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-star"></i></span>
+                                <input type="number" class="form-control" id="level" th:field="*{level}" disabled>
+                            </div>
+                            <div class="form-text">O nível aumenta conforme você ganha experiência.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="experience" class="form-label">Experiência</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-medal"></i></span>
+                                <input type="number" class="form-control" id="experience" th:field="*{experience}" disabled>
+                            </div>
+                            <div class="form-text">Ganhe XP completando transações.</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="goldCoins" class="form-label">Moedas de Ouro</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-coins text-warning"></i></span>
+                                <input type="number" class="form-control" id="goldCoins" th:field="*{goldCoins}" disabled>
+                            </div>
+                            <div class="form-text">Use suas moedas para comprar itens.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span>Alguns campos não podem ser alterados, pois são controlados pelo sistema de progressão.</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a th:href="@{/aventureiro/perfil}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-gold">
+                            <i class="fas fa-save me-2"></i>Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Include footer fragment -->
+    <div th:insert="~{fragments/footer :: footer}"></div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/script.js}"></script>
+</body>
+</html>

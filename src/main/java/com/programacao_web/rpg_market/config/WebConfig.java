@@ -12,7 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     @Bean
-    public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> containerCustomizer() {
+    WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> containerCustomizer() {
         return factory -> {
             factory.addErrorPages(
                 new ErrorPage(HttpStatus.NOT_FOUND, "/error/404"),

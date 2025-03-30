@@ -1,11 +1,11 @@
-/* Common Base Styles */
+/* CSS variables */
 :root {
-    --primary-color: #6f4e37;     /* Brown for wood themes */
-    --secondary-color: #d4af37;   /* Gold for accents */
+    --primary-color: #704214;
+    --secondary-color: #d4af37;
+    --bg-color: #f8f5e6;
     --text-color: #333;
-    --bg-color: #f5f5dc;          /* Beige parchment background */
-    --accent-red: #8b0000;        /* Dark red for special elements */
-    --accent-green: #2e8b57;      /* Forest green */
+    --header-bg: #2a2a2a;
+    --footer-bg: #2a2a2a;
 }
 
 /* Base styles */
@@ -22,10 +22,10 @@ body.rpg-theme {
     background-attachment: fixed;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    min-height: 100vh; /* Full viewport height */
 }
 
-/* Main content area should expand to push footer down */
+/* Make main content expand to push footer down */
 main.container {
     flex: 1 0 auto;
 }
@@ -70,11 +70,6 @@ footer {
 .bg-gold {
     background-color: var(--secondary-color) !important;
     color: #333;
-}
-
-.text-gold-translucent {
-    color: var(--secondary-color);
-    opacity: 0.3;
 }
 
 /* Layout components */

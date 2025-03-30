@@ -77,7 +77,7 @@
     content: "\f71b"; /* This is fa-sword but fallback to another icon */
 }
 
-/* Inventory empty state */
+/* Inventory page specific styles */
 .inventory-empty {
     text-align: center;
     padding: 3rem 0;
@@ -85,8 +85,18 @@
 
 .inventory-empty i {
     font-size: 3rem;
-    color: #ccc;
-    margin-bottom: 1rem;
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
+}
+
+.empty-inventory-container {
+    background-image: url('../images/parchment-bg.jpg');
+    background-position: center;
+    background-size: cover;
+    border: 2px solid var(--secondary-color);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
 /* Pagination styling */
@@ -155,9 +165,8 @@
 
 .auction-timer {
     background-color: #fff3cd;
-    border-radius: 5px;
-    font-size: 0.9rem;
     border-left: 4px solid #ffc107;
+    font-size: 0.9rem;
 }
 
 .notice-card {
@@ -169,6 +178,36 @@
 .notice-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.product-card {
+    transition: all 0.3s ease;
+    border: 2px solid #d2b48c;
+    transform: rotate(0deg);
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    border-color: var(--secondary-color);
+}
+
+/* Tabs styling */
+.nav-tabs .nav-link {
+    color: #555;
+    border-bottom: none;
+    font-family: 'MedievalSharp', cursive;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    border-color: var(--secondary-color) var(--secondary-color) #fff;
+    font-weight: bold;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+    border-color: #f0f0f0 #f0f0f0 #dee2e6;
+    background-color: #f9f9f9;
 }
 
 /* Responsiveness adjustments */

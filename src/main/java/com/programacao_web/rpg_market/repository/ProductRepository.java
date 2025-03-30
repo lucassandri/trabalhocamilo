@@ -24,4 +24,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> searchByNameAndStatus(@Param("keyword") String keyword, @Param("status") ProductStatus status, Pageable pageable);
     
     List<Product> findByStatusAndAuctionEndDateLessThanEqual(ProductStatus status, LocalDateTime dateTime);
+    List<Product> findBySeller(User seller);
+    List<Product> findBySellerAndStatusIn(User seller, List<ProductStatus> statuses);
 }

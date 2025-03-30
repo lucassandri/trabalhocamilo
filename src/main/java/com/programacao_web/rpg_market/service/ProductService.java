@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -258,5 +259,28 @@ public class ProductService {
      */
     public List<User> getTopBuyers() {
         return transactionRepository.findTopBuyers();
+    }
+
+    /**
+     * Find all products owned by a user
+     */
+    public List<Product> findByUser(User user) {
+        return productRepository.findBySeller(user);
+    }
+    
+    /**
+     * Find active products (available or auction) owned by a user
+     */
+    public List<Product> findActiveByUser(User user) {
+        return productRepository.findBySellerAndStatusIn(
+            user, Arrays.asList(ProductStatus.AVAILABLE, ProductStatus.AUCTION_ACTIVE));
+    }
+    
+    /**
+     * Find sold products owned by a user
+     */
+    public List<Product> findSoldByUser(User user) {
+        return productRepository.findBySellerAndStatusIn(
+            user, Arrays.asList(ProductStatus.SOLD, ProductStatus.AUCTION_ENDED));
     }
 }

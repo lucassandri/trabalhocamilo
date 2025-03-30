@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <footer th:fragment="footer" class="bg-dark text-white py-4 mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5 class="rpg-font mb-3">RPG Market</h5>
+                    <p class="mb-0">O melhor mercado de itens mágicos do reino!</p>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5 class="mb-3">Links Rápidos</h5>
+                    <ul class="list-unstyled">
+                        <li><a th:href="@{/mercado}" class="text-white text-decoration-none">Mercado</a></li>
+                        <li><a th:href="@{/mercado/masmorra-dos-leiloes}" class="text-white text-decoration-none">Leilões</a></li>
+                        <li><a th:href="@{/mercado/ranking-dos-nobres}" class="text-white text-decoration-none">Ranking</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="mb-3">Conecte-se</h5>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="text-white fs-5"><i class="fab fa-discord"></i></a>
+                        <a href="#" class="text-white fs-5"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white fs-5"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <p class="mb-0">&copy; 1564 RPG Market - Em caso de dúvida, mande um pombo para a Guilda Central</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

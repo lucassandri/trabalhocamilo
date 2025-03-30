@@ -16,6 +16,7 @@
     
     <!-- CSS files -->
     <link th:href="@{/css/common.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
     <link th:href="@{/css/market.css}" rel="stylesheet">
     <link th:href="@{/css/product.css}" rel="stylesheet">
     <link th:href="@{/css/user.css}" rel="stylesheet">
@@ -62,7 +63,7 @@
                                    data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-user-circle me-1"></i><span sec:authentication="name">User</span>
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" th:href="@{/aventureiro/perfil}"><i class="fas fa-user me-2"></i>Meu Perfil</a></li>
                                     <li><a class="dropdown-item" th:href="@{/aventureiro/inventario}"><i class="fas fa-box-open me-2"></i>Inventário</a></li>
                                     <li><hr class="dropdown-divider"></li>
@@ -77,13 +78,13 @@
         
         <main class="container py-4 flex-grow-1">
             <!-- This is where page-specific content is inserted -->
-            <div class="content-wrapper" th:replace="${content} ?: ~{}">
+            <div class="content-wrapper" th:insert="~{${content}}">
                 <!-- Default content if none is provided -->
                 Conteúdo padrão
             </div>
         </main>
         
-        <footer class="bg-dark text-white py-4">
+        <footer class="bg-dark text-white py-4 mt-auto" th:fragment="footer">
             <div class="container">
                 <div class="row">
                     <div class="col-md-4 mb-3 mb-md-0">
@@ -93,9 +94,9 @@
                     <div class="col-md-4 mb-3 mb-md-0">
                         <h5 class="mb-3">Links Rápidos</h5>
                         <ul class="list-unstyled">
-                            <li><a href="/mercado" class="text-white text-decoration-none">Mercado</a></li>
-                            <li><a href="/mercado/masmorra-dos-leiloes" class="text-white text-decoration-none">Leilões</a></li>
-                            <li><a href="/mercado/ranking-dos-nobres" class="text-white text-decoration-none">Ranking</a></li>
+                            <li><a th:href="@{/mercado}" class="text-white text-decoration-none">Mercado</a></li>
+                            <li><a th:href="@{/mercado/masmorra-dos-leiloes}" class="text-white text-decoration-none">Leilões</a></li>
+                            <li><a th:href="@{/mercado/ranking-dos-nobres}" class="text-white text-decoration-none">Ranking</a></li>
                         </ul>
                     </div>
                     <div class="col-md-4">
@@ -112,21 +113,22 @@
                 </div>
             </div>
         </footer>
-        
-        <!-- Bootstrap JS -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script th:src="@{/js/script.js}"></script>
     </div>
     
-    <!-- Old layout fragment kept for backward compatibility -->
+    <!-- Additional fragments kept for backward compatibility -->
+    <div th:fragment="header" class="d-none"></div>
+    
     <div th:fragment="layout(content)">
         <div th:replace="~{layout/main :: mainContent}"></div>
     </div>
     
-    <!-- Legacy content fragment -->
     <div th:fragment="content">
         <div th:replace="~{layout/main :: mainContent}"></div>
     </div>
+    
+    <!-- Bootstrap JS - Must be at the end of body -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/script.js}"></script>
     
     <!-- Page scripts fragment -->
     <th:block th:fragment="pageScripts">

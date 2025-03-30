@@ -65,4 +65,53 @@ public class UserService {
     public List<Transaction> getUserSales(User user) {
         return transactionRepository.findBySeller(user);
     }
+    
+    /**
+     * Altera a senha do usuário
+     */
+    @Transactional
+    public void changePassword(User user, String currentPassword, String newPassword, String confirmPassword) {
+        try {
+            // Verifica se a senha atual está correta
+            if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+                throw new IllegalArgumentException("Senha atual incorreta");
+            }
+            
+            // Verifica se a nova senha e a confirmação são iguais
+            if (!newPassword.equals(confirmPassword)) {
+                throw new IllegalArgumentException("A nova senha e a confirmação não correspondem");
+            }
+            
+            // Verifica se a nova senha tem pelo menos 6 caracteres
+            if (newPassword.length() < 6) {
+                throw new IllegalArgumentException("A nova senha deve ter pelo menos 6 caracteres");
+            }
+            
+            // Atualiza a senha
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+            System.out.println("Senha alterada com sucesso para o usuário: " + user.getUsername());
+        } catch (Exception e) {
+            System.err.println("Erro ao alterar senha: " + e.getMessage());
+            throw e;
+        }
+    }
+    
+    /**
+     * Atualiza o perfil do usuário
+     */
+    @Transactional
+    public void updateProfile(User currentUser, User updatedUser) {
+        // Verifica se o email foi alterado e se já está em uso
+        if (!currentUser.getEmail().equals(updatedUser.getEmail()) && 
+            userRepository.existsByEmail(updatedUser.getEmail())) {
+            throw new IllegalArgumentException("Este email já está sendo usado por outro aventureiro");
+        }
+        
+        // Atualiza apenas os campos permitidos
+        currentUser.setEmail(updatedUser.getEmail());
+        currentUser.setCharacterClass(updatedUser.getCharacterClass());
+        
+        userRepository.save(currentUser);
+    }
 }

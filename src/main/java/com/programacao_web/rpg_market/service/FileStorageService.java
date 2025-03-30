@@ -2,6 +2,7 @@ package com.programacao_web.rpg_market.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -14,32 +15,61 @@ import java.util.UUID;
 @Service
 public class FileStorageService {
 
-    @Value("${rpg.market.upload.dir}")
-    private String uploadDir;
+    private final Path fileStorageLocation;
 
-    public String storeFile(MultipartFile file) {
+    public FileStorageService(@Value("${rpg.market.upload-dir}") String uploadDir) {
+        this.fileStorageLocation = Paths.get(uploadDir)
+                .toAbsolutePath().normalize();
+        
         try {
-            Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
-            
-            // Cria diretório se não existir
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-            
-            // Gera nome único para o arquivo
-            String uniqueFileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            Path targetLocation = uploadPath.resolve(uniqueFileName);
-            
-            // Copia o arquivo para o diretório de destino
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-            
-            return uniqueFileName;
-        } catch (IOException ex) {
-            throw new RuntimeException("Não foi possível armazenar o arquivo " + file.getOriginalFilename(), ex);
+            Files.createDirectories(this.fileStorageLocation);
+        } catch (Exception ex) {
+            throw new RuntimeException("Could not create the directory where the uploaded files will be stored", ex);
         }
     }
 
+    public String storeFile(MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+        
+        // Generate unique filename
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null) {
+            originalFilename = "unknown_file";
+        }
+        originalFilename = StringUtils.cleanPath(originalFilename);
+
+        // Handle case where there's no file extension
+        String fileExtension = "";
+        if (originalFilename.contains(".")) {
+            fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+
+        String fileName = UUID.randomUUID().toString() + fileExtension;
+        
+        // Save file
+        Path targetLocation = this.fileStorageLocation.resolve(fileName);
+        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+        
+        return fileName;
+    }
+    
+    public void deleteFile(String fileName) {
+        try {
+            Path filePath = this.fileStorageLocation.resolve(fileName);
+            Files.deleteIfExists(filePath);
+        } catch (IOException ex) {
+            throw new RuntimeException("Error deleting file: " + fileName, ex);
+        }
+    }
+    
+    /**
+     * Returns the path to a file in the storage location
+     * @param fileName The name of the file
+     * @return The complete path to the file
+     */
     public Path getFilePath(String fileName) {
-        return Paths.get(uploadDir).toAbsolutePath().normalize().resolve(fileName);
+        return this.fileStorageLocation.resolve(fileName);
     }
 }
