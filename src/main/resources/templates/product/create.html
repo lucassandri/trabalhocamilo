@@ -1,200 +1,300 @@
 <!DOCTYPE html>
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Criar Item - RPG Market</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anunciar Item - RPG Market</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts - Medieval Sharp -->
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    
+    <!-- CSS files -->
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link th:href="@{/css/market.css}" rel="stylesheet">
+    <link th:href="@{/css/product.css}" rel="stylesheet">
+    <link th:href="@{/css/user.css}" rel="stylesheet">
+    <link th:href="@{/css/item-creation.css}" rel="stylesheet">
 </head>
-<body>
-    <div th:replace="~{layout/main :: content}">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="rpg-font">
-                <i class="fas fa-plus-circle me-2"></i>Criar Novo Item
-            </h1>
-            <div>
-                <a th:href="@{/aventureiro/inventario}" class="btn btn-outline-dark">
-                    <i class="fas fa-arrow-left me-2"></i>Voltar ao Inventário
-                </a>
+<body class="rpg-theme">
+    <!-- Include the header -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+        <main class="container py-4 flex-grow-1">
+            <!-- Pergaminho título -->
+            <div class="scroll-header mb-4">
+                <h1 class="rpg-font">
+                    <i class="fas fa-scroll me-2"></i>Anunciar Item Mágico
+                </h1>
             </div>
-        </div>
-        
-        <form th:action="@{/item/novo}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
-            <div class="row mb-4">
-                <div class="col-md-8">
-                    <!-- Informações Básicas -->
-                    <div class="card border-gold mb-4">
-                        <div class="card-header bg-dark text-light">
-                            <h3 class="rpg-font mb-0">
-                                <i class="fas fa-info-circle me-2"></i>Informações Básicas
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Nome do Item*</label>
-                                <input type="text" class="form-control" id="name" name="name" required
-                                       placeholder="Ex: Espada Lendária de Aço Élfico">
-                                <div class="invalid-feedback">
-                                    Por favor, informe um nome para o item.
-                                </div>
+            
+            <!-- Alerts for feedback -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${success}">Sucesso!</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span th:text="${error}">Erro!</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            
+            <!-- Item Creation Form -->
+            <form th:action="@{/item/novo}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <div class="row">
+                    <!-- Coluna esquerda - Informações básicas e preço -->
+                    <div class="col-md-8">
+                        <div class="card border-gold shadow-sm mb-4">
+                            <div class="card-header bg-dark text-light">
+                                <h3 class="rpg-font mb-0"><i class="fas fa-info-circle me-2"></i>Informações Básicas</h3>
                             </div>
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Descrição</label>
-                                <textarea class="form-control" id="description" name="description" rows="4"
-                                          placeholder="Descreva seu item em detalhes..."></textarea>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="category" class="form-label">Categoria*</label>
-                                    <select class="form-select" id="category" name="category" required>
-                                        <option value="" selected disabled>Selecione uma categoria</option>
-                                        <option th:each="category : ${categories}" 
-                                                th:value="${category}" 
-                                                th:text="${category.displayName}">Categoria</option>
-                                    </select>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Nome do Item</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
                                     <div class="invalid-feedback">
-                                        Por favor, selecione uma categoria.
+                                        Por favor, informe o nome do item.
                                     </div>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="type" class="form-label">Tipo de Venda*</label>
+                                
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Descrição</label>
+                                    <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                                    <div class="invalid-feedback">
+                                        Por favor, descreva as características do item.
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="category" class="form-label">Categoria</label>
+                                        <select class="form-select" id="category" name="category" required>
+                                            <option value="" selected disabled>Selecione uma categoria</option>
+                                            <option th:each="categoryOption : ${categories}" 
+                                                    th:value="${categoryOption}" 
+                                                    th:text="${categoryOption.displayName}">Categoria</option>
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Por favor, selecione uma categoria.
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="rarity" class="form-label">Raridade</label>
+                                        <select class="form-select" id="rarity" name="rarity" required>
+                                            <option value="" selected disabled>Selecione uma raridade</option>
+                                            <option th:each="rarityOption : ${rarities}" 
+                                                    th:value="${rarityOption}" 
+                                                    th:text="${rarityOption.displayName}">Raridade</option>
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Por favor, selecione a raridade do item.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card border-gold shadow-sm mb-4">
+                            <div class="card-header bg-dark text-light">
+                                <h3 class="rpg-font mb-0"><i class="fas fa-coins me-2"></i>Preço e Tipo</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="type" class="form-label">Tipo de Venda</label>
                                     <select class="form-select" id="type" name="type" required>
-                                        <option value="" selected disabled>Selecione um tipo</option>
-                                        <option th:each="type : ${types}" 
-                                                th:value="${type}" 
-                                                th:text="${type == T(com.programacao_web.rpg_market.model.ProductType).DIRECT_SALE ? 'Venda Direta' : 
-                                                         (type == T(com.programacao_web.rpg_market.model.ProductType).AUCTION ? 'Leilão' : 'Negociável')}">
-                                            Tipo
-                                        </option>
+                                        <option value="" selected disabled>Selecione o tipo de venda</option>
+                                        <option value="DIRECT_SALE">Venda Direta</option>
+                                        <option value="AUCTION">Leilão</option>
                                     </select>
                                     <div class="invalid-feedback">
-                                        Por favor, selecione um tipo de venda.
+                                        Por favor, selecione o tipo de venda.
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">Preço (Moedas de Ouro)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text gold-icon"><i class="fas fa-coins"></i></span>
+                                        <input type="number" class="form-control" id="price" name="price" min="0.01" step="0.01" required>
+                                        <div class="invalid-feedback">
+                                            Por favor, informe um preço válido.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Campos específicos para leilão (inicialmente ocultos) -->
+                                <div id="auctionFields" style="display:none;">
+                                    <div class="mb-3 mt-4 border-top pt-4">
+                                        <label for="startingBid" class="form-label">Lance Inicial (Moedas de Ouro)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text gold-icon"><i class="fas fa-gavel"></i></span>
+                                            <input type="number" class="form-control" id="startingBid" name="startingBid" min="0.01" step="0.01">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="auctionEndDate" class="form-label">Data de Término do Leilão</label>
+                                        <input type="datetime-local" class="form-control" id="auctionEndDate" name="auctionEndDate">
+                                        <div class="form-text">Se não definido, o leilão terminará em 7 dias.</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Preços -->
-                    <div class="card border-gold">
-                        <div class="card-header bg-dark text-light">
-                            <h3 class="rpg-font mb-0">
-                                <i class="fas fa-coins me-2"></i>Preços e Valores
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="price" class="form-label">Preço de Venda (Moedas de Ouro)*</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-coins"></i></span>
-                                        <input type="number" step="0.01" min="0" class="form-control" id="price" name="price" required>
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Por favor, informe um preço válido.
-                                    </div>
-                                </div>
+                    <!-- Coluna direita - Imagem, durabilidade e propriedades mágicas -->
+                    <div class="col-md-4">
+                        <!-- Imagem -->
+                        <div class="card border-gold shadow-sm mb-4">
+                            <div class="card-header bg-dark text-light">
+                                <h3 class="rpg-font mb-0"><i class="fas fa-image me-2"></i>Imagem</h3>
                             </div>
-                            
-                            <!-- Campos específicos para leilão -->
-                            <div id="auctionFields" style="display: none;">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="buyNowPrice" class="form-label">Preço de Compra Imediata (opcional)</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-coins"></i></span>
-                                            <input type="number" step="0.01" min="0" class="form-control" id="buyNowPrice" name="buyNowPrice">
-                                        </div>
-                                        <div class="form-text">Deixe em branco para não permitir compra imediata.</div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="minBidIncrement" class="form-label">Incremento Mínimo por Lance</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-coins"></i></span>
-                                            <input type="number" step="0.01" min="0" class="form-control" id="minBidIncrement" name="minBidIncrement" value="1.00">
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="card-body">
                                 <div class="mb-3">
-                                    <label for="auctionEndDate" class="form-label">Data de Término do Leilão</label>
-                                    <input type="datetime-local" class="form-control" id="auctionEndDate" name="auctionEndDate">
-                                    <div class="form-text">Se não preenchido, o leilão terá duração padrão de 7 dias.</div>
+                                    <label for="image" class="form-label">Imagem do Item</label>
+                                    <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                                </div>
+                                <div class="item-image-preview mt-3" id="imagePreview">
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Durabilidade -->
+                        <div class="card border-gold shadow-sm mb-4">
+                            <div class="card-header bg-dark text-light">
+                                <h3 class="rpg-font mb-0"><i class="fas fa-shield-alt me-2"></i>Durabilidade</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="durability" class="form-label">Estado do Item: <span id="durabilityValue">100%</span></label>
+                                    <input type="range" class="form-range" id="durability" name="durability" min="0" max="100" value="100">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Propriedades Mágicas -->
+                        <div class="card border-gold shadow-sm mb-4">
+                            <div class="card-header bg-dark text-light">
+                                <h3 class="rpg-font mb-0"><i class="fas fa-magic me-2"></i>Propriedades Mágicas</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-text mb-3">Selecione até 3 propriedades mágicas para seu item.</div>
+                                
+                                <div class="magic-properties-grid">
+                                    <div class="row g-2">
+                                        <div th:each="property : ${magicProperties}" class="col-6 mb-2">
+                                            <div class="magic-property-card">
+                                                <div class="form-check">
+                                                    <input class="form-check-input magic-property-checkbox" 
+                                                           type="checkbox" 
+                                                           name="magicProperties" 
+                                                           th:id="${'property-' + property}" 
+                                                           th:value="${property}">
+                                                    <label class="form-check-label w-100" th:for="${'property-' + property}">
+                                                        <span class="property-name" th:text="${property.displayName}">Propriedade</span>
+                                                        <span class="property-desc" th:text="${property.description}">Descrição</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="col-md-4">
-                    <!-- Imagem -->
-                    <div class="card border-gold">
-                        <div class="card-header bg-dark text-light">
-                            <h3 class="rpg-font mb-0">
-                                <i class="fas fa-image me-2"></i>Imagem
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <div class="text-center mb-3">
-                                    <img id="imagePreview" src="/images/default-product.jpg" alt="Pré-visualização" class="img-fluid rounded border" style="max-height: 200px;">
+                <!-- Live Preview Card -->
+                <div class="row mt-4">
+                    <div class="col-md-6 mx-auto">
+                        <div class="card preview-card border-gold shadow">
+                            <div class="card-header bg-dark text-light">
+                                <h4 class="rpg-font mb-0"><i class="fas fa-eye me-2"></i>Prévia</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="product-card">
+                                    <div class="product-img-container">
+                                        <img id="previewImage" src="/images/default-item.jpg" class="product-img">
+                                        <span class="badge product-category-badge bg-dark" id="previewCategory">Categoria</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title rpg-font" id="previewName">Nome do Item</h5>
+                                        <p class="card-text" id="previewDescription">Descrição do item...</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="product-price" id="previewPrice">$0.00</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <label for="image" class="form-label">Imagem do Item</label>
-                                <input class="form-control" type="file" id="image" name="image" accept="image/*">
-                                <div class="form-text">Tamanho máximo: 5MB. Formatos: JPG, PNG.</div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="d-flex justify-content-between">
-                <a th:href="@{/aventureiro/inventario}" class="btn btn-outline-secondary">
-                    <i class="fas fa-times me-2"></i>Cancelar
-                </a>
-                <button type="submit" class="btn btn-gold">
-                    <i class="fas fa-save me-2"></i>Salvar Item
-                </button>
-            </div>
-        </form>
-    </div>
+                
+                <!-- Form buttons (ensuring they are visible with proper styling) -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                    <a th:href="@{/aventureiro/inventario}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-gold">
+                        <i class="fas fa-scroll me-2"></i>Anunciar Item
+                    </button>
+                </div>
+            </form>
+        </main>
+
+    <!-- Include the footer -->
+    <div th:replace="~{fragments/footer :: footer}">    </div>
     
-    <th:block th:replace="~{layout/main :: pageScripts}">
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Validação do formulário
-                const form = document.querySelector('.needs-validation');
-                form.addEventListener('submit', function(event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                });
-                
-                // Mostrar/esconder campos de leilão
-                const typeSelect = document.getElementById('type');
-                const auctionFields = document.getElementById('auctionFields');
-                
-                typeSelect.addEventListener('change', function() {
-                    if (this.value === 'AUCTION') {
-                        auctionFields.style.display = 'block';
-                    } else {
-                        auctionFields.style.display = 'none';
-                    }
-                });
-                
-                // Pré-visualização de imagem
-                const imageInput = document.getElementById('image');
-                const imagePreview = document.getElementById('imagePreview');
-                
-                imageInput.addEventListener('change', function() {
-                    if (this.files && this.files[0]) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            imagePreview.src = e.target.result;
-                        };
-                        reader.readAsDataURL(this.files[0]);
-                    }
-                });
+    <!-- Bootstrap JS (ensure it loads before your script.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/script.js}"></script>
+    
+    <!-- Add additional script for rarity selection -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ensure dropdown menus work
+            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+            dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl);
             });
-        </script>
-    </th:block>
+            
+            // Add listener for rarity selection
+            const raritySelect = document.getElementById('rarity');
+            if (raritySelect) {
+                raritySelect.addEventListener('change', function() {
+                    updatePreview();
+                    
+                    // Add visual feedback for rarity selection
+                    const rarityValue = this.value;
+                    const previewCard = document.querySelector('.preview-card');
+                    
+                    // Remove previous rarity classes
+                    previewCard.classList.remove('border-common', 'border-uncommon', 'border-rare', 'border-epic', 'border-legendary');
+                    
+                    // Add appropriate class based on selection
+                    if (rarityValue) {
+                        previewCard.classList.add('border-' + rarityValue.toLowerCase());
+                    }
+                });
+            }
+            
+            // Make sure form exists and gets proper submit button
+            const form = document.querySelector('form');
+            if (form) {
+                // Ensure the form is properly structured
+                console.log('Form found:', form);
+            }
+        });
+    </script>
 </body>
 </html>

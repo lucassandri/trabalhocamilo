@@ -1,36 +1,34 @@
 package com.programacao_web.rpg_market.model;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "bids")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Document(collection = "bids")
 public class Bid {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @DBRef
     private Product product;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bidder_id")
+    @DBRef
     private User bidder;
     
-    @Column(nullable = false)
+    @Field("amount")
     private BigDecimal amount;
     
+    @Field("bid_time")
     private LocalDateTime bidTime = LocalDateTime.now();
     
-    private boolean isWinning = false;
+    @Field("winning")
+    private boolean winning;
 }

@@ -2,6 +2,7 @@ package com.programacao_web.rpg_market.service;
 
 import com.programacao_web.rpg_market.model.Transaction;
 import com.programacao_web.rpg_market.model.User;
+import com.programacao_web.rpg_market.model.UserRole;
 import com.programacao_web.rpg_market.repository.TransactionRepository;
 import com.programacao_web.rpg_market.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +26,7 @@ public class UserService {
     @Autowired
     private TransactionRepository transactionRepository;
     
+    @Transactional
     public User registerUser(User user) {
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new RuntimeException("Username já existe!");
@@ -36,6 +39,12 @@ public class UserService {
         // Codifica a senha antes de salvar
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         
+        // Define valores padrão para novos usuários
+        user.setRole(UserRole.ROLE_AVENTUREIRO); // Papel padrão para usuários normais
+        user.setLevel(1);  // Nível inicial
+        user.setExperience(0);  // Experiência inicial
+        user.setGoldCoins(new BigDecimal("100"));  // Moedas iniciais
+        
         return userRepository.save(user);
     }
     
@@ -45,13 +54,17 @@ public class UserService {
     
     @Transactional
     public void addExperience(User user, int exp) {
-        user.setExperience(user.getExperience() + exp);
+        int currentExp = user.getExperience();
+        int newExp = currentExp + exp;
+        user.setExperience(newExp);
         
-        // Verifica se subiu de nível (100 exp por nível)
-        int newLevel = (user.getExperience() / 100) + 1;
+        // Level up mechanism - every 100 XP is a level
+        int newLevel = (newExp / 100) + 1;
         if (newLevel > user.getLevel()) {
             user.setLevel(newLevel);
-            user.setGoldCoins(user.getGoldCoins() + 50); // Recompensa por subir de nível
+            // Award gold for leveling up - 100 gold per level
+            BigDecimal goldBonus = new BigDecimal(100);
+            user.setGoldCoins(user.getGoldCoins().add(goldBonus));
         }
         
         userRepository.save(user);

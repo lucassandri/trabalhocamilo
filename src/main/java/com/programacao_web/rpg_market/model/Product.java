@@ -1,57 +1,91 @@
 package com.programacao_web.rpg_market.model;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-@Entity
-@Table(name = "products")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Document(collection = "products")
 public class Product {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
     
-    @Column(nullable = false)
+    @Field("name")
     private String name;
     
-    @Column(length = 2000)
+    @Field("description")
     private String description;
     
+    @Field("price")
     private BigDecimal price;
     
-    @Enumerated(EnumType.STRING)
+    @Field("category")
     private ProductCategory category;
     
-    @Enumerated(EnumType.STRING)
+    @Field("status")
     private ProductStatus status = ProductStatus.AVAILABLE;
     
-    @Enumerated(EnumType.STRING)
+    @Field("type")
     private ProductType type = ProductType.DIRECT_SALE;
     
+    @Field("image_url")
     private String imageUrl;
     
-    private LocalDateTime createdAt = LocalDateTime.now();
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id")
+    @DBRef
     private User seller;
     
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @DBRef
     private List<Bid> bids = new ArrayList<>();
     
-    private LocalDateTime auctionEndDate; // Para leilões
+    @Field("created_at")
+    private LocalDateTime createdAt;
     
-    private BigDecimal minBidIncrement; // Para leilões
+    @Field("auction_end_date")
+    private LocalDateTime auctionEndDate;
     
-    private BigDecimal buyNowPrice; // Preço para compra imediata em leilões
+    @Field("buy_now_price")
+    private BigDecimal buyNowPrice;
+    
+    @Field("min_bid_increment")
+    private BigDecimal minBidIncrement;
+    
+    // Novos campos para elementos RPG
+    @Field("rarity")
+    private ItemRarity rarity = ItemRarity.COMUM;
+    
+    @Field("level_required")
+    private Integer levelRequired = 1;
+    
+    @Field("magic_properties")
+    private Set<MagicProperty> magicProperties = new HashSet<>();
+    
+    @Field("quantity")
+    private Integer quantity = 1;
+    
+    @Field("weight")
+    private BigDecimal weight = BigDecimal.ONE;
+    
+    @Field("durability")
+    private Integer durability = 100;
+    
+    @Field("history")
+    private String history;
+    
+    // Helper method to add magic properties
+    public void addMagicProperty(MagicProperty property) {
+        if (this.magicProperties == null) {
+            this.magicProperties = new HashSet<>();
+        }
+        this.magicProperties.add(property);
+    }
 }

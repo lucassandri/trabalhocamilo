@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // For form submission - prevent double submission
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', function() { // Removed unused 'e' parameter
             // Disable submit button on click to prevent double submission
             const submitBtn = form.querySelector('button[type="submit"]');
             if (submitBtn) {
@@ -75,6 +75,55 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (!isValid) {
                 e.preventDefault(); // Prevent form submission
+            }
+        });
+    }
+
+    // Mostrar/esconder campos de leilão com animação
+    const typeSelect = document.getElementById('type');
+    const auctionFields = document.getElementById('auctionFields');
+    
+    if (typeSelect && auctionFields) {
+        typeSelect.addEventListener('change', function() {
+            console.log('Type changed to:', this.value); // Debug info
+            
+            if (this.value === 'AUCTION') {
+                console.log('Showing auction fields');
+                auctionFields.style.display = 'block';
+                setTimeout(() => {
+                    auctionFields.classList.add('show');
+                }, 10);
+            } else {
+                console.log('Hiding auction fields');
+                auctionFields.classList.remove('show');
+                setTimeout(() => {
+                    auctionFields.style.display = 'none';
+                }, 300); // Match transition duration
+            }
+        });
+    }
+
+    // Add event listeners for form fields if they exist
+    const nameInput = document.getElementById('name');
+    const descInput = document.getElementById('description');
+    const priceInput = document.getElementById('price');
+    const categorySelect = document.getElementById('category');
+    const imageInput = document.getElementById('image');
+
+    if (nameInput) nameInput.addEventListener('input', updatePreview);
+    if (descInput) descInput.addEventListener('input', updatePreview);
+    if (priceInput) priceInput.addEventListener('input', updatePreview);
+    if (categorySelect) categorySelect.addEventListener('change', updatePreview);
+
+    if (imageInput) {
+        imageInput.addEventListener('change', function() {
+            const previewImage = document.getElementById('previewImage');
+            if (this.files && this.files[0] && previewImage) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                };
+                reader.readAsDataURL(this.files[0]);
             }
         });
     }
@@ -186,5 +235,55 @@ function clearValidationError(inputElement) {
     const existingError = inputElement.parentNode.querySelector('.invalid-feedback');
     if (existingError) {
         existingError.remove();
+    }
+}
+
+/**
+ * Live preview update
+ */
+function updatePreview() {
+    // Name
+    const previewName = document.getElementById('previewName');
+    const nameInput = document.getElementById('name');
+    if (previewName && nameInput) {
+        previewName.textContent = nameInput.value || 'Nome do Item';
+    }
+    
+    // Description
+    const previewDesc = document.getElementById('previewDescription');
+    const descInput = document.getElementById('description');
+    if (previewDesc && descInput) {
+        previewDesc.textContent = descInput.value || 'Descrição do item...';
+    }
+    
+    // Price
+    const previewPrice = document.getElementById('previewPrice');
+    const priceInput = document.getElementById('price');
+    if (previewPrice && priceInput) {
+        const price = priceInput.value || 0;
+        previewPrice.textContent = '$' + parseFloat(price).toFixed(2);
+    }
+    
+    // Category
+    const previewCategory = document.getElementById('previewCategory');
+    const categorySelect = document.getElementById('category');
+    if (previewCategory && categorySelect && categorySelect.selectedIndex > 0) {
+        previewCategory.textContent = categorySelect.options[categorySelect.selectedIndex].text;
+    }
+    
+    // Rarity (if exists)
+    const raritySelect = document.getElementById('rarity');
+    const previewCard = document.querySelector('.preview-card');
+    
+    if (raritySelect && previewCard && raritySelect.selectedIndex > 0) {
+        const rarityValue = raritySelect.value.toLowerCase();
+        
+        // Remove previous rarity classes
+        previewCard.classList.remove('border-common', 'border-uncommon', 'border-rare', 'border-epic', 'border-legendary');
+        
+        // Add appropriate class based on selection
+        if (rarityValue) {
+            previewCard.classList.add('border-' + rarityValue);
+        }
     }
 }

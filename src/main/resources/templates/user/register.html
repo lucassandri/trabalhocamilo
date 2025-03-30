@@ -1,4 +1,3 @@
-.html
 <!DOCTYPE html>
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -31,9 +30,9 @@
                             <p class="mb-0">Junte-se ao mercado de itens mágicos!</p>
                         </div>
                         
-                        <div th:if="${param.error}" class="alert alert-danger">
+                        <div th:if="${error}" class="alert alert-danger">
                             <i class="fas fa-exclamation-triangle me-2"></i>
-                            <span th:text="${errorMessage ?: 'Ocorreu um erro ao processar seu registro.'}">Erro</span>
+                            <span th:text="${error}">Erro ao criar conta</span>
                         </div>
                         
                         <form th:action="@{/aventureiro/registrar}" th:object="${user}" method="post">

@@ -1,53 +1,43 @@
 package com.programacao_web.rpg_market.model;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "transactions")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Document(collection = "transactions")
 public class Transaction {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @Id
+    private String id;
+    
+    @DBRef
     private Product product;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "buyer_id")
+    @DBRef
     private User buyer;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id")
+    @DBRef
     private User seller;
     
+    @Field("amount")
     private BigDecimal amount;
     
-    @Enumerated(EnumType.STRING)
-    private TransactionStatus status = TransactionStatus.PENDING;
+    @Field("status")
+    private TransactionStatus status;
     
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Field("created_at")
+    private LocalDateTime createdAt;
     
+    @Field("completed_at")
     private LocalDateTime completedAt;
     
-    private String trackingCode; // Código de rastreio para envios
-
-    // Se a Transaction tiver outros nomes para estes campos, use-os:
-    public void setCreateDate(LocalDateTime createDate) {
-        this.createdAt = createDate;
-    }
-
-    public void setFinalizedDate(LocalDateTime finalizedDate) {
-        this.completedAt = finalizedDate;
-    }
+    @Field("tracking_code")
+    private String trackingCode;
 }

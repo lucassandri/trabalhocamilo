@@ -51,7 +51,7 @@ public class ProductService {
     /**
      * Busca um produto pelo ID
      */
-    public Optional<Product> findById(Long id) {
+    public Optional<Product> findById(String id) {  // Changed from Long to String
         return productRepository.findById(id);
     }
     
@@ -213,38 +213,70 @@ public class ProductService {
      * Atualiza um produto existente
      */
     @Transactional
-    public Product update(Long id, Product updatedProduct, User seller) {
-        Optional<Product> existingProductOpt = productRepository.findById(id);
-        if (existingProductOpt.isEmpty()) {
-            throw new IllegalArgumentException("Produto não encontrado");
+    public Product updateProduct(String id, Product updatedProduct) {  // Changed from Long to String
+        Optional<Product> productOpt = findById(id);
+        if (productOpt.isEmpty()) {
+            throw new RuntimeException("Produto não encontrado");
         }
         
-        Product existingProduct = existingProductOpt.get();
-        
-        // Verifica se o produto pertence ao vendedor
-        if (!existingProduct.getSeller().getId().equals(seller.getId())) {
-            throw new IllegalArgumentException("Você não tem permissão para editar este produto");
-        }
-        
-        // Atualiza apenas os campos permitidos
-        existingProduct.setName(updatedProduct.getName());
-        existingProduct.setDescription(updatedProduct.getDescription());
-        existingProduct.setPrice(updatedProduct.getPrice());
-        existingProduct.setCategory(updatedProduct.getCategory());
+        Product product = productOpt.get();
+        // Update properties
+        product.setName(updatedProduct.getName());
+        product.setDescription(updatedProduct.getDescription());
+        product.setPrice(updatedProduct.getPrice());
+        product.setCategory(updatedProduct.getCategory());
         
         // Se for um leilão, permite atualizar o preço de compra imediata e incremento mínimo
-        if (existingProduct.getType() == ProductType.AUCTION && 
-            existingProduct.getStatus() != ProductStatus.AUCTION_ENDED) {
-            existingProduct.setBuyNowPrice(updatedProduct.getBuyNowPrice());
-            existingProduct.setMinBidIncrement(updatedProduct.getMinBidIncrement());
+        if (product.getType() == ProductType.AUCTION && 
+            product.getStatus() != ProductStatus.AUCTION_ENDED) {
+            product.setBuyNowPrice(updatedProduct.getBuyNowPrice());
+            product.setMinBidIncrement(updatedProduct.getMinBidIncrement());
         }
         
         // Se houver nova imagem, atualiza ela
         if (updatedProduct.getImageUrl() != null && !updatedProduct.getImageUrl().isEmpty()) {
-            existingProduct.setImageUrl(updatedProduct.getImageUrl());
+            product.setImageUrl(updatedProduct.getImageUrl());
         }
         
-        return productRepository.save(existingProduct);
+        return productRepository.save(product);
+    }
+
+    /**
+     * Update product with string ID for MongoDB
+     */
+    @Transactional
+    public Product update(String id, Product updatedProduct, User user) {
+        Optional<Product> productOpt = findById(id);
+        if (productOpt.isEmpty()) {
+            throw new IllegalArgumentException("Produto não encontrado");
+        }
+        
+        Product product = productOpt.get();
+        
+        // Verify ownership
+        if (!product.getSeller().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("Você não tem permissão para editar este produto");
+        }
+        
+        // Update properties
+        product.setName(updatedProduct.getName());
+        product.setDescription(updatedProduct.getDescription());
+        product.setPrice(updatedProduct.getPrice());
+        product.setCategory(updatedProduct.getCategory());
+        
+        // If it's an auction, allow updating buy now price and minimum bid increment
+        if (product.getType() == ProductType.AUCTION && 
+            product.getStatus() != ProductStatus.AUCTION_ENDED) {
+            product.setBuyNowPrice(updatedProduct.getBuyNowPrice());
+            product.setMinBidIncrement(updatedProduct.getMinBidIncrement());
+        }
+        
+        // If there's a new image, update it
+        if (updatedProduct.getImageUrl() != null && !updatedProduct.getImageUrl().isEmpty()) {
+            product.setImageUrl(updatedProduct.getImageUrl());
+        }
+        
+        return productRepository.save(product);
     }
 
     /**

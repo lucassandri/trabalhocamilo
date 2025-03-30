@@ -1,12 +1,22 @@
 package com.programacao_web.rpg_market.model;
 
 public enum TransactionStatus {
-    PENDING, // Pagamento pendente
-    PAID, // Pago, aguardando envio
-    SHIPPED, // Enviado
-    DELIVERED, // Entregue
-    COMPLETED, // Concluído com sucesso
-    DISPUTED, // Em disputa
-    CANCELED, // Cancelado
-    REFUNDED // Reembolsado
+    PENDING("Pendente"),
+    PROCESSING("Processando"),
+    SHIPPED("Enviado"),
+    DELIVERED("Entregue"),  // Added missing status
+    COMPLETED("Concluído"),
+    CANCELED("Cancelado"),
+    DISPUTED("Em Disputa"),
+    REFUNDED("Reembolsado");  // Added missing status
+    
+    private final String displayName;
+    
+    TransactionStatus(String displayName) {
+        this.displayName = displayName;
+    }
+    
+    public String getDisplayName() {
+        return displayName;
+    }
 }

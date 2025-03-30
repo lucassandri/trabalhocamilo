@@ -3,18 +3,26 @@ package com.programacao_web.rpg_market.repository;
 import com.programacao_web.rpg_market.model.Bid;
 import com.programacao_web.rpg_market.model.Product;
 import com.programacao_web.rpg_market.model.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface BidRepository extends JpaRepository<Bid, Long> {
+public interface BidRepository extends MongoRepository<Bid, String> {
     List<Bid> findByProductOrderByAmountDesc(Product product);
     List<Bid> findByBidder(User bidder);
     
-    @Query("SELECT b FROM Bid b WHERE b.product = :product AND b.amount = (SELECT MAX(b2.amount) FROM Bid b2 WHERE b2.product = :product)")
-    Optional<Bid> findHighestBidForProduct(Product product);
+    @Query("{ 'product' : ?0, 'amount' : { $eq: ?1 } }")
+    Optional<Bid> findByProductAndAmount(Product product, String highestAmount);
+    
+    @Query(value="{ 'product' : ?0 }", sort="{ 'amount' : -1 }")
+    List<Bid> findByProductSortedByAmountDesc(Product product);
+    
+    default Optional<Bid> findHighestBidForProduct(Product product) {
+        List<Bid> bids = findByProductSortedByAmountDesc(product);
+        return bids.isEmpty() ? Optional.empty() : Optional.of(bids.get(0));
+    }
 }

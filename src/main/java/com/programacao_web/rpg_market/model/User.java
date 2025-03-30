@@ -1,44 +1,35 @@
 package com.programacao_web.rpg_market.model;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.index.Indexed;
+
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
 
-@Entity
-@Table(name = "users")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Document(collection = "users")
 public class User {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
     
-    @Column(nullable = false, unique = true)
+    @Indexed(unique = true)
     private String username;
     
-    @Column(nullable = false)
-    private String password;
-    
-    @Column(nullable = false, unique = true)
+    @Indexed(unique = true)
     private String email;
     
-    private String characterClass; // Mago, Guerreiro, etc.
+    private String password;
     
-    private int level = 1;
+    private String characterClass;
     
-    private int experience = 0;
+    private int level;
     
-    private int goldCoins = 100; // Moeda do jogo
+    private int experience;
     
-    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Product> products = new ArrayList<>();
+    private BigDecimal goldCoins;
     
-    @Enumerated(EnumType.STRING)
-    private UserRole role = UserRole.AVENTUREIRO; // Papel do usuário
+    private UserRole role;
 }

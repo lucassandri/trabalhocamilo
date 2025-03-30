@@ -1,11 +1,11 @@
 package com.programacao_web.rpg_market.controller;
 
 import com.programacao_web.rpg_market.model.Product;
-import com.programacao_web.rpg_market.model.Transaction;
 import com.programacao_web.rpg_market.model.User;
 import com.programacao_web.rpg_market.service.ProductService;
 import com.programacao_web.rpg_market.service.UserService;
 import com.programacao_web.rpg_market.dto.PasswordChangeRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,9 +39,29 @@ public class UserController {
     
     // Processa o registro de novos usuários
     @PostMapping("/registrar")
-    public String registerUser(@ModelAttribute User user) {
-        userService.registerUser(user);
-        return "redirect:/login"; // Redireciona para a página de login após registro
+    public String registerUser(@ModelAttribute User user, RedirectAttributes redirectAttributes) {
+        try {
+            userService.registerUser(user);
+            redirectAttributes.addFlashAttribute("success", "Conta criada com sucesso!");
+            return "redirect:/login";
+        } catch (Exception e) {
+            // Log the error for server-side troubleshooting
+            System.err.println("Erro ao registrar usuário: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Provide a user-friendly error message
+            String errorMessage = e.getMessage();
+            if (errorMessage.contains("Username já existe")) {
+                errorMessage = "Este nome de aventureiro já está em uso. Por favor, escolha outro.";
+            } else if (errorMessage.contains("Email já está em uso")) {
+                errorMessage = "Este email já está cadastrado. Tente fazer login ou recuperar sua senha.";
+            } else {
+                errorMessage = "Ocorreu um erro ao criar sua conta. Por favor, tente novamente.";
+            }
+            
+            redirectAttributes.addFlashAttribute("error", errorMessage);
+            return "redirect:/aventureiro/registrar";
+        }
     }
     
     // Exibe o perfil do usuário logado

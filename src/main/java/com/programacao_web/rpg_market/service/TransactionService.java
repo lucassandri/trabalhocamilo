@@ -49,7 +49,7 @@ public class TransactionService {
      * Atualiza o status de uma transação (versão simplificada)
      */
     @Transactional
-    public Transaction updateStatus(Long id, TransactionStatus newStatus) {
+    public Transaction updateStatus(String id, TransactionStatus newStatus) {
         Optional<Transaction> transactionOpt = transactionRepository.findById(id);
         if (transactionOpt.isEmpty()) {
             throw new RuntimeException("Transação não encontrada");
@@ -86,7 +86,7 @@ public class TransactionService {
     /**
      * Busca uma transação por ID
      */
-    public Optional<Transaction> findById(Long id) {
+    public Optional<Transaction> findById(String id) {
         return transactionRepository.findById(id);
     }
     
@@ -94,7 +94,7 @@ public class TransactionService {
      * Atualiza o status de uma transação, com verificação de permissões
      */
     @Transactional
-    public Transaction updateStatus(Long id, TransactionStatus newStatus, User requestingUser) {
+    public Transaction updateStatus(String id, TransactionStatus newStatus, User requestingUser) {
         Optional<Transaction> transactionOpt = transactionRepository.findById(id);
         if (transactionOpt.isEmpty()) {
             throw new RuntimeException("Transação não encontrada");
@@ -102,32 +102,22 @@ public class TransactionService {
         
         Transaction transaction = transactionOpt.get();
         
-        // Verifica se o usuário é parte da transação
-        if (!transaction.getBuyer().getId().equals(requestingUser.getId()) && 
-            !transaction.getSeller().getId().equals(requestingUser.getId())) {
+        // Verificar permissões
+        boolean isSeller = transaction.getSeller().getId().equals(requestingUser.getId());
+        boolean isBuyer = transaction.getBuyer().getId().equals(requestingUser.getId());
+        
+        if (!isSeller && !isBuyer) {
             throw new IllegalArgumentException("Você não tem permissão para atualizar esta transação");
         }
         
-        // Verifica se a mudança de status é válida (implementação simplificada)
-        if (newStatus == TransactionStatus.SHIPPED && 
-            !transaction.getSeller().getId().equals(requestingUser.getId())) {
-            throw new IllegalArgumentException("Apenas o vendedor pode marcar como enviado");
-        }
+        // Validar transições de status
+        validateStatusTransition(transaction.getStatus(), newStatus, isSeller, isBuyer);
         
-        if (newStatus == TransactionStatus.DELIVERED && 
-            !transaction.getBuyer().getId().equals(requestingUser.getId())) {
-            throw new IllegalArgumentException("Apenas o comprador pode confirmar o recebimento");
-        }
-        
-        // Atualiza o status
         transaction.setStatus(newStatus);
         
+        // Se for concluído, atualiza data de conclusão
         if (newStatus == TransactionStatus.COMPLETED) {
             transaction.setCompletedAt(LocalDateTime.now());
-            
-            // Experiência extra ao completar
-            userService.addExperience(transaction.getBuyer(), 5);
-            userService.addExperience(transaction.getSeller(), 5);
         }
         
         return transactionRepository.save(transaction);
@@ -137,7 +127,7 @@ public class TransactionService {
      * Adiciona código de rastreio (para vendedor)
      */
     @Transactional
-    public Transaction addTrackingCode(Long id, String trackingCode, User seller) {
+    public Transaction addTrackingCode(String id, String trackingCode, User seller) {
         Optional<Transaction> transactionOpt = transactionRepository.findById(id);
         if (transactionOpt.isEmpty()) {
             throw new RuntimeException("Transação não encontrada");
@@ -160,7 +150,7 @@ public class TransactionService {
      * Confirma recebimento (para comprador)
      */
     @Transactional
-    public Transaction confirmReceipt(Long id, User buyer) {
+    public Transaction confirmReceipt(String id, User buyer) {
         Optional<Transaction> transactionOpt = transactionRepository.findById(id);
         if (transactionOpt.isEmpty()) {
             throw new RuntimeException("Transação não encontrada");
@@ -173,12 +163,15 @@ public class TransactionService {
             throw new IllegalArgumentException("Apenas o comprador pode confirmar o recebimento");
         }
         
+        // Verifica se o status atual é compatível
+        if (transaction.getStatus() != TransactionStatus.SHIPPED && 
+            transaction.getStatus() != TransactionStatus.DELIVERED) {
+            throw new IllegalArgumentException("Não é possível confirmar o recebimento neste momento");
+        }
+        
+        // Atualiza o status e completa a transação
         transaction.setStatus(TransactionStatus.COMPLETED);
         transaction.setCompletedAt(LocalDateTime.now());
-        
-        // Adiciona experiência para comprador e vendedor
-        userService.addExperience(transaction.getBuyer(), 10);
-        userService.addExperience(transaction.getSeller(), 15);
         
         return transactionRepository.save(transaction);
     }
@@ -187,7 +180,7 @@ public class TransactionService {
      * Abre uma disputa (para comprador)
      */
     @Transactional
-    public Transaction openDispute(Long id, String reason, User buyer) {
+    public Transaction openDispute(String id, String reason, User buyer) {
         Optional<Transaction> transactionOpt = transactionRepository.findById(id);
         if (transactionOpt.isEmpty()) {
             throw new RuntimeException("Transação não encontrada");
@@ -200,17 +193,79 @@ public class TransactionService {
             throw new IllegalArgumentException("Apenas o comprador pode abrir uma disputa");
         }
         
-        // Verifica se a transação está em status que permite abrir disputa
+        // Verifica se o status permite abrir disputa
         if (transaction.getStatus() == TransactionStatus.COMPLETED || 
-            transaction.getStatus() == TransactionStatus.DISPUTED ||
             transaction.getStatus() == TransactionStatus.CANCELED ||
+            transaction.getStatus() == TransactionStatus.DISPUTED ||
             transaction.getStatus() == TransactionStatus.REFUNDED) {
-            throw new IllegalArgumentException("Não é possível abrir disputa para esta transação no estado atual");
+            throw new IllegalArgumentException("Não é possível abrir uma disputa neste momento");
         }
         
+        // Atualiza para status de disputa
         transaction.setStatus(TransactionStatus.DISPUTED);
-        // Idealmente armazenaria o motivo da disputa em um campo adicional ou tabela separada
         
         return transactionRepository.save(transaction);
+    }
+    
+    /**
+     * Atualiza o status de uma transação (nova versão)
+     */
+    @Transactional
+    public Transaction updateTransactionStatus(String id, TransactionStatus status) {
+        Optional<Transaction> transactionOpt = transactionRepository.findById(id);
+        if (transactionOpt.isEmpty()) {
+            throw new RuntimeException("Transação não encontrada");
+        }
+        
+        Transaction transaction = transactionOpt.get();
+        transaction.setStatus(status);
+        
+        if (status == TransactionStatus.COMPLETED) {
+            transaction.setCompletedAt(LocalDateTime.now());
+        }
+        
+        return transactionRepository.save(transaction);
+    }
+    
+    /**
+     * Validates if the transition from current status to new status is allowed
+     * based on user's role in the transaction
+     */
+    private boolean validateStatusTransition(TransactionStatus currentStatus, TransactionStatus newStatus, 
+                                             boolean isSeller, boolean isBuyer) {
+        // Basic validation rules
+        switch (currentStatus) {
+            case PENDING:
+                // Pending -> Shipped: Only seller can ship
+                if (newStatus == TransactionStatus.SHIPPED) {
+                    return isSeller;
+                }
+                // Pending -> Canceled: Both buyer and seller can cancel
+                if (newStatus == TransactionStatus.CANCELED) {
+                    return true;
+                }
+                break;
+                
+            case SHIPPED:
+                // Shipped -> Delivered: Only buyer can confirm receipt
+                if (newStatus == TransactionStatus.DELIVERED) {
+                    return isBuyer;
+                }
+                // Shipped -> Disputed: Only buyer can open dispute
+                if (newStatus == TransactionStatus.DISPUTED) {
+                    return isBuyer;
+                }
+                break;
+                
+            case DISPUTED:
+                // Disputed -> Resolved/Refunded: Admin only (not handled here)
+                break;
+                
+            default:
+                // Other statuses generally don't allow transitions
+                return false;
+        }
+        
+        return false; // Default: transition not allowed
     }
 }

@@ -28,7 +28,7 @@ public class TransactionController {
     // Exibe detalhes de uma transação
     @GetMapping("/{id}")
     public String showTransaction(
-            @PathVariable Long id,
+            @PathVariable String id,
             @AuthenticationPrincipal UserDetails currentUser,
             Model model) {
         
@@ -59,7 +59,7 @@ public class TransactionController {
     // Atualiza o status de uma transação
     @PostMapping("/{id}/atualizar")
     public String updateTransactionStatus(
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestParam TransactionStatus status,
             @AuthenticationPrincipal UserDetails currentUser,
             RedirectAttributes redirectAttributes) {
@@ -70,7 +70,6 @@ public class TransactionController {
                 throw new IllegalArgumentException("Usuário não encontrado");
             }
             
-            // Atribuir a variável updated a algo ou remover a variável
             Transaction updated = transactionService.updateStatus(id, status, userOpt.get());
             redirectAttributes.addFlashAttribute("success", "Status atualizado para: " + updated.getStatus().name());
             
@@ -84,7 +83,7 @@ public class TransactionController {
     // Adiciona código de rastreio (para vendedor)
     @PostMapping("/{id}/rastreio")
     public String addTrackingCode(
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestParam String trackingCode,
             @AuthenticationPrincipal UserDetails currentUser,
             RedirectAttributes redirectAttributes) {
@@ -108,7 +107,7 @@ public class TransactionController {
     // Confirma recebimento (para comprador)
     @PostMapping("/{id}/confirmar-recebimento")
     public String confirmReceipt(
-            @PathVariable Long id,
+            @PathVariable String id,
             @AuthenticationPrincipal UserDetails currentUser,
             RedirectAttributes redirectAttributes) {
         
@@ -131,7 +130,7 @@ public class TransactionController {
     // Abre uma disputa (para comprador)
     @PostMapping("/{id}/abrir-disputa")
     public String openDispute(
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestParam String reason,
             @AuthenticationPrincipal UserDetails currentUser,
             RedirectAttributes redirectAttributes) {
