@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-br" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
 <head>
     <title>Editar Anúncio - RPG Market</title>
 </head>
 <body>
-    <div th:replace="~{layout/main :: content}">
+    <div layout:fragment="content">
         <h1 class="rpg-font mb-4"><i class="fas fa-edit me-2"></i>Editar Anúncio</h1>
         
         <div class="card border-gold">
@@ -72,7 +76,7 @@
                                 <div class="mb-3">
                                     <label for="auctionEndDate" class="form-label">Data de Término</label>
                                     <input type="datetime-local" class="form-control" id="auctionEndDate" 
-                                           th:value="${#temporals.format(product.auctionEndDate, 'yyyy-MM-dd\'T\'HH:mm')}"
+                                           th:value="${#temporals.format(product.auctionEndDate, 'yyyy-MM-dd HH:mm')}"
                                            disabled>
                                     <div class="form-text">A data de término não pode ser alterada após a criação do leilão.</div>
                                 </div>
@@ -126,7 +130,7 @@
         </div>
     </div>
     
-    <th:block th:replace="~{layout/main :: pageScripts}">
+    <th:block layout:fragment="pageScripts">
         <script>
             // Preview da imagem
             document.getElementById('image').addEventListener('change', function(e) {

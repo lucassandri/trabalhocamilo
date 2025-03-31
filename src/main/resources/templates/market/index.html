@@ -1,30 +1,14 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="pt-br" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Praça do Mercado - RPG Market</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts - Medieval Sharp -->
-    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
-    
-    <!-- CSS files -->
-    <link th:href="@{/css/common.css}" rel="stylesheet">
-    <link th:href="@{/css/market.css}" rel="stylesheet">
-    <link th:href="@{/css/product.css}" rel="stylesheet">
-    <link th:href="@{/css/user.css}" rel="stylesheet">
 </head>
-<body class="rpg-theme">
-    <!-- Use direct import for header -->
-    <header th:replace="~{layout/main :: header}"></header>
-    
-    <main class="container py-4 flex-grow-1">
+<body>
+    <main layout:fragment="content">
         <!-- Banner de boas-vindas -->
         <div class="welcome-banner p-4 mb-4 text-center rounded border-gold">
             <h1 class="display-5 fw-bold rpg-font">Bem-vindo à Praça do Mercado</h1>
@@ -70,7 +54,7 @@
         </div>
         
         <!-- Itens em Destaque -->
-        <div class="market-section mb-5" th:if="${not #lists.isEmpty(products)}">
+        <div class="market-section mb-5">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="rpg-font section-title mb-0">
                     <i class="fas fa-scroll me-2"></i>Anúncios Recentes
@@ -111,6 +95,9 @@
                         </div>
                     </div>
                 </div>
+                <div th:if="${#lists.isEmpty(products)}" class="text-center py-4">
+                    <p class="text-muted">Nenhum item disponível para venda no momento.</p>
+                </div>
             </div>
         </div>
         
@@ -143,7 +130,7 @@
                                 
                                 <div class="auction-timer p-2 mb-2">
                                     <i class="fas fa-hourglass-half me-1"></i>
-                                    <span>Termina em: <span class="countdown" th:data-end-date="${#temporals.format(auction.auctionEndDate, 'yyyy-MM-dd''T''HH:mm:ss')}">3d 12h 45m</span></span>
+                                    <span>Termina em: <span class="countdown" th:data-end-date="${#temporals.format(auction.auctionEndDate, 'yyyy-MM-dd HH:mm:ss')}">3d 12h 45m</span></span>
                                 </div>
                                 
                                 <div class="d-flex justify-content-between align-items-center">
@@ -209,45 +196,41 @@
         </div>
     </main>
     
-    <!-- Use direct import for footer -->
-    <footer th:replace="~{layout/main :: footer}"></footer>
-    
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script th:src="@{/js/script.js}"></script>
-    
-    <script>
-        // Atualizar contadores de leilão
-        document.addEventListener('DOMContentLoaded', function() {
-            const countdowns = document.querySelectorAll('.countdown');
-            
-            function updateCountdowns() {
-                countdowns.forEach(element => {
-                    const endDate = new Date(element.getAttribute('data-end-date'));
-                    const now = new Date();
-                    const diff = endDate - now;
-                    
-                    if (diff <= 0) {
-                        element.textContent = "Encerrado";
-                        return;
-                    }
-                    
-                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    
-                    let displayText = "";
-                    if(days > 0) displayText += days + "d ";
-                    displayText += hours + "h " + minutes + "m";
-                    
-                    element.textContent = displayText;
-                });
-            }
-            
-            // Atualizar imediatamente e depois a cada minuto
-            updateCountdowns();
-            setInterval(updateCountdowns, 60000);
-        });
-    </script>
+    <th:block layout:fragment="pageScripts">
+        <!-- Script específico da página -->
+        <script>
+            // Atualizar contadores de leilão
+            document.addEventListener('DOMContentLoaded', function() {
+                const countdowns = document.querySelectorAll('.countdown');
+                
+                function updateCountdowns() {
+                    countdowns.forEach(element => {
+                        const endDate = new Date(element.getAttribute('data-end-date'));
+                        const now = new Date();
+                        const diff = endDate - now;
+                        
+                        if (diff <= 0) {
+                            element.textContent = "Encerrado";
+                            return;
+                        }
+                        
+                        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        
+                        let displayText = "";
+                        if(days > 0) displayText += days + "d ";
+                        displayText += hours + "h " + minutes + "m";
+                        
+                        element.textContent = displayText;
+                    });
+                }
+                
+                // Atualizar imediatamente e depois a cada minuto
+                updateCountdowns();
+                setInterval(updateCountdowns, 60000);
+            });
+        </script>
+    </th:block>
 </body>
 </html>

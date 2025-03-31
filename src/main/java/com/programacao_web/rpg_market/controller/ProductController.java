@@ -106,7 +106,7 @@ public class ProductController {
             product.setCreatedAt(LocalDateTime.now());
             
             // Salva o produto
-            Product savedProduct = productService.create(product, userOpt.get());
+            productService.create(product, userOpt.get());
             
             redirectAttributes.addFlashAttribute("success", 
                 "Seu item foi colocado à venda no mercado! Os aventureiros já podem vê-lo.");
