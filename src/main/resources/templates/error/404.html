@@ -1,23 +1,20 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-br" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página Não Encontrada - RPG Market</title>
 </head>
 <body>
-    <!-- Replace the content fragment with direct mainContent usage -->
-    <div th:replace="~{layout/main :: mainContent(~{::section})}">
-        <section>
-            <div class="text-center py-5">
-                <i class="fas fa-dungeon fa-5x text-muted mb-4"></i>
-                <h1 class="rpg-font mb-3">Página Não Encontrada!</h1>
-                <p class="lead mb-4">O mapa parece estar errado... Este local não existe no reino.</p>
-                <a th:href="@{/mercado}" class="btn btn-gold">
-                    <i class="fas fa-home me-2"></i>Voltar ao Mercado
-                </a>
-            </div>
-        </section>
+    <div layout:fragment="content">
+        <div class="container text-center py-5">
+            <h1 class="rpg-font display-1 text-danger">404</h1>
+            <p class="lead">A página que você procura foi enviada para outra dimensão.</p>
+            <a href="/mercado" class="btn btn-gold">
+                <i class="fas fa-home me-2"></i>Voltar ao Mercado
+            </a>
+        </div>
     </div>
 </body>
 </html>

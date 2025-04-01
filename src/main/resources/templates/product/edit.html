@@ -69,14 +69,15 @@
                                     <label for="minBidIncrement" class="form-label">Incremento Mínimo de Lance</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-coins text-warning"></i></span>
-                                        <input type="number" class="form-control" id="minBidIncrement" th:field="*{minBidIncrement}" min="0.1" step="0.1">
+                                        <input type="number" class="form-control" id="minBidIncrement" th:field="*{minBidIncrement}" 
+                                               min="0.1" step="0.1" th:value="${product.minBidIncrement != null ? product.minBidIncrement : 1.0}">
                                     </div>
                                 </div>
                                 
                                 <div class="mb-3">
                                     <label for="auctionEndDate" class="form-label">Data de Término</label>
                                     <input type="datetime-local" class="form-control" id="auctionEndDate" 
-                                           th:value="${#temporals.format(product.auctionEndDate, 'yyyy-MM-dd HH:mm')}"
+                                           th:value="${product.auctionEndDate != null ? #temporals.format(product.auctionEndDate, 'yyyy-MM-dd HH:mm') : ''}"
                                            disabled>
                                     <div class="form-text">A data de término não pode ser alterada após a criação do leilão.</div>
                                 </div>
@@ -85,7 +86,8 @@
                                     <label for="buyNowPrice" class="form-label">Preço de Compra Imediata (opcional)</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-coins text-warning"></i></span>
-                                        <input type="number" class="form-control" id="buyNowPrice" th:field="*{buyNowPrice}" min="0" step="0.01">
+                                        <input type="number" class="form-control" id="buyNowPrice" th:field="*{buyNowPrice}" 
+                                               min="0" step="0.01" th:value="${product.buyNowPrice}">
                                     </div>
                                 </div>
                             </div>

@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -27,6 +28,7 @@ public class SecurityConfig {
                 .requestMatchers("/item/{id}/editar").authenticated()
                 .requestMatchers("/item/{id}/comprar").authenticated()
                 .requestMatchers("/item/{id}/lance").authenticated()
+                .requestMatchers("/item/{id}/excluir").authenticated() // Adicionar permissão explícita
                 .requestMatchers("/aventureiro/**").authenticated()
                 .requestMatchers("/transacao/**").authenticated()
                 
@@ -34,6 +36,7 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").hasRole("MESTRE")
                 .anyRequest().authenticated()
             )
+            .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
             .formLogin(form -> form
                 .loginPage("/login")
                 .permitAll()

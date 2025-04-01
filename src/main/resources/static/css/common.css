@@ -18,6 +18,7 @@ body.rpg-theme {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
+    /* Corrigido para caminhos relativos corretos */
     background-image: url('../images/parchment-bg.jpg');
     background-attachment: fixed;
     display: flex;

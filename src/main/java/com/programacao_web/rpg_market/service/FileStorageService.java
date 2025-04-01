@@ -15,24 +15,24 @@ import org.slf4j.LoggerFactory;
 
 @Service
 public class FileStorageService {
-    private static final Logger logger = LoggerFactory.getLogger(FileStorageService.class);
+    private static final Logger log = LoggerFactory.getLogger(FileStorageService.class);
     private final Path fileStorageLocation;
 
-    public FileStorageService(@Value("${rpg.market.upload-dir:uploads/images}") String uploadDir) {
+    public FileStorageService(@Value("${rpg.market.file.upload-dir}") String uploadDir) {
         this.fileStorageLocation = Paths.get(uploadDir).toAbsolutePath().normalize();
         try {
-            logger.info("Creating directory at: {}", this.fileStorageLocation.toString());
+            log.info("Creating directory at: {}", this.fileStorageLocation.toString());
             Files.createDirectories(this.fileStorageLocation);
-            logger.info("Upload directory created successfully");
+            log.info("Upload directory created successfully");
         } catch (Exception ex) {
-            logger.error("Failed to create upload directory: {}", ex.getMessage(), ex);
+            log.error("Could not create upload directory: {}", ex.getMessage());
             throw new RuntimeException("Não foi possível criar o diretório de upload: " + this.fileStorageLocation, ex);
         }
     }
 
     public String storeFile(MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
-            logger.warn("Attempted to store empty or null file");
+            log.warn("Attempted to store empty or null file");
             return null; // Return null for empty files rather than throwing exception
         }
         
@@ -53,11 +53,11 @@ public class FileStorageService {
             
             // Copy file to the target location
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-            logger.info("File stored successfully at: {}", targetLocation);
+            log.info("File stored successfully at: {}", targetLocation);
             
             return filename;
         } catch (IOException ex) {
-            logger.error("Could not store file: {}", ex.getMessage(), ex);
+            log.error("Could not store file: {}", ex.getMessage(), ex);
             throw new IOException("Não foi possível armazenar o arquivo. Por favor, tente novamente!", ex);
         }
     }
@@ -67,5 +67,22 @@ public class FileStorageService {
      */
     public Path getFilePath(String fileName) {
         return this.fileStorageLocation.resolve(fileName);
+    }
+    
+    /**
+     * Delete a file from storage
+     */
+    public boolean deleteFile(String fileName) {
+        try {
+            Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            log.error("Could not delete file: {}", e.getMessage());
+            return false;
+        }
     }
 }

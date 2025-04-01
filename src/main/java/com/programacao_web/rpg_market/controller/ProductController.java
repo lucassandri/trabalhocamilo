@@ -66,6 +66,8 @@ public class ProductController {
             @ModelAttribute Product product,
             @RequestParam(required = false) MultipartFile image,
             @RequestParam(required = false) String[] magicProperties,
+            @RequestParam(value = "directSalePrice", required = false) BigDecimal directSalePrice,
+            @RequestParam(value = "startingBid", required = false) BigDecimal startingBid,
             @AuthenticationPrincipal UserDetails currentUser,
             RedirectAttributes redirectAttributes) {
         
@@ -75,6 +77,21 @@ public class ProductController {
             if (userOpt.isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "Usuário não encontrado no reino.");
                 return "redirect:/item/novo";
+            }
+            
+            // Verifica o tipo de anúncio e atribui o preço adequado
+            if (product.getType() == ProductType.DIRECT_SALE) {
+                if (directSalePrice == null || directSalePrice.compareTo(BigDecimal.ZERO) <= 0) {
+                    redirectAttributes.addFlashAttribute("error", "Por favor, informe um preço válido para venda direta.");
+                    return "redirect:/item/novo";
+                }
+                product.setPrice(directSalePrice);
+            } else if (product.getType() == ProductType.AUCTION) {
+                if (startingBid == null || startingBid.compareTo(BigDecimal.ZERO) <= 0) {
+                    redirectAttributes.addFlashAttribute("error", "Por favor, informe um lance inicial válido para leilão.");
+                    return "redirect:/item/novo";
+                }
+                product.setPrice(startingBid);
             }
             
             // Processa a imagem do item
@@ -236,5 +253,67 @@ public class ProductController {
         }
         
         return "redirect:/item/" + id;
+    }
+    
+    /**
+     * Handles request to delete a product
+     */
+    @PostMapping("/{id}/excluir")
+    public String deleteProduct(@PathVariable String id, 
+                              @AuthenticationPrincipal UserDetails currentUser,  // Mudado de User para UserDetails
+                              RedirectAttributes redirectAttributes) {
+        try {
+            // Primeiro, obtenha o usuário atual do UserService usando o nome de usuário do UserDetails
+            Optional<User> userOpt = userService.findByUsername(currentUser.getUsername());
+            
+            if (userOpt.isEmpty()) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Usuário não encontrado");
+                return "redirect:/aventureiro/inventario";
+            }
+            
+            User user = userOpt.get();
+            
+            System.out.println("Tentativa de excluir produto ID: " + id + " pelo usuário: " + currentUser.getUsername());
+            
+            Optional<Product> productOpt = productService.findById(id);
+            
+            if (productOpt.isEmpty()) {
+                System.out.println("Produto não encontrado com ID: " + id);
+                redirectAttributes.addFlashAttribute("errorMessage", "Item não encontrado");
+                return "redirect:/aventureiro/inventario";
+            }
+            
+            Product product = productOpt.get();
+            
+            // Check if current user is the seller
+            if (!product.getSeller().getId().equals(user.getId())) {  // Use user do userService
+                System.out.println("Usuário " + user.getUsername() + " não tem permissão para excluir o item " + product.getId());
+                redirectAttributes.addFlashAttribute("errorMessage", "Você não tem permissão para excluir este item");
+                return "redirect:/item/" + id;
+            }
+            
+            boolean result = productService.deleteProduct(product, user);  // Passa o user do userService
+            
+            if (result) {
+                String messageType = "Anúncio removido com sucesso";
+                if (product.getType() == ProductType.AUCTION && product.getStatus() == ProductStatus.AUCTION_ACTIVE) {
+                    messageType = "Leilão encerrado e removido com sucesso";
+                }
+                // Adicionar log de sucesso no terminal
+                System.out.println("SUCESSO: " + messageType + " para o item " + product.getId() + " - " + product.getName());
+                redirectAttributes.addFlashAttribute("successMessage", messageType);
+            } else {
+                System.out.println("FALHA: Não foi possível remover o item " + product.getId());
+                redirectAttributes.addFlashAttribute("errorMessage", "Não foi possível remover o item");
+            }
+            
+            return "redirect:/aventureiro/inventario";
+            
+        } catch (Exception e) {
+            System.out.println("ERRO AO EXCLUIR: " + e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "Erro ao processar a exclusão: " + e.getMessage());
+            return "redirect:/aventureiro/inventario";
+        }
     }
 }

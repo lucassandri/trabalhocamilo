@@ -17,8 +17,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class ProductService {
+
+    private static final Logger log = LoggerFactory.getLogger(ProductService.class);
 
     @Autowired
     private ProductRepository productRepository;
@@ -31,6 +36,9 @@ public class ProductService {
     
     @Autowired
     private TransactionRepository transactionRepository;
+    
+    @Autowired
+    private FileStorageService fileStorageService;
     
     /**
      * Cria um novo produto
@@ -314,5 +322,55 @@ public class ProductService {
     public List<Product> findSoldByUser(User user) {
         return productRepository.findBySellerAndStatusIn(
             user, Arrays.asList(ProductStatus.SOLD, ProductStatus.AUCTION_ENDED));
+    }
+    
+    /**
+     * Delete a product
+     * Returns true if successful, false otherwise
+     */
+    @Transactional
+    public boolean deleteProduct(Product product, User currentUser) {
+        try {
+            // Verify user is the seller
+            if (!product.getSeller().getId().equals(currentUser.getId())) {
+                return false;
+            }
+            
+            // For active auctions, cancel all bids
+            if (product.getType() == ProductType.AUCTION && 
+                product.getStatus() == ProductStatus.AUCTION_ACTIVE) {
+                
+                cancelAllBidsForProduct(product);
+                
+                // Update product status before deletion to reflect it was canceled
+                product.setStatus(ProductStatus.CANCELED);
+                productRepository.save(product);
+            }
+            
+            // Delete the product
+            productRepository.delete(product);
+            
+            // Handle image deletion if needed
+            if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
+                fileStorageService.deleteFile(product.getImageUrl());
+            }
+            
+            return true;
+        } catch (Exception e) {
+            log.error("Error deleting product: {}", e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Cancel all bids for a product
+     */
+    private void cancelAllBidsForProduct(Product product) {
+        List<Bid> bids = bidRepository.findByProductOrderByAmountDesc(product);
+        if (!bids.isEmpty()) {
+            // Notify bidders about cancellation if needed
+            // For now, just delete all bids
+            bidRepository.deleteAll(bids);
+        }
     }
 }

@@ -30,11 +30,11 @@
                                      class="img-fluid rounded-start h-100 w-100 object-fit-cover" 
                                      alt="Imagem do Produto">
                                 <img th:unless="${product.imageUrl}" 
-                                     th:src="@{/images/default-product.jpg}" 
+                                     th:src="@{/static/images/default-product.jpg}" 
                                      class="img-fluid rounded-start h-100 w-100 object-fit-cover" 
                                      alt="Imagem Padrão">
                                 <span class="badge product-category-badge bg-dark" 
-                                      th:text="${product.category.displayName}">Categoria</span>
+                                      th:text="${product.category != null ? product.category.displayName : 'Sem categoria'}">Categoria</span>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -42,12 +42,14 @@
                                 <!-- Nome, Tipo e Status -->
                                 <h5 class="card-title rpg-font" th:text="${product.name}">Nome do Item</h5>
                                 <p class="mb-2">
-                                    <span class="badge" 
-                                          th:classappend="${product.type.name() == 'DIRECT_SALE' ? 'bg-primary' : 'bg-danger'}"
-                                          th:text="${product.type.name() == 'DIRECT_SALE' ? 'Venda Direta' : 'Leilão'}">Tipo</span>
-                                    <span class="badge" 
-                                          th:classappend="${product.status.name() == 'AVAILABLE' ? 'bg-success' : (product.status.name() == 'AUCTION_ACTIVE' ? 'bg-warning' : 'bg-secondary')}"
-                                          th:text="${product.status.name() == 'AVAILABLE' ? 'Disponível' : (product.status.name() == 'AUCTION_ACTIVE' ? 'Leilão Ativo' : 'Vendido')}">Status</span>
+                                    <span th:if="${product.type.name() == 'DIRECT_SALE'}" class="badge bg-primary">Venda Direta</span>
+                                    <span th:if="${product.type.name() == 'AUCTION'}" class="badge bg-danger">Leilão</span>
+                                    
+                                    <span th:if="${product.status.name() == 'AVAILABLE'}" class="badge bg-success">Disponível</span>
+                                    <span th:if="${product.status.name() == 'SOLD'}" class="badge bg-secondary">Vendido</span>
+                                    <span th:if="${product.status.name() == 'AUCTION_ACTIVE'}" class="badge bg-warning">Leilão Ativo</span>
+                                    <span th:if="${product.status.name() == 'AUCTION_ENDED'}" class="badge bg-secondary">Leilão Encerrado</span>
+                                    <span th:if="${product.status.name() == 'CANCELED'}" class="badge bg-danger">Cancelado</span>
                                 </p>
                                 
                                 <!-- Contador de Leilão -->
@@ -55,25 +57,25 @@
                                     <input type="hidden" id="endDate" 
                                            th:value="${#temporals.format(product.auctionEndDate, 'yyyy-MM-dd HH:mm:ss')}">
                                     <i class="fas fa-hourglass-half me-2"></i>Termina em: 
-                                    <span id="countdown">Calculando...</span>
+                                    <span id="countdown">--h --m</span>
                                 </div>
                                 
                                 <!-- Descrição -->
                                 <div class="mb-3">
                                     <h6 class="fw-bold">Descrição:</h6>
                                     <p class="card-text" 
-                                       th:text="${product.description ?: 'Sem descrição'}">Descrição do item...</p>
+                                       th:text="${product.description}">Descrição do produto</p>
                                 </div>
                                 
                                 <!-- Detalhes do Vendedor -->
                                 <div class="mb-3">
                                     <h6 class="fw-bold">Vendido por:</h6>
                                     <div class="d-flex align-items-center">
-                                        <img th:src="@{/images/default-user.jpg}" 
+                                        <img th:src="@{/static/images/default-user.jpg}" 
                                              alt="Foto do Vendedor" 
                                              class="rounded-circle me-2" style="width:40px;height:40px;">
                                         <div>
-                                            <p class="mb-0" th:text="${product.seller.username}">Nome do Vendedor</p>
+                                            <p class="mb-0" th:text="${product.seller.username}">Vendedor</p>
                                             <small class="text-muted">Nível <span th:text="${product.seller.level}">1</span></small>
                                         </div>
                                     </div>
@@ -106,11 +108,23 @@
                                 </button>
                             </form>
                             <!-- Link para editar se o vendedor -->
-                            <a th:if="${#authentication.name == product.seller.username}" 
-                               th:href="@{/item/{id}/editar(id=${product.id})}" 
-                               class="btn btn-outline-primary btn-lg w-100 mb-2">
-                                <i class="fas fa-edit me-2"></i>Editar Item
-                            </a>
+                            <div th:if="${#authentication.name == product.seller.username}" class="d-grid gap-2">
+                                <a th:href="@{/item/{id}/editar(id=${product.id})}" 
+                                   class="btn btn-outline-primary btn-lg w-100 mb-2">
+                                    <i class="fas fa-edit me-2"></i>Editar Item
+                                </a>
+                                
+                                <!-- Botão para excluir o item -->
+                                <form th:action="@{/item/{id}/excluir(id=${product.id})}" method="post" 
+                                      onsubmit="return confirm('Tem certeza que deseja excluir este anúncio? Esta ação não pode ser desfeita.');">
+                                    <!-- Adicionar token CSRF -->
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    
+                                    <button type="submit" class="btn btn-danger btn-lg w-100">
+                                        <i class="fas fa-trash-alt me-2"></i>Excluir Anúncio
+                                    </button>
+                                </form>
+                            </div>
                             <!-- Alert para usuários não autenticados -->
                             <div sec:authorize="!isAuthenticated()" class="alert alert-info">
                                 <a th:href="@{/login}" class="alert-link">Entre</a> ou 
@@ -125,7 +139,7 @@
                                 <div>
                                     <h6>Lance Atual:</h6>
                                     <h2 class="product-price mb-0" 
-                                        th:text="${'$' + #numbers.formatDecimal(product.price, 0, 'POINT', 2, 'COMMA')}">
+                                        th:text="${'$' + #numbers.formatDecimal((product.price != null ? product.price : 0), 0, 'POINT', 2, 'COMMA')}">
                                         $99.99
                                     </h2>
                                 </div>
@@ -142,8 +156,10 @@
                                 <div class="input-group mb-3">
                                     <span class="input-group-text"><i class="fas fa-coins"></i></span>
                                     <input type="number" name="amount" class="form-control"
-                                           th:min="${product.price + (product.minBidIncrement ?: 1)}" step="0.01"
-                                           th:value="${product.price + (product.minBidIncrement ?: 1)}" required>
+                                           th:min="${(product.price != null ? product.price : 0) + (product.minBidIncrement != null ? product.minBidIncrement : 1)}" 
+                                           step="0.01"
+                                           th:value="${(product.price != null ? product.price : 0) + (product.minBidIncrement != null ? product.minBidIncrement : 1)}" 
+                                           required>
                                 </div>
                                 <button type="submit" class="btn btn-gold w-100">Dar Lance</button>
                             </form>
@@ -154,12 +170,24 @@
                                     <i class="fas fa-shopping-cart me-2"></i>Comprar Agora
                                 </button>
                             </form>
-                            <!-- Link para editar se o vendedor -->
-                            <a th:if="${#authentication.name == product.seller.username}" 
-                               th:href="@{/item/{id}/editar(id=${product.id})}" 
-                               class="btn btn-outline-primary w-100 mb-2">
-                                <i class="fas fa-edit me-2"></i>Editar Item
-                            </a>
+                            <!-- Modificar a seção de edição para incluir exclusão -->
+                            <div th:if="${#authentication.name == product.seller.username}" class="d-grid gap-2 mt-2">
+                                <a th:href="@{/item/{id}/editar(id=${product.id})}" 
+                                   class="btn btn-outline-primary w-100 mb-2">
+                                    <i class="fas fa-edit me-2"></i>Editar Item
+                                </a>
+                                
+                                <!-- Botão para excluir o item -->
+                                <form th:action="@{/item/{id}/excluir(id=${product.id})}" method="post" 
+                                      onsubmit="return confirm('Tem certeza que deseja excluir este leilão? Esta ação não pode ser desfeita. Todos os lances serão cancelados.');">
+                                    <!-- Adicionar token CSRF -->
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    
+                                    <button type="submit" class="btn btn-danger w-100">
+                                        <i class="fas fa-trash-alt me-2"></i>Encerrar e Excluir Leilão
+                                    </button>
+                                </form>
+                            </div>
                             <!-- Alert para usuários não autenticados -->
                             <div sec:authorize="!isAuthenticated()" class="alert alert-info">
                                 <a th:href="@{/login}" class="alert-link">Entre</a> ou 
@@ -176,6 +204,18 @@
                                 th:text="${'$' + #numbers.formatDecimal(product.price, 0, 'POINT', 2, 'COMMA')}">
                                 $99.99
                             </h2>
+                            
+                            <!-- Botão para excluir o item vendido (apenas para o vendedor) -->
+                            <form th:if="${#authentication.name == product.seller.username}" 
+                                  th:action="@{/item/{id}/excluir(id=${product.id})}" method="post" class="mt-3"
+                                  onsubmit="return confirm('Tem certeza que deseja remover este item do seu histórico? Esta ação não pode ser desfeita.');">
+                                <!-- Adicionar token CSRF -->
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                
+                                <button type="submit" class="btn btn-outline-danger">
+                                    <i class="fas fa-trash-alt me-2"></i>Remover Anúncio
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -191,12 +231,12 @@
                         <ul class="list-group list-group-flush bid-history">
                             <li th:each="bid : ${bids}" class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <span th:text="${bid.bidder.username}">Usuário</span>
-                                    <small class="text-muted d-block">
-                                        <i class="fas fa-clock me-1"></i>Lance registrado
-                                    </small>
+                                    <span class="fw-bold text-primary" th:text="${bid.bidder.username}">Usuário</span>
+                                    <span class="ms-2 badge bg-secondary">
+                                        <i class="fas fa-user-tag me-1"></i>Licitante
+                                    </span>
                                 </div>
-                                <span class="badge bg-primary" 
+                                <span class="badge bg-success fs-6" 
                                       th:text="${'$' + #numbers.formatDecimal(bid.amount, 0, 'POINT', 2, 'COMMA')}">
                                     $99.99
                                 </span>

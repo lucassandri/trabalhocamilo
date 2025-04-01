@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="pt-br" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anunciar Item - RPG Market</title>
+    <title>Criar Anúncio - RPG Market</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -21,11 +25,17 @@
     <link th:href="@{/css/product.css}" rel="stylesheet">
     <link th:href="@{/css/user.css}" rel="stylesheet">
     <link th:href="@{/css/item-creation.css}" rel="stylesheet">
+    
+    <style>
+        /* Override CSS for sale type fields */
+        #directSaleFields, #auctionFields {
+            display: none;
+            transition: all 0.3s ease;
+        }
+    </style>
 </head>
 <body class="rpg-theme">
-    <!-- Include the header -->
-    <div th:replace="~{fragments/header :: header}"></div>
-
+    <div layout:fragment="content">
         <main class="container py-4 flex-grow-1">
             <!-- Pergaminho título -->
             <div class="scroll-header mb-4">
@@ -109,36 +119,54 @@
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
-                                    <label for="type" class="form-label">Tipo de Venda</label>
+                                    <label for="type" class="form-label">Tipo de Venda*</label>
                                     <select class="form-select" id="type" name="type" required>
                                         <option value="" selected disabled>Selecione o tipo de venda</option>
                                         <option value="DIRECT_SALE">Venda Direta</option>
                                         <option value="AUCTION">Leilão</option>
                                     </select>
-                                    <div class="invalid-feedback">
-                                        Por favor, selecione o tipo de venda.
-                                    </div>
                                 </div>
                                 
-                                <div class="mb-3">
-                                    <label for="price" class="form-label">Preço (Moedas de Ouro)</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text gold-icon"><i class="fas fa-coins"></i></span>
-                                        <input type="number" class="form-control" id="price" name="price" min="0.01" step="0.01" required>
-                                        <div class="invalid-feedback">
-                                            Por favor, informe um preço válido.
+                                <!-- Hidden price field that will always be submitted -->
+                                <input type="hidden" id="price" name="price" value="0">
+                                
+                                <!-- Direct Sale Fields -->
+                                <div id="directSaleFields">
+                                    <div class="mb-3">
+                                        <label for="directSalePrice" class="form-label">Preço (Moedas de Ouro)*</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-coins text-warning"></i></span>
+                                            <input type="number" class="form-control" id="directSalePrice" name="directSalePrice" min="0.01" step="0.01" required>
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <!-- Campos específicos para leilão (inicialmente ocultos) -->
-                                <div id="auctionFields" style="display:none;">
-                                    <div class="mb-3 mt-4 border-top pt-4">
-                                        <label for="startingBid" class="form-label">Lance Inicial (Moedas de Ouro)</label>
+                                <!-- Auction Fields -->
+                                <div id="auctionFields">
+                                    <div class="mb-3">
+                                        <label for="startingBid" class="form-label">Lance Inicial (Moedas de Ouro)*</label>
                                         <div class="input-group">
-                                            <span class="input-group-text gold-icon"><i class="fas fa-gavel"></i></span>
+                                            <span class="input-group-text"><i class="fas fa-gavel text-warning"></i></span>
                                             <input type="number" class="form-control" id="startingBid" name="startingBid" min="0.01" step="0.01">
                                         </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="minBidIncrement" class="form-label">Incremento Mínimo entre Lances</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-plus text-warning"></i></span>
+                                            <input type="number" class="form-control" id="minBidIncrement" name="minBidIncrement" min="0.01" step="0.01" value="1.00">
+                                        </div>
+                                        <div class="form-text">Valor mínimo a ser adicionado ao lance atual para um novo lance ser válido. Padrão: 1.00</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="buyNowPrice" class="form-label">Preço de Compra Imediata (opcional)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-coins text-warning"></i></span>
+                                            <input type="number" class="form-control" id="buyNowPrice" name="buyNowPrice" min="0" step="0.01">
+                                        </div>
+                                        <div class="form-text">Se definido, os usuários poderão encerrar o leilão comprando imediatamente pelo valor especificado.</div>
                                     </div>
                                     
                                     <div class="mb-3">
@@ -245,56 +273,151 @@
                     <a th:href="@{/aventureiro/inventario}" class="btn btn-secondary">
                         <i class="fas fa-arrow-left me-2"></i>Cancelar
                     </a>
-                    <button type="submit" class="btn btn-gold">
+                    <button type="submit" id="submitBtn" class="btn btn-gold" disabled>
                         <i class="fas fa-scroll me-2"></i>Anunciar Item
                     </button>
                 </div>
             </form>
         </main>
 
-    <!-- Include the footer -->
-    <div th:replace="~{fragments/footer :: footer}">    </div>
+        <!-- Include the footer -->
+        <div th:replace="~{fragments/footer :: footer}"></div>
+    </div>
     
-    <!-- Bootstrap JS (ensure it loads before your script.js) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script th:src="@{/js/script.js}"></script>
-    
-    <!-- Add additional script for rarity selection -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Ensure dropdown menus work
-            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
-            dropdownElementList.map(function (dropdownToggleEl) {
-                return new bootstrap.Dropdown(dropdownToggleEl);
-            });
-            
-            // Add listener for rarity selection
-            const raritySelect = document.getElementById('rarity');
-            if (raritySelect) {
-                raritySelect.addEventListener('change', function() {
-                    updatePreview();
-                    
-                    // Add visual feedback for rarity selection
-                    const rarityValue = this.value;
-                    const previewCard = document.querySelector('.preview-card');
-                    
-                    // Remove previous rarity classes
-                    previewCard.classList.remove('border-common', 'border-uncommon', 'border-rare', 'border-epic', 'border-legendary');
-                    
-                    // Add appropriate class based on selection
-                    if (rarityValue) {
-                        previewCard.classList.add('border-' + rarityValue.toLowerCase());
+    <th:block layout:fragment="pageScripts">
+        <!-- Bootstrap JS (ensure it loads before your script.js) -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script th:src="@{/js/script.js}"></script>
+        
+        <!-- Add additional script for rarity selection -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log("Form initialization starting...");
+                
+                // Get DOM elements
+                const typeSelect = document.getElementById('type');
+                const directSaleFields = document.getElementById('directSaleFields');
+                const auctionFields = document.getElementById('auctionFields');
+                const priceField = document.getElementById('price');
+                const directSalePriceField = document.getElementById('directSalePrice');
+                const startingBidField = document.getElementById('startingBid');
+                const previewPrice = document.getElementById('previewPrice');
+                const submitBtn = document.getElementById('submitBtn');
+                
+                // Enable submit button only when type is selected
+                if (typeSelect && submitBtn) {
+                    typeSelect.addEventListener('change', function() {
+                        submitBtn.disabled = false;
+                    });
+                }
+                
+                // Handle form type switching
+                if (typeSelect) {
+                    typeSelect.addEventListener('change', function() {
+                        console.log("Type changed to:", this.value);
+                        
+                        if (this.value === 'AUCTION') {
+                            // Show auction fields, hide direct sale fields
+                            directSaleFields.style.display = 'none';
+                            auctionFields.style.display = 'block';
+                            
+                            // Make auction fields required
+                            startingBidField.setAttribute('required', 'required');
+                            directSalePriceField.removeAttribute('required');
+                            
+                            // Update preview to show starting bid if available
+                            if (startingBidField.value) {
+                                priceField.value = startingBidField.value;
+                                updatePricePreview(startingBidField.value);
+                            }
+                            
+                        } else if (this.value === 'DIRECT_SALE') {
+                            // Show direct sale fields, hide auction fields
+                            directSaleFields.style.display = 'block';
+                            auctionFields.style.display = 'none';
+                            
+                            // Make direct sale fields required
+                            directSalePriceField.setAttribute('required', 'required');
+                            startingBidField.removeAttribute('required');
+                            
+                            // Update preview to show direct sale price if available
+                            if (directSalePriceField.value) {
+                                priceField.value = directSalePriceField.value;
+                                updatePricePreview(directSalePriceField.value);
+                            }
+                        }
+                    });
+                }
+                
+                // Handle direct sale price changes
+                if (directSalePriceField) {
+                    directSalePriceField.addEventListener('input', function() {
+                        priceField.value = this.value;
+                        updatePricePreview(this.value);
+                        console.log("Updated price to:", this.value);
+                    });
+                }
+                
+                // Handle starting bid changes
+                if (startingBidField) {
+                    startingBidField.addEventListener('input', function() {
+                        // Update the hidden price field immediately
+                        priceField.value = this.value;
+                        updatePricePreview(this.value);
+                        console.log("Updated starting bid to:", this.value);
+                    });
+                }
+                
+                // Update price preview function
+                function updatePricePreview(value) {
+                    if (previewPrice) {
+                        const price = parseFloat(value) || 0;
+                        previewPrice.textContent = '$' + price.toFixed(2);
                     }
-                });
-            }
-            
-            // Make sure form exists and gets proper submit button
-            const form = document.querySelector('form');
-            if (form) {
-                // Ensure the form is properly structured
-                console.log('Form found:', form);
-            }
-        });
-    </script>
+                }
+                
+                // Handle form submission with extra validation
+                const form = document.querySelector('form');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault(); // Temporarily prevent form submission
+                        const selectedType = typeSelect.value;
+                        
+                        if (selectedType === 'AUCTION') {
+                            // For auctions, confirm price is set to starting bid
+                            if (startingBidField.value) {
+                                priceField.value = startingBidField.value;
+                                console.log("Auction submission: Price set to:", priceField.value);
+                                console.log("Starting bid value:", startingBidField.value);
+                            } else {
+                                alert("Por favor, informe um lance inicial válido.");
+                                startingBidField.focus();
+                                return; // Stop submission
+                            }
+                        } else if (selectedType === 'DIRECT_SALE') {
+                            // For direct sales, confirm price is set
+                            if (directSalePriceField.value) {
+                                priceField.value = directSalePriceField.value;
+                            } else {
+                                alert("Por favor, informe um preço válido.");
+                                directSalePriceField.focus();
+                                return; // Stop submission
+                            }
+                        }
+                        
+                        // Final check that price is set before submitting
+                        if (!priceField.value || parseFloat(priceField.value) <= 0) {
+                            console.error("Price is still zero or invalid:", priceField.value);
+                            alert("Erro: O preço não foi definido corretamente. Por favor, tente novamente.");
+                            return; // Stop submission
+                        }
+                        
+                        console.log("Form submitting with final price:", priceField.value);
+                        form.submit(); // Actually submit the form
+                    });
+                }
+            });
+        </script>
+    </th:block>
 </body>
 </html>

@@ -5,5 +5,6 @@ public enum ProductStatus {
     RESERVED, // Reservado (em processo de compra)
     SOLD, // Vendido
     AUCTION_ACTIVE, // Leilão ativo
-    AUCTION_ENDED // Leilão finalizado
+    AUCTION_ENDED, // Leilão finalizado
+    CANCELED // Leilão ou produto cancelado
 }
