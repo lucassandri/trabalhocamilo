@@ -39,8 +39,17 @@
                     </div>
                     <div class="card-body text-center p-4">
                         <div class="mb-3">
-                            <div class="avatar-placeholder mb-3">
-                                <i class="fas fa-user-circle fa-6x text-secondary"></i>
+                            <div class="avatar-container text-center mb-4">
+                                <img th:if="${user.profileImageUrl}" 
+                                     th:src="@{/images/{name}(name=${user.profileImageUrl})}" 
+                                     class="avatar-image rounded-circle" 
+                                     alt="Imagem de Perfil"
+                                     style="width: 150px; height: 150px; object-fit: cover; border: 3px solid var(--secondary-color);">
+                                <img th:unless="${user.profileImageUrl}" 
+                                     th:src="@{/static/images/default-avatar.png}" 
+                                     class="avatar-image rounded-circle" 
+                                     alt="Imagem de Perfil"
+                                     style="width: 150px; height: 150px; object-fit: cover; border: 3px solid var(--secondary-color);">
                             </div>
                             <h3 class="rpg-font" th:text="${user.username}">NomeDaJogadora</h3>
                             <p class="mb-1">

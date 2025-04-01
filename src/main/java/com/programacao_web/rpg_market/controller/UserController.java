@@ -5,16 +5,23 @@ import com.programacao_web.rpg_market.model.User;
 import com.programacao_web.rpg_market.service.ProductService;
 import com.programacao_web.rpg_market.service.UserService;
 import com.programacao_web.rpg_market.dto.PasswordChangeRequest;
+import com.programacao_web.rpg_market.service.FileStorageService;
+import com.programacao_web.rpg_market.service.CustomUserDetailsService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -30,6 +37,20 @@ public class UserController {
     @Autowired
     private ProductService productService;
     
+    @Autowired
+    private FileStorageService fileStorageService;
+    
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
+    
+    // Adicionar este método na classe UserController
+    private void refreshAuthentication(User user) {
+        UserDetails updatedUserDetails = customUserDetailsService.loadUserByUsername(user.getUsername());
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(
+            updatedUserDetails, null, updatedUserDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
+    }
+    
     // Exibe formulário de registro
     @GetMapping("/registrar")
     public String showRegisterForm(Model model) {
@@ -39,8 +60,17 @@ public class UserController {
     
     // Processa o registro de novos usuários
     @PostMapping("/registrar")
-    public String registerUser(@ModelAttribute User user, RedirectAttributes redirectAttributes) {
+    public String registerUser(
+            @ModelAttribute User user, 
+            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
+            RedirectAttributes redirectAttributes) {
         try {
+            // Processar upload de imagem se fornecido
+            if (profileImage != null && !profileImage.isEmpty()) {
+                String imageFilename = fileStorageService.storeAndResizeImage(profileImage, 200, 200);
+                user.setProfileImageUrl(imageFilename);
+            }
+            
             userService.registerUser(user);
             redirectAttributes.addFlashAttribute("success", "Conta criada com sucesso!");
             return "redirect:/login";
@@ -166,6 +196,8 @@ public class UserController {
     @PostMapping("/editar-perfil")
     public String updateProfile(
             @ModelAttribute User updatedUser,
+            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
+            @RequestParam(value = "croppedImage", required = false) String croppedImageData,
             @AuthenticationPrincipal UserDetails currentUser,
             RedirectAttributes redirectAttributes) {
         
@@ -176,7 +208,36 @@ public class UserController {
             }
             
             User user = userOpt.get();
+            
+            // Processar o upload da imagem do perfil
+            if (croppedImageData != null && !croppedImageData.isEmpty()) {
+                // Processar a imagem recortada do data URL
+                String imageFilename = fileStorageService.storeBase64Image(croppedImageData, "profile");
+                
+                // Remover imagem anterior se existir
+                if (user.getProfileImageUrl() != null) {
+                    fileStorageService.deleteFile(user.getProfileImageUrl());
+                }
+                
+                user.setProfileImageUrl(imageFilename);
+            } else if (profileImage != null && !profileImage.isEmpty()) {
+                // Caso não tenha recortado, apenas redimensionar e salvar
+                String imageFilename = fileStorageService.storeAndResizeImage(profileImage, 200, 200);
+                
+                // Remover imagem anterior se existir
+                if (user.getProfileImageUrl() != null) {
+                    fileStorageService.deleteFile(user.getProfileImageUrl());
+                }
+                
+                user.setProfileImageUrl(imageFilename);
+            }
+            
+            // Atualiza os outros campos
             userService.updateProfile(user, updatedUser);
+            
+            // Atualiza a autenticação para refletir as mudanças no perfil
+            refreshAuthentication(user);
+            
             redirectAttributes.addFlashAttribute("success", "Perfil atualizado com sucesso!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

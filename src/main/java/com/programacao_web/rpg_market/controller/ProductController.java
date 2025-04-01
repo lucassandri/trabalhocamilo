@@ -91,7 +91,12 @@ public class ProductController {
                     redirectAttributes.addFlashAttribute("error", "Por favor, informe um lance inicial válido para leilão.");
                     return "redirect:/item/novo";
                 }
+                
+                // Garantir que o preço é definido para leilões
                 product.setPrice(startingBid);
+                
+                // Adicionar log para debug
+                System.out.println("Leilão criado com lance inicial de: " + startingBid);
             }
             
             // Processa a imagem do item

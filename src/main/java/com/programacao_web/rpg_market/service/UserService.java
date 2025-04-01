@@ -7,8 +7,12 @@ import com.programacao_web.rpg_market.repository.TransactionRepository;
 import com.programacao_web.rpg_market.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,6 +20,8 @@ import java.util.Optional;
 
 @Service
 public class UserService {
+
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private UserRepository userRepository;
@@ -126,5 +132,25 @@ public class UserService {
         currentUser.setCharacterClass(updatedUser.getCharacterClass());
         
         userRepository.save(currentUser);
+    }
+    
+    /**
+     * Método para obter a URL da imagem de perfil do usuário atual
+     */
+    public String getCurrentUserProfileImageUrl() {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !(auth.getPrincipal() instanceof String)) {
+                String username = auth.getName();
+                Optional<User> userOpt = findByUsername(username);
+                if (userOpt.isPresent()) {
+                    return userOpt.get().getProfileImageUrl();
+                }
+            }
+        } catch (Exception e) {
+            // Log the exception but don't let it break the application
+            log.error("Error getting current user profile image: {}", e.getMessage());
+        }
+        return null;
     }
 }

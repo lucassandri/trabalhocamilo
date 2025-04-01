@@ -90,8 +90,7 @@
                             class="product-img" alt="Imagem Padrão">
                         
                         <!-- Category badge -->
-                        <span class="badge product-category-badge bg-dark" 
-                            th:text="${product.category.displayName}">Categoria</span>
+                        <span class="badge product-category-badge bg-dark" th:text="${product.category != null ? product.category.displayName : 'Sem categoria'}">Categoria</span>
                         
                         <!-- Auction badge -->
                         <span th:if="${product.type.name() == 'AUCTION'}" 

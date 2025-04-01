@@ -44,7 +44,14 @@ public class ProductService {
      * Cria um novo produto
      */
     public Product create(Product product, User seller) {
+        // Definir o vendedor
         product.setSeller(seller);
+        
+        // Garantir que leilões sempre tenham um preço inicial > 0
+        if (product.getType() == ProductType.AUCTION && 
+            (product.getPrice() == null || product.getPrice().compareTo(BigDecimal.ZERO) <= 0)) {
+            throw new IllegalArgumentException("Leilões devem ter um lance inicial válido maior que zero");
+        }
         
         // Se for leilão, verifica se tem data de término
         if (product.getType() == ProductType.AUCTION && product.getAuctionEndDate() == null) {

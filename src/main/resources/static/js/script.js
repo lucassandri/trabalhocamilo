@@ -81,24 +81,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Mostrar/esconder campos de leilão com animação
     const typeSelect = document.getElementById('type');
+    const directSaleFields = document.getElementById('directSaleFields');
     const auctionFields = document.getElementById('auctionFields');
-    
-    if (typeSelect && auctionFields) {
+
+    if (typeSelect && directSaleFields && auctionFields) {
+        // Inicializar os campos corretamente no carregamento da página
+        if (typeSelect.value === 'AUCTION') {
+            directSaleFields.style.display = 'none';
+            auctionFields.style.display = 'block';
+            setTimeout(() => {
+                auctionFields.classList.add('show');
+            }, 10);
+        } else {
+            auctionFields.style.display = 'none';
+            directSaleFields.style.display = 'block';
+        }
+        
         typeSelect.addEventListener('change', function() {
-            console.log('Type changed to:', this.value); // Debug info
-            
             if (this.value === 'AUCTION') {
-                console.log('Showing auction fields');
-                auctionFields.style.display = 'block';
+                // Esconder campos de venda direta
+                directSaleFields.classList.remove('show');
                 setTimeout(() => {
-                    auctionFields.classList.add('show');
-                }, 10);
+                    directSaleFields.style.display = 'none';
+                    // Mostrar campos de leilão
+                    auctionFields.style.display = 'block';
+                    setTimeout(() => {
+                        auctionFields.classList.add('show');
+                        // Definir o campo de lance inicial como obrigatório
+                        document.getElementById('startingBid').required = true;
+                        document.getElementById('directSalePrice').required = false;
+                    }, 10);
+                }, 300);
             } else {
-                console.log('Hiding auction fields');
+                // Esconder campos de leilão
                 auctionFields.classList.remove('show');
                 setTimeout(() => {
                     auctionFields.style.display = 'none';
-                }, 300); // Match transition duration
+                    // Mostrar campos de venda direta
+                    directSaleFields.style.display = 'block';
+                    setTimeout(() => {
+                        directSaleFields.classList.add('show');
+                        // Definir o campo de preço como obrigatório
+                        document.getElementById('startingBid').required = false;
+                        document.getElementById('directSalePrice').required = true;
+                    }, 10);
+                }, 300);
             }
         });
     }
