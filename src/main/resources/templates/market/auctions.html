@@ -20,21 +20,108 @@
             </div>
         </div>
         
-        <!-- Lista de Produtos em Leilão -->
+        <!-- Filtros e Ordenação -->
+        <div class="card border-gold mb-4">
+            <div class="card-header bg-dark text-light">
+                <h3 class="rpg-font mb-0">
+                    <i class="fas fa-filter me-2"></i>Filtros e Ordenação
+                </h3>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/mercado/masmorra-dos-leiloes}" method="get" class="row g-3">
+                    <!-- Filtro por categoria -->
+                    <div class="col-md-3 col-sm-6">
+                        <label for="category" class="form-label">Categoria</label>
+                        <select class="form-select" id="category" name="category">
+                            <option value="">Todas as Categorias</option>
+                            <option th:each="categoryOption : ${categories}" 
+                                    th:value="${categoryOption}" 
+                                    th:text="${categoryOption.displayName}"
+                                    th:selected="${param.category != null && param.category[0] == categoryOption.name()}">
+                                Categoria
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <!-- Filtro por raridade -->
+                    <div class="col-md-3 col-sm-6">
+                        <label for="rarity" class="form-label">Raridade</label>
+                        <select class="form-select" id="rarity" name="rarity">
+                            <option value="">Todas as Raridades</option>
+                            <option th:each="rarityOption : ${rarities}" 
+                                    th:value="${rarityOption}" 
+                                    th:text="${rarityOption.displayName}"
+                                    th:selected="${param.rarity != null && param.rarity[0] == rarityOption.name()}">
+                                Raridade
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <!-- Filtro por faixa de preço -->
+                    <div class="col-md-3 col-sm-6">
+                        <label for="minPrice" class="form-label">Lance Mínimo</label>
+                        <input type="number" class="form-control" id="minPrice" name="minPrice" 
+                               th:value="${param.minPrice}" min="0" step="0.01" placeholder="Min">
+                    </div>
+                    
+                    <div class="col-md-3 col-sm-6">
+                        <label for="maxPrice" class="form-label">Lance Máximo</label>
+                        <input type="number" class="form-control" id="maxPrice" name="maxPrice" 
+                               th:value="${param.maxPrice}" min="0" step="0.01" placeholder="Max">
+                    </div>
+                    
+                    <!-- Checkbox para leilões terminando em breve -->
+                    <div class="col-md-4">
+                        <div class="form-check mt-4">
+                            <input class="form-check-input" type="checkbox" id="endingSoon" name="endingSoon" value="true"
+                                  th:checked="${param.endingSoon != null && param.endingSoon[0] == 'true'}">
+                            <label class="form-check-label" for="endingSoon">
+                                <i class="fas fa-hourglass-end me-1"></i>Apenas leilões terminando em breve (24h)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Ordenação -->
+                    <div class="col-md-8">
+                        <label for="sort" class="form-label">Ordenar por</label>
+                        <div class="d-flex gap-2">
+                            <select class="form-select" id="sort" name="sort">
+                                <option value="auctionEndDate,asc" th:selected="${param.sort == null || param.sort[0] == 'auctionEndDate,asc'}">Terminando em breve</option>
+                                <option value="auctionEndDate,desc" th:selected="${param.sort != null && param.sort[0] == 'auctionEndDate,desc'}">Terminando depois</option>
+                                <option value="price,asc" th:selected="${param.sort != null && param.sort[0] == 'price,asc'}">Lance atual: menor primeiro</option>
+                                <option value="price,desc" th:selected="${param.sort != null && param.sort[0] == 'price,desc'}">Lance atual: maior primeiro</option>
+                                <option value="createdAt,desc" th:selected="${param.sort != null && param.sort[0] == 'createdAt,desc'}">Mais recentes primeiro</option>
+                                <option value="createdAt,asc" th:selected="${param.sort != null && param.sort[0] == 'createdAt,asc'}">Mais antigos primeiro</option>
+                            </select>
+                            
+                            <button type="submit" class="btn btn-gold">
+                                <i class="fas fa-search me-2"></i>Aplicar
+                            </button>
+                            
+                            <a th:href="@{/mercado/masmorra-dos-leiloes}" class="btn btn-outline-secondary">
+                                <i class="fas fa-sync-alt me-2"></i>Limpar
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Lista de Produtos -->
         <div class="row g-4">
             <!-- Se não houver produtos -->
             <div th:if="${auctions.empty}" class="col-12 inventory-empty">
                 <i class="fas fa-gavel mb-3"></i>
-                <h4>Não há leilões ativos no momento</h4>
-                <p class="text-muted">Seja o primeiro a criar um leilão!</p>
-                <a th:href="@{/item/novo}" sec:authorize="isAuthenticated()" class="btn btn-gold mt-2">
-                    <i class="fas fa-plus-circle me-2"></i>Criar Leilão
+                <h4>Não há leilões ativos com estes filtros</h4>
+                <p class="text-muted">Tente outros critérios de busca ou visite mais tarde!</p>
+                <a th:href="@{/mercado/masmorra-dos-leiloes}" class="btn btn-gold mt-2">
+                    <i class="fas fa-search me-2"></i>Ver Todos os Leilões
                 </a>
             </div>
             
-            <!-- Lista de leilões ativos -->
+            <!-- Lista de leilões -->
             <div th:unless="${auctions.empty}" th:each="auction : ${auctions}" class="col-md-6 col-lg-4">
-                <div class="card h-100 product-card">
+                <div class="card h-100 product-card auction-item">
                     <div class="product-img-container">
                         <img th:if="${auction.imageUrl}" th:src="@{/images/{name}(name=${auction.imageUrl})}" class="product-img" alt="Imagem do Produto">
                         <img th:unless="${auction.imageUrl}" th:src="@{/images/default-product.jpg}" class="product-img" alt="Imagem Padrão">
@@ -42,21 +129,46 @@
                         <span class="badge bg-danger position-absolute start-0 top-0 m-2">
                             <i class="fas fa-gavel me-1"></i>Leilão
                         </span>
+                        
+                        <!-- Raridade badge -->
+                        <span th:if="${auction.rarity}" 
+                              th:class="'badge position-absolute top-0 end-0 m-2 ' + ${auction.rarity.badgeClass}"
+                              th:text="${auction.rarity.displayName}">
+                            Raridade
+                        </span>
                     </div>
                     <div class="card-body">
                         <h5 class="card-title rpg-font" th:text="${auction.name}">Nome do Produto</h5>
                         <p class="card-text text-truncate" th:text="${auction.description}">Descrição do produto...</p>
                         
-                        <div class="auction-timer p-2 mb-2">
+                        <div class="auction-timer p-2 mb-3 rounded">
                             <i class="fas fa-hourglass-half me-1"></i>
-                            <span class="countdown" th:data-end-date="${#temporals.format(auction.auctionEndDate, 'yyyy-MM-dd HH:mm:ss')}">3d 12h 45m</span>
+                            <span class="countdown" th:data-end-date="${#temporals.format(auction.auctionEndDate, 'yyyy-MM-dd''T''HH:mm:ss')}">
+                                Calculando...
+                            </span>
                         </div>
                         
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="product-price" th:text="${'$' + #numbers.formatDecimal(auction.price != null ? auction.price : 0, 0, 'POINT', 2, 'COMMA')}">$0.00</span>
+                            <div>
+                                <span class="product-price fs-5" th:text="${'$' + #numbers.formatDecimal(auction.price != null ? auction.price : 0, 0, 'POINT', 2, 'COMMA')}">$0.00</span>
+                                <small class="text-muted d-block">Lance Atual</small>
+                            </div>
                             <a th:href="@{/item/{id}(id=${auction.id})}" class="btn btn-sm btn-gold">
-                                <i class="fas fa-eye me-1"></i>Detalhes
+                                <i class="fas fa-gavel me-1"></i>Dar Lance
                             </a>
+                        </div>
+                        
+                        <!-- Compra Imediata se disponível -->
+                        <div th:if="${auction.buyNowPrice != null}" class="mt-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="text-success fw-bold" th:text="${'$' + #numbers.formatDecimal(auction.buyNowPrice, 0, 'POINT', 2, 'COMMA')}">$0.00</span>
+                                    <small class="text-muted d-block">Compra Imediata</small>
+                                </div>
+                                <a th:href="@{/item/{id}(id=${auction.id})}" class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-shopping-cart me-1"></i>Comprar
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
@@ -75,16 +187,16 @@
             <nav>
                 <ul class="pagination">
                     <li th:class="${auctions.first ? 'page-item disabled' : 'page-item'}">
-                        <a class="page-link" th:href="@{/mercado/masmorra-dos-leiloes(page=${auctions.number - 1})}">
+                        <a class="page-link" th:href="@{/mercado/masmorra-dos-leiloes(page=${auctions.number - 1},category=${param.category},rarity=${param.rarity},minPrice=${param.minPrice},maxPrice=${param.maxPrice},endingSoon=${param.endingSoon},sort=${param.sort})}">
                             <i class="fas fa-chevron-left"></i>
                         </a>
                     </li>
                     <li th:each="i : ${#numbers.sequence(0, auctions.totalPages - 1)}" 
                         th:class="${auctions.number == i ? 'page-item active' : 'page-item'}">
-                        <a class="page-link" th:href="@{/mercado/masmorra-dos-leiloes(page=${i})}" th:text="${i + 1}">1</a>
+                        <a class="page-link" th:href="@{/mercado/masmorra-dos-leiloes(page=${i},category=${param.category},rarity=${param.rarity},minPrice=${param.minPrice},maxPrice=${param.maxPrice},endingSoon=${param.endingSoon},sort=${param.sort})}" th:text="${i + 1}">1</a>
                     </li>
                     <li th:class="${auctions.last ? 'page-item disabled' : 'page-item'}">
-                        <a class="page-link" th:href="@{/mercado/masmorra-dos-leiloes(page=${auctions.number + 1})}">
+                        <a class="page-link" th:href="@{/mercado/masmorra-dos-leiloes(page=${auctions.number + 1},category=${param.category},rarity=${param.rarity},minPrice=${param.minPrice},maxPrice=${param.maxPrice},endingSoon=${param.endingSoon},sort=${param.sort})}">
                             <i class="fas fa-chevron-right"></i>
                         </a>
                     </li>
@@ -96,36 +208,9 @@
     <th:block layout:fragment="pageScripts">
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                const countdowns = document.querySelectorAll('.countdown');
-                
-                function updateCountdowns() {
-                    countdowns.forEach(element => {
-                        const dateStr = element.getAttribute('data-end-date');
-                        if (!dateStr) return;
-                        
-                        const endDate = new Date(dateStr);
-                        const now = new Date();
-                        const diff = endDate - now;
-                        
-                        if (diff <= 0) {
-                            element.textContent = "Encerrado";
-                            return;
-                        }
-                        
-                        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                        
-                        let displayText = "";
-                        if(days > 0) displayText += days + "d ";
-                        displayText += hours + "h " + minutes + "m";
-                        
-                        element.textContent = displayText;
-                    });
-                }
-                
-                updateCountdowns();
-                setInterval(updateCountdowns, 60000);
+                // Garantir que os countdowns sejam atualizados imediatamente e a cada segundo
+                updateAllCountdowns();
+                setInterval(updateAllCountdowns, 1000);
             });
         </script>
     </th:block>

@@ -1,12 +1,12 @@
 package com.programacao_web.rpg_market;
 
-import com.programacao_web.rpg_market.config.FileStorageProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-@SpringBootApplication
-@EnableConfigurationProperties({FileStorageProperties.class})
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@EnableScheduling
 public class RpgMarketApplication {
 
     public static void main(String[] args) {

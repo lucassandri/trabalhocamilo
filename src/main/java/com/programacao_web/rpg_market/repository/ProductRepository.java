@@ -17,12 +17,12 @@ import java.util.List;
 public interface ProductRepository extends MongoRepository<Product, String> {
     Page<Product> findByStatus(ProductStatus status, Pageable pageable);
     Page<Product> findByCategoryAndStatus(ProductCategory category, ProductStatus status, Pageable pageable);
-    Page<Product> findBySeller(User seller, Pageable pageable);
     
-    @Query("{ $or: [{'name': {$regex: ?0, $options: 'i'}}, {'description': {$regex: ?0, $options: 'i'}}], 'status': ?1 }")
+    @Query("{'$or': [{'name': {$regex: ?0, $options: 'i'}}, {'description': {$regex: ?0, $options: 'i'}}], 'status': ?1}")
     Page<Product> searchByNameAndStatus(String keyword, ProductStatus status, Pageable pageable);
     
     List<Product> findByStatusAndAuctionEndDateLessThanEqual(ProductStatus status, LocalDateTime dateTime);
     List<Product> findBySeller(User seller);
     List<Product> findBySellerAndStatusIn(User seller, List<ProductStatus> statuses);
+    
 }

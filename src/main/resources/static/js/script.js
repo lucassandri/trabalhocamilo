@@ -15,12 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return new bootstrap.Popover(popoverTriggerEl);
     });
     
-    // Initialize all dropdowns using Bootstrap's native approach
-    const dropdownElementList = document.querySelectorAll('.dropdown-toggle');
-    dropdownElementList.forEach(function(dropdownToggleEl) {
-        new bootstrap.Dropdown(dropdownToggleEl);
-    });
-    
     // Funções específicas para determinadas páginas
     if (document.getElementById('countdown')) {
         updateAuctionCountdown();
@@ -151,6 +145,43 @@ document.addEventListener('DOMContentLoaded', function() {
                     previewImage.src = e.target.result;
                 };
                 reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+
+    // NOVA IMPLEMENTAÇÃO PARA O DROPDOWN DE USUÁRIO
+    const userDropdown = document.getElementById('userDropdown');
+    const userDropdownMenu = userDropdown ? userDropdown.nextElementSibling : null;
+    
+    if (userDropdown && userDropdownMenu && userDropdownMenu.classList.contains('dropdown-menu')) {
+        // 1. Desativar qualquer comportamento padrão do Bootstrap
+        userDropdown.setAttribute('data-bs-toggle', '');
+        userDropdown.setAttribute('data-bs-auto', 'false');
+        
+        // 2. Adicionar manipulador de clique simplificado
+        userDropdown.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Toggle simples da classe show
+            if (userDropdownMenu.classList.contains('show')) {
+                userDropdownMenu.classList.remove('show');
+                userDropdown.setAttribute('aria-expanded', 'false');
+                console.log("Dropdown fechado");
+            } else {
+                userDropdownMenu.classList.add('show');
+                userDropdown.setAttribute('aria-expanded', 'true');
+                console.log("Dropdown aberto");
+            }
+        });
+        
+        // 3. Fechar ao clicar fora (document)
+        document.addEventListener('click', function(e) {
+            if (userDropdownMenu.classList.contains('show') && 
+                !userDropdown.contains(e.target) && 
+                !userDropdownMenu.contains(e.target)) {
+                userDropdownMenu.classList.remove('show');
+                userDropdown.setAttribute('aria-expanded', 'false');
             }
         });
     }

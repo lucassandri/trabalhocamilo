@@ -52,3 +52,16 @@
     border-radius: 0.25rem;
     font-size: 0.8rem;
 }
+
+/* Cores de raridade */
+.bg-purple {
+    background-color: #9c27b0;
+    color: white;
+}
+
+/* Bordas de raridade para o preview do item */
+.border-comum { border-color: #6c757d !important; }
+.border-incomum { border-color: #28a745 !important; }
+.border-raro { border-color: #007bff !important; }
+.border-epico { border-color: #9c27b0 !important; }
+.border-lendario { border-color: #ffc107 !important; }

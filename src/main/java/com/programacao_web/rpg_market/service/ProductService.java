@@ -10,6 +10,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.domain.PageImpl;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -39,6 +43,9 @@ public class ProductService {
     
     @Autowired
     private FileStorageService fileStorageService;
+    
+    @Autowired
+    private MongoTemplate mongoTemplate;
     
     /**
      * Cria um novo produto
@@ -379,5 +386,112 @@ public class ProductService {
             // For now, just delete all bids
             bidRepository.deleteAll(bids);
         }
+    }
+
+    /**
+     * Busca produtos de venda direta com filtros
+     */
+    public Page<Product> findDirectSalesWithFilters(
+            ProductCategory category,
+            ProductRarity rarity,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            Pageable pageable) {
+        
+        // Criar critérios
+        Criteria criteria = new Criteria();
+        
+        // Critérios básicos para vendas diretas
+        criteria = Criteria.where("type").is(ProductType.DIRECT_SALE)
+                .and("status").is(ProductStatus.AVAILABLE);
+        
+        // Adicionar filtros opcionais
+        if (category != null) {
+            criteria = criteria.and("category").is(category);
+        }
+        
+        if (rarity != null) {
+            criteria = criteria.and("rarity").is(rarity);
+        }
+        
+        if (minPrice != null && minPrice.compareTo(BigDecimal.ZERO) > 0) {
+            criteria = criteria.and("price").gte(minPrice);
+        }
+        
+        if (maxPrice != null && maxPrice.compareTo(BigDecimal.ZERO) > 0) {
+            criteria = criteria.and("price").lte(maxPrice);
+        }
+        
+        // Criar consulta
+        Query query = new Query(criteria);
+        
+        // Obter contagem total para paginação
+        long total = mongoTemplate.count(query, Product.class);
+        
+        // Adicionar paginação
+        query.with(pageable);
+        
+        // Executar consulta
+        List<Product> products = mongoTemplate.find(query, Product.class);
+        
+        // Retornar Page
+        return new PageImpl<>(products, pageable, total);
+    }
+
+    /**
+     * Busca leilões ativos com filtros
+     */
+    public Page<Product> findAuctionsWithFilters(
+            ProductCategory category,
+            ProductRarity rarity,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            Boolean endingSoon,
+            Pageable pageable) {
+        
+        // Criar critérios
+        Criteria criteria = new Criteria();
+        
+        // Critérios básicos para leilões ativos
+        criteria = Criteria.where("type").is(ProductType.AUCTION)
+                .and("status").is(ProductStatus.AUCTION_ACTIVE);
+        
+        // Adicionar filtros opcionais
+        if (category != null) {
+            criteria = criteria.and("category").is(category);
+        }
+        
+        if (rarity != null) {
+            criteria = criteria.and("rarity").is(rarity);
+        }
+        
+        if (minPrice != null && minPrice.compareTo(BigDecimal.ZERO) > 0) {
+            criteria = criteria.and("price").gte(minPrice);
+        }
+        
+        if (maxPrice != null && maxPrice.compareTo(BigDecimal.ZERO) > 0) {
+            criteria = criteria.and("price").lte(maxPrice);
+        }
+        
+        // Filtro especial para leilões terminando em breve (próximas 24 horas)
+        if (endingSoon != null && endingSoon) {
+            LocalDateTime nextDay = LocalDateTime.now().plusHours(24);
+            criteria = criteria.and("auctionEndDate").lte(nextDay);
+        }
+        
+        // Criar consulta
+        Query query = new Query(criteria);
+        
+        // Obter contagem total para paginação
+        long total = mongoTemplate.count(query, Product.class);
+        
+        // Adicionar paginação
+        query.with(pageable);
+        
+        // Executar consulta
+        List<Product> auctions = mongoTemplate.find(query, Product.class);
+        
+        // Retornar Page
+        return new PageImpl<>(auctions, pageable, total);
     }
 }

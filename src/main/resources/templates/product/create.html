@@ -27,7 +27,6 @@
     <link th:href="@{/css/item-creation.css}" rel="stylesheet">
     
     <style>
-        /* Override CSS for sale type fields */
         #directSaleFields, #auctionFields {
             display: none;
             transition: all 0.3s ease;
@@ -40,7 +39,7 @@
             <!-- Pergaminho título -->
             <div class="scroll-header mb-4">
                 <h1 class="rpg-font">
-                    <i class="fas fa-scroll me-2"></i>Anunciar Item Mágico
+                    <i class="fas fa-scroll me-2"></i>Anunciar Item
                 </h1>
             </div>
             
@@ -279,9 +278,6 @@
                 </div>
             </form>
         </main>
-
-        <!-- Include the footer -->
-        <div th:replace="~{fragments/footer :: footer}"></div>
     </div>
     
     <th:block layout:fragment="pageScripts">

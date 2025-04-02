@@ -1,10 +1,15 @@
 package com.programacao_web.rpg_market.controller;
 
+import com.programacao_web.rpg_market.model.Product;
 import com.programacao_web.rpg_market.model.ProductCategory;
+import com.programacao_web.rpg_market.model.ProductRarity;
 import com.programacao_web.rpg_market.model.ProductStatus;
+import com.programacao_web.rpg_market.model.ProductType;
 import com.programacao_web.rpg_market.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -14,6 +19,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.math.BigDecimal;
 
 @Controller
 @RequestMapping("/mercado")
@@ -76,14 +83,38 @@ public class MarketController {
         return "market/search";
     }
     
-    // Exibe todos os leilões ativos
+    // Exibe todos os leilões ativos com opções de filtro e ordenação
     @GetMapping("/masmorra-dos-leiloes")
     public String showAuctions(
+            @RequestParam(required = false) ProductCategory category,
+            @RequestParam(required = false) ProductRarity rarity,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) Boolean endingSoon,
+            @RequestParam(required = false, defaultValue = "auctionEndDate,asc") String sort,
             Model model,
             @PageableDefault(size = 12) Pageable pageable) {
         
-        model.addAttribute("auctions", productService.findActiveAuctions(pageable));
+        // Processar parâmetros de ordenação
+        String[] sortParams = sort.split(",");
+        String sortField = sortParams[0];
+        Sort.Direction direction = sortParams.length > 1 && sortParams[1].equalsIgnoreCase("desc") ? 
+            Sort.Direction.DESC : Sort.Direction.ASC;
+        
+        // Criar pageable com ordenação específica
+        PageRequest pageRequest = PageRequest.of(
+            pageable.getPageNumber(), 
+            pageable.getPageSize(), 
+            Sort.by(direction, sortField)
+        );
+        
+        // Usar o novo método de filtro
+        model.addAttribute("auctions", productService.findAuctionsWithFilters(
+            category, rarity, minPrice, maxPrice, endingSoon, pageRequest));
+        
         model.addAttribute("categories", ProductCategory.values());
+        model.addAttribute("rarities", ProductRarity.values());
+        
         return "market/auctions";
     }
     
@@ -93,5 +124,33 @@ public class MarketController {
         model.addAttribute("topSellers", productService.getTopSellers());
         model.addAttribute("topBuyers", productService.getTopBuyers());
         return "market/ranking";
+    }
+    
+    /**
+     * Exibe todos os itens de venda direta com opções de filtro e ordenação
+     */
+    @GetMapping("/vendas-diretas")
+    public String showDirectSales(
+            @RequestParam(required = false) ProductCategory category,
+            @RequestParam(required = false) ProductRarity rarity,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            Model model,
+            @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        
+        // Filtrar produtos de venda direta (não leilões)
+        Page<Product> productsPage = productService.findDirectSalesWithFilters(
+            category, 
+            rarity,
+            minPrice, 
+            maxPrice, 
+            pageable
+        );
+        
+        model.addAttribute("products", productsPage);
+        model.addAttribute("categories", ProductCategory.values());
+        model.addAttribute("rarities", ProductRarity.values());
+        
+        return "market/direct-sales";
     }
 }
