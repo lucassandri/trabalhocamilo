@@ -6,9 +6,13 @@ import com.programacao_web.rpg_market.model.ProductRarity;
 import com.programacao_web.rpg_market.model.ProductStatus;
 import com.programacao_web.rpg_market.model.ProductType;
 import com.programacao_web.rpg_market.service.ProductService;
+import com.programacao_web.rpg_market.model.User;
+import com.programacao_web.rpg_market.service.UserService;
+import com.programacao_web.rpg_market.util.ClassCategoryPermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -19,8 +23,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/mercado")
@@ -28,6 +38,9 @@ public class MarketController {
 
     @Autowired
     private ProductService productService;
+    
+    @Autowired
+    private UserService userService;
     
     // Página principal do mercado
     @GetMapping
@@ -38,16 +51,31 @@ public class MarketController {
             
             @Qualifier("auctions") @PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) 
             Pageable auctionPageable) {
-        
+        // Obter usuário logado
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String characterClass = null;
+        if (auth != null && auth.isAuthenticated() && !(auth.getPrincipal() instanceof String)) {
+            Object principal = auth.getPrincipal();
+            if (principal instanceof com.programacao_web.rpg_market.service.CustomUserDetailsService.CustomUserDetails) {
+                characterClass = ((com.programacao_web.rpg_market.service.CustomUserDetailsService.CustomUserDetails) principal).getCharacterClass();
+            } else {
+                String username = auth.getName();
+                Optional<User> userOpt = userService.findByUsername(username);
+                if (userOpt.isPresent()) {
+                    characterClass = userOpt.get().getCharacterClass();
+                }
+            }
+        }
+        if (characterClass != null) characterClass = capitalize(characterClass.trim());
+        Set<ProductCategory> allowedCategories = ClassCategoryPermission.getAllowedCategories(characterClass);
         // Produtos de venda direta disponíveis
         model.addAttribute("products", productService.findAvailable(productPageable).getContent());
-        
-        // Leilões ativos
-        model.addAttribute("auctions", productService.findActiveAuctions(auctionPageable).getContent());
-        
-        // Categorias para navegação
-        model.addAttribute("categories", ProductCategory.values());
-        
+        // Leilões ativos filtrados
+        List<Product> auctionsList = new ArrayList<>(productService.findActiveAuctions(auctionPageable).getContent());
+        auctionsList.removeIf(a -> a.getCategory() == null || !allowedCategories.contains(a.getCategory()));
+        model.addAttribute("auctions", auctionsList);
+        // Categorias permitidas para navegação
+        model.addAttribute("categories", allowedCategories);
         return "market/index";
     }
     
@@ -94,27 +122,42 @@ public class MarketController {
             @RequestParam(required = false, defaultValue = "auctionEndDate,asc") String sort,
             Model model,
             @PageableDefault(size = 12) Pageable pageable) {
-        
+        // Obter usuário logado
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String characterClass = null;
+        if (auth != null && auth.isAuthenticated() && !(auth.getPrincipal() instanceof String)) {
+            Object principal = auth.getPrincipal();
+            if (principal instanceof com.programacao_web.rpg_market.service.CustomUserDetailsService.CustomUserDetails) {
+                characterClass = ((com.programacao_web.rpg_market.service.CustomUserDetailsService.CustomUserDetails) principal).getCharacterClass();
+            } else {
+                String username = auth.getName();
+                Optional<User> userOpt = userService.findByUsername(username);
+                if (userOpt.isPresent()) {
+                    characterClass = userOpt.get().getCharacterClass();
+                }
+            }
+        }
+        if (characterClass != null) characterClass = capitalize(characterClass.trim());
+        Set<ProductCategory> allowedCategories = ClassCategoryPermission.getAllowedCategories(characterClass);
         // Processar parâmetros de ordenação
         String[] sortParams = sort.split(",");
         String sortField = sortParams[0];
         Sort.Direction direction = sortParams.length > 1 && sortParams[1].equalsIgnoreCase("desc") ? 
             Sort.Direction.DESC : Sort.Direction.ASC;
-        
         // Criar pageable com ordenação específica
         PageRequest pageRequest = PageRequest.of(
             pageable.getPageNumber(), 
             pageable.getPageSize(), 
             Sort.by(direction, sortField)
         );
-        
         // Usar o novo método de filtro
-        model.addAttribute("auctions", productService.findAuctionsWithFilters(
-            category, rarity, minPrice, maxPrice, endingSoon, pageRequest));
-        
-        model.addAttribute("categories", ProductCategory.values());
+        List<Product> auctionsList = new ArrayList<>(productService.findAuctionsWithFilters(
+            category, rarity, minPrice, maxPrice, endingSoon, pageRequest).getContent());
+        auctionsList.removeIf(a -> a.getCategory() == null || !allowedCategories.contains(a.getCategory()));
+        Page<Product> auctions = new PageImpl<>(auctionsList, pageRequest, auctionsList.size());
+        model.addAttribute("auctions", auctions);
+        model.addAttribute("categories", allowedCategories);
         model.addAttribute("rarities", ProductRarity.values());
-        
         return "market/auctions";
     }
     
@@ -152,5 +195,10 @@ public class MarketController {
         model.addAttribute("rarities", ProductRarity.values());
         
         return "market/direct-sales";
+    }
+
+    private String capitalize(String str) {
+        if (str == null || str.isEmpty()) return str;
+        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 }
