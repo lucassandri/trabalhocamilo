@@ -51,4 +51,12 @@ public class User {
     public void setGoldBalance(BigDecimal goldBalance) {
         this.goldCoins = goldBalance;
     }
+
+    public String getCharacterClass() {
+        return characterClass;
+    }
+
+    public void setCharacterClass(String characterClass) {
+        this.characterClass = characterClass;
+    }
 }

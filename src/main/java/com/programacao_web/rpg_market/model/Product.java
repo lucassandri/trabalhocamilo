@@ -88,4 +88,11 @@ public class Product {
         }
         this.magicProperties.add(property);
     }
+
+    public ProductCategory getCategory() {
+        return category;
+    }
+    public void setCategory(ProductCategory category) {
+        this.category = category;
+    }
 }

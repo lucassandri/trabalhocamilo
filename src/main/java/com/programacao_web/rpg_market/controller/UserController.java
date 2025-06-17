@@ -51,6 +51,7 @@ public class UserController {
     // Adicionar este método na classe UserController
     private void refreshAuthentication(User user) {
         UserDetails updatedUserDetails = customUserDetailsService.loadUserByUsername(user.getUsername());
+        System.out.println("[DEBUG] Atualizando contexto de autenticação para usuário: " + user.getUsername() + ", classe: " + ((com.programacao_web.rpg_market.service.CustomUserDetailsService.CustomUserDetails)updatedUserDetails).getCharacterClass());
         Authentication newAuth = new UsernamePasswordAuthenticationToken(
             updatedUserDetails, null, updatedUserDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(newAuth);
@@ -139,7 +140,7 @@ public class UserController {
     // Exibe as vendas realizadas pelo usuário
     @GetMapping("/vendas")
     public String showUserSales(@AuthenticationPrincipal UserDetails currentUser, Model model) {
-        userService.findByUsername(currentUser.getUsername()).ifPresent(user -> {
+        userService.findByUsername(currentUser.getUsername()).ifPresent user -> {
             model.addAttribute("transactions", userService.getUserSales(user));
         });
         return "user/sales";

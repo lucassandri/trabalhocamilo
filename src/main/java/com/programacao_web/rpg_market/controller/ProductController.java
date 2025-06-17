@@ -4,6 +4,7 @@ import com.programacao_web.rpg_market.model.*;
 import com.programacao_web.rpg_market.service.FileStorageService;
 import com.programacao_web.rpg_market.service.ProductService;
 import com.programacao_web.rpg_market.service.UserService;
+import com.programacao_web.rpg_market.util.ClassCategoryPermission;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,16 +34,23 @@ public class ProductController {
     
     // Exibe formulário para criar um novo produto com dados enriquecidos
     @GetMapping("/novo")
-    public String showCreateProductForm(Model model) {
+    public String showCreateProductForm(Model model, @AuthenticationPrincipal UserDetails currentUser) {
         try {
             model.addAttribute("product", new Product());
-            model.addAttribute("categories", ProductCategory.values());
+            // Exibir apenas categorias permitidas para a classe do usuário logado
+            String characterClass = null;
+            if (currentUser != null) {
+                Optional<User> userOpt = userService.findByUsername(currentUser.getUsername());
+                if (userOpt.isPresent()) {
+                    characterClass = userOpt.get().getCharacterClass();
+                }
+            }
+            if (characterClass != null) characterClass = capitalize(characterClass.trim());
+            model.addAttribute("categories", com.programacao_web.rpg_market.util.ClassCategoryPermission.getAllowedCategories(characterClass));
             model.addAttribute("rarities", ItemRarity.values());
             model.addAttribute("types", ProductType.values());
-            
-            // Add information about magic properties if used in template
             model.addAttribute("magicProperties", MagicProperty.values());
-              return "product/create";
+            return "product/create";
         } catch (Exception e) {
             throw e; // Rethrow to see the error in browser
         }
@@ -58,12 +66,17 @@ public class ProductController {
             @RequestParam(value = "startingBid", required = false) BigDecimal startingBid,
             @AuthenticationPrincipal UserDetails currentUser,
             RedirectAttributes redirectAttributes) {
-        
         try {
             // Busca o usuário atual para definir como vendedor
             Optional<User> userOpt = userService.findByUsername(currentUser.getUsername());
             if (userOpt.isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "Usuário não encontrado no reino.");
+                return "redirect:/item/novo";
+            }
+            User user = userOpt.get();
+            // Validação: só pode criar leilão de categoria permitida
+            if (product.getType() == ProductType.AUCTION && !ClassCategoryPermission.isCategoryAllowed(user.getCharacterClass(), product.getCategory())) {
+                redirectAttributes.addFlashAttribute("error", "Sua classe não pode criar leilões dessa categoria.");
                 return "redirect:/item/novo";
             }
             
@@ -313,4 +326,9 @@ public class ProductController {
             return "redirect:/aventureiro/inventario";
         }
     }
+    
+    private String capitalize(String str) {
+    if (str == null || str.isEmpty()) return str;
+    return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+}
 }
