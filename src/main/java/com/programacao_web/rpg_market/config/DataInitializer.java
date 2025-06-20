@@ -1,14 +1,20 @@
 package com.programacao_web.rpg_market.config;
 
-import com.programacao_web.rpg_market.model.*;
-import com.programacao_web.rpg_market.repository.*;
+import com.programacao_web.rpg_market.model.Product;
+import com.programacao_web.rpg_market.model.User;
+import com.programacao_web.rpg_market.model.UserRole;
+import com.programacao_web.rpg_market.model.ProductCategory;
+import com.programacao_web.rpg_market.model.ProductType;
+import com.programacao_web.rpg_market.model.ProductStatus;
+import com.programacao_web.rpg_market.model.ItemRarity;
+import com.programacao_web.rpg_market.repository.UserRepository;
+import com.programacao_web.rpg_market.repository.ProductRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
-
 import java.time.LocalDateTime;
 
 @Configuration

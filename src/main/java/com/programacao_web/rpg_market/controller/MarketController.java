@@ -154,10 +154,9 @@ public class MarketController {
         List<Product> auctionsList = new ArrayList<>(productService.findAuctionsWithFilters(
             category, rarity, minPrice, maxPrice, endingSoon, pageRequest).getContent());
         auctionsList.removeIf(a -> a.getCategory() == null || !allowedCategories.contains(a.getCategory()));
-        Page<Product> auctions = new PageImpl<>(auctionsList, pageRequest, auctionsList.size());
-        model.addAttribute("auctions", auctions);
+        Page<Product> auctions = new PageImpl<>(auctionsList, pageRequest, auctionsList.size());        model.addAttribute("auctions", auctions);
         model.addAttribute("categories", allowedCategories);
-        model.addAttribute("rarities", ProductRarity.values());
+        model.addAttribute("rarities", com.programacao_web.rpg_market.model.ProductRarity.values());
         return "market/auctions";
     }
     

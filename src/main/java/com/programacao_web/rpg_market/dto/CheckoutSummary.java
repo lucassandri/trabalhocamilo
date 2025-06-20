@@ -3,10 +3,8 @@ package com.programacao_web.rpg_market.dto;
 import com.programacao_web.rpg_market.model.DeliveryAddress;
 import com.programacao_web.rpg_market.model.Product;
 import com.programacao_web.rpg_market.model.User;
-import lombok.Data;
 import java.math.BigDecimal;
 
-@Data
 public class CheckoutSummary {
     
     private Product product;
@@ -29,6 +27,119 @@ public class CheckoutSummary {
     private BigDecimal serviceFee = BigDecimal.ZERO;
     
     public BigDecimal getGrandTotal() {
-        return totalAmount.add(shippingCost).add(serviceFee);
+        return totalAmount != null ? totalAmount.add(shippingCost).add(serviceFee) : BigDecimal.ZERO;
+    }
+    
+    // Getters and setters
+    public Product getProduct() {
+        return product;
+    }
+    
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+    
+    public User getBuyer() {
+        return buyer;
+    }
+    
+    public void setBuyer(User buyer) {
+        this.buyer = buyer;
+    }
+    
+    public User getSeller() {
+        return seller;
+    }
+    
+    public void setSeller(User seller) {
+        this.seller = seller;
+    }
+    
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+    
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+    
+    public BigDecimal getGoldBalance() {
+        return goldBalance;
+    }
+    
+    public void setGoldBalance(BigDecimal goldBalance) {
+        this.goldBalance = goldBalance;
+    }
+    
+    public Boolean getHasSufficientFunds() {
+        return hasSufficientFunds;
+    }
+    
+    public void setHasSufficientFunds(Boolean hasSufficientFunds) {
+        this.hasSufficientFunds = hasSufficientFunds;
+    }
+    
+    public DeliveryAddress getDeliveryAddress() {
+        return deliveryAddress;
+    }
+    
+    public void setDeliveryAddress(DeliveryAddress deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
+    }
+    
+    public String getNotes() {
+        return notes;
+    }
+    
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+    
+    public String getPurchaseType() {
+        return purchaseType;
+    }
+    
+    public void setPurchaseType(String purchaseType) {
+        this.purchaseType = purchaseType;
+    }
+    
+    public BigDecimal getBidAmount() {
+        return bidAmount;
+    }
+    
+    public void setBidAmount(BigDecimal bidAmount) {
+        this.bidAmount = bidAmount;
+    }
+    
+    public BigDecimal getCurrentBid() {
+        return currentBid;
+    }
+    
+    public void setCurrentBid(BigDecimal currentBid) {
+        this.currentBid = currentBid;
+    }
+    
+    public BigDecimal getMinBidAmount() {
+        return minBidAmount;
+    }
+    
+    public void setMinBidAmount(BigDecimal minBidAmount) {
+        this.minBidAmount = minBidAmount;
+    }
+    
+    public BigDecimal getShippingCost() {
+        return shippingCost;
+    }
+    
+    public void setShippingCost(BigDecimal shippingCost) {
+        this.shippingCost = shippingCost;
+    }
+    
+    public BigDecimal getServiceFee() {
+        return serviceFee;
+    }
+    
+    public void setServiceFee(BigDecimal serviceFee) {
+        this.serviceFee = serviceFee;
     }
 }

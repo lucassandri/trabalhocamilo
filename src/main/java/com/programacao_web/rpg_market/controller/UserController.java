@@ -136,11 +136,10 @@ public class UserController {
         });
         return "user/purchases";
     }
-    
-    // Exibe as vendas realizadas pelo usuário
+      // Exibe as vendas realizadas pelo usuário
     @GetMapping("/vendas")
     public String showUserSales(@AuthenticationPrincipal UserDetails currentUser, Model model) {
-        userService.findByUsername(currentUser.getUsername()).ifPresent user -> {
+        userService.findByUsername(currentUser.getUsername()).ifPresent(user -> {
             model.addAttribute("transactions", userService.getUserSales(user));
         });
         return "user/sales";
@@ -338,13 +337,12 @@ public class UserController {
             @ModelAttribute DeliveryAddress updatedAddress,
             @AuthenticationPrincipal UserDetails currentUser,
             RedirectAttributes redirectAttributes) {
-          try {
-            Optional<User> userOpt = userService.findByUsername(currentUser.getUsername());
+          try {            Optional<User> userOpt = userService.findByUsername(currentUser.getUsername());
             if (userOpt.isEmpty()) {
                 return "error/403";
             }
             
-            User user = userOpt.get();
+            // No need to get the user since it's not used
             deliveryAddressService.update(addressId, updatedAddress);
             redirectAttributes.addFlashAttribute("success", "Endereço atualizado com sucesso!");
             
