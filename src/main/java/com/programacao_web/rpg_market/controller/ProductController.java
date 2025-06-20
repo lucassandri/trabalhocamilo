@@ -4,6 +4,7 @@ import com.programacao_web.rpg_market.model.*;
 import com.programacao_web.rpg_market.service.FileStorageService;
 import com.programacao_web.rpg_market.service.ProductService;
 import com.programacao_web.rpg_market.service.UserService;
+import com.programacao_web.rpg_market.util.ClassCategoryPermission;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,25 +36,22 @@ public class ProductController {    private static final Logger log = LoggerFact
     private FileStorageService fileStorageService;
     
     @GetMapping("/novo")
-    public String showCreateProductForm(Model model, @RequestParam(required = false) String type) {
+    public String showCreateProductForm(Model model, @AuthenticationPrincipal UserDetails currentUser) {
         try {
-            Product product = new Product();
-            
-            if (type != null) {
-                try {
-                    ProductType productType = ProductType.valueOf(type.toUpperCase());
-                    product.setType(productType);
-                } catch (IllegalArgumentException e) {
-                    // Tipo inválido, ignora
+            model.addAttribute("product", new Product());
+            // Exibir apenas categorias permitidas para a classe do usuário logado
+            String characterClass = null;
+            if (currentUser != null) {
+                Optional<User> userOpt = userService.findByUsername(currentUser.getUsername());
+                if (userOpt.isPresent()) {
+                    characterClass = userOpt.get().getCharacterClass();
                 }
             }
-            
-            model.addAttribute("product", product);
-            model.addAttribute("categories", ProductCategory.values());
+            if (characterClass != null) characterClass = capitalize(characterClass.trim());
+            model.addAttribute("categories", com.programacao_web.rpg_market.util.ClassCategoryPermission.getAllowedCategories(characterClass));
             model.addAttribute("rarities", ItemRarity.values());
             model.addAttribute("types", ProductType.values());
             model.addAttribute("magicProperties", MagicProperty.values());
-            
             return "product/create";
         } catch (Exception e) {
             throw e;
@@ -68,11 +66,16 @@ public class ProductController {    private static final Logger log = LoggerFact
             @RequestParam(value = "startingBid", required = false) BigDecimal startingBid,
             @AuthenticationPrincipal UserDetails currentUser,
             RedirectAttributes redirectAttributes) {
-        
         try {
             Optional<User> userOpt = userService.findByUsername(currentUser.getUsername());
             if (userOpt.isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "Usuário não encontrado no reino.");
+                return "redirect:/item/novo";
+            }
+            User user = userOpt.get();
+            // Validação: só pode criar leilão de categoria permitida
+            if (product.getType() == ProductType.AUCTION && !ClassCategoryPermission.isCategoryAllowed(user.getCharacterClass(), product.getCategory())) {
+                redirectAttributes.addFlashAttribute("error", "Sua classe não pode criar leilões dessa categoria.");
                 return "redirect:/item/novo";
             }
             
@@ -345,4 +348,9 @@ public class ProductController {    private static final Logger log = LoggerFact
             return "redirect:/aventureiro/inventario";
         }
     }
+    
+    private String capitalize(String str) {
+    if (str == null || str.isEmpty()) return str;
+    return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+}
 }

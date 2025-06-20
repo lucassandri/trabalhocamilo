@@ -35,7 +35,8 @@ public class CustomUserDetailsService implements UserDetailsService {
             user.getPassword(),
             true, true, true, true,
             authorities,
-            user.getProfileImageUrl()
+            user.getProfileImageUrl(),
+            user.getCharacterClass()
         );
     }
     
@@ -44,20 +45,26 @@ public class CustomUserDetailsService implements UserDetailsService {
         
         private static final long serialVersionUID = 1L;
         private final String profileImageUrl;
+        private final String characterClass;
         
         public CustomUserDetails(String username, String password, 
                               boolean enabled, boolean accountNonExpired,
                               boolean credentialsNonExpired, boolean accountNonLocked,
                               Collection<? extends GrantedAuthority> authorities,
-                              String profileImageUrl) {
+                              String profileImageUrl,
+                              String characterClass) {
             super(username, password, enabled, accountNonExpired, 
                   credentialsNonExpired, accountNonLocked, authorities);
             this.profileImageUrl = profileImageUrl;
+            this.characterClass = characterClass;
         }
         
         // Método getter para o atributo personalizado
         public String getProfileImageUrl() {
             return profileImageUrl;
+        }
+        public String getCharacterClass() {
+            return characterClass;
         }
     }
 }
