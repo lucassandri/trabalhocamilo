@@ -65,15 +65,19 @@ public class MarketController {
                     characterClass = userOpt.get().getCharacterClass();
                 }
             }
-        }
-        if (characterClass != null) characterClass = capitalize(characterClass.trim());
+        }        if (characterClass != null) characterClass = capitalize(characterClass.trim());
         Set<ProductCategory> allowedCategories = ClassCategoryPermission.getAllowedCategories(characterClass);
-        // Produtos de venda direta disponíveis
-        model.addAttribute("products", productService.findAvailable(productPageable).getContent());
+        
+        // Produtos de venda direta disponíveis - filtrados por classe de usuário
+        List<Product> productsList = new ArrayList<>(productService.findAvailable(productPageable).getContent());
+        productsList.removeIf(p -> p.getCategory() == null || !allowedCategories.contains(p.getCategory()));
+        model.addAttribute("products", productsList);
+        
         // Leilões ativos filtrados
         List<Product> auctionsList = new ArrayList<>(productService.findActiveAuctions(auctionPageable).getContent());
         auctionsList.removeIf(a -> a.getCategory() == null || !allowedCategories.contains(a.getCategory()));
         model.addAttribute("auctions", auctionsList);
+        
         // Categorias permitidas para navegação
         model.addAttribute("categories", allowedCategories);
         return "market/index";
@@ -179,6 +183,24 @@ public class MarketController {
             Model model,
             @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         
+        // Obter usuário logado e suas permissões de classe
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String characterClass = null;
+        if (auth != null && auth.isAuthenticated() && !(auth.getPrincipal() instanceof String)) {
+            Object principal = auth.getPrincipal();
+            if (principal instanceof com.programacao_web.rpg_market.service.CustomUserDetailsService.CustomUserDetails) {
+                characterClass = ((com.programacao_web.rpg_market.service.CustomUserDetailsService.CustomUserDetails) principal).getCharacterClass();
+            } else {
+                String username = auth.getName();
+                Optional<User> userOpt = userService.findByUsername(username);
+                if (userOpt.isPresent()) {
+                    characterClass = userOpt.get().getCharacterClass();
+                }
+            }
+        }
+        if (characterClass != null) characterClass = capitalize(characterClass.trim());
+        Set<ProductCategory> allowedCategories = ClassCategoryPermission.getAllowedCategories(characterClass);
+
         // Filtrar produtos de venda direta (não leilões)
         Page<Product> productsPage = productService.findDirectSalesWithFilters(
             category, 
@@ -187,8 +209,14 @@ public class MarketController {
             maxPrice, 
             pageable
         );
-          model.addAttribute("products", productsPage);
-        model.addAttribute("categories", ProductCategory.values());
+        
+        // Filtrar produtos pela classe do usuário
+        List<Product> productsList = new ArrayList<>(productsPage.getContent());
+        productsList.removeIf(p -> p.getCategory() == null || !allowedCategories.contains(p.getCategory()));
+        Page<Product> filteredProductsPage = new PageImpl<>(productsList, pageable, productsList.size());
+        
+        model.addAttribute("products", filteredProductsPage);
+        model.addAttribute("categories", allowedCategories); // Mostra apenas categorias permitidas
         model.addAttribute("rarities", ItemRarity.values());
         
         return "market/direct-sales";

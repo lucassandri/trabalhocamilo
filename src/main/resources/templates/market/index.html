@@ -22,6 +22,17 @@
             </div>
         </div>
         
+        <!-- Alerta sobre restrições de classe -->
+        <div sec:authorize="isAuthenticated()" class="alert alert-info bg-light border-gold mb-4">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-scroll me-3 fa-2x text-gold"></i>
+                <div>
+                    <h5 class="rpg-font mb-1">Aviso do Mestre</h5>
+                    <p class="mb-0">Como aventureiro, você só consegue ver os itens permitidos para sua classe. Os mercadores limitam o acesso a certas categorias com base em sua profissão!</p>
+                </div>
+            </div>
+        </div>
+        
         <div class="market-section mb-5">
             <h2 class="rpg-font section-title">
                 <i class="fas fa-tags me-2"></i>Guildas & Mercadores
