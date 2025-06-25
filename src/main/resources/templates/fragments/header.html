@@ -46,15 +46,17 @@
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link" th:href="@{/mercado}"><i class="fas fa-store me-1"></i>Mercado</a>
-                        </li>
-                        <li class="nav-item">
+                        </li>                        <li class="nav-item">
                             <a class="nav-link" th:href="@{/mercado/vendas-diretas}"><i class="fas fa-shopping-bag me-1"></i>Comprar</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" th:href="@{/mercado/masmorra-dos-leiloes}"><i class="fas fa-gavel me-1"></i>Leilões</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/mercado/ranking-dos-nobres}"><i class="fas fa-crown me-1"></i>Ranking</a>
+                        <!-- Link especial para Mestres -->
+                        <li class="nav-item" sec:authorize="hasRole('MESTRE')">
+                            <a class="nav-link text-warning" th:href="@{/mestre/dashboard}">
+                                <i class="fas fa-shield-alt me-1"></i>Painel do Mestre
+                            </a>
                         </li>
                     </ul>
                     
@@ -79,9 +81,26 @@
                                      alt="Avatar do Aventureiro"
                                      onerror="this.style.backgroundImage='url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAzMCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTUiIGN5PSIxNSIgcj0iMTUiIGZpbGw9IiNkNGFmMzciLz4KPHBhdGggZD0iTTE1IDhDMTIuNzkgOCAxMSA5Ljc5IDExIDEyQzExIDE0LjIxIDEyLjc5IDE2IDE1IDE2QzE3LjIxIDE2IDE5IDE0LjIxIDE5IDEyQzE5IDkuNzkgMTcuMjEgOCAxNSA4WiIgZmlsbD0iIzJjMmMyYyIvPgo8cGF0aCBkPSJNMTUgMThDMTEuNjkgMTggOSAyMC42OSA5IDI0VjI2SDE1SDIxVjI0QzIxIDIwLjY5IDE4LjMxIDE4IDE1IDE4WiIgZmlsbD0iIzJjMmMyYyIvPgo8L3N2Zz4K)'; this.style.backgroundSize='cover'; this.src='';">
                                 <span sec:authentication="name">User</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdownDesktop">
+                            </a>                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdownDesktop">
                                 <li><a class="dropdown-item" th:href="@{/aventureiro/perfil}"><i class="fas fa-user me-2"></i>Meu Perfil</a></li>
+                                <!-- Opções especiais para Mestres -->
+                                <li sec:authorize="hasRole('MESTRE')">
+                                    <a class="dropdown-item text-warning fw-bold" th:href="@{/mestre/dashboard}">
+                                        <i class="fas fa-shield-alt me-2"></i>Painel do Mestre
+                                    </a>
+                                </li>
+                                <li sec:authorize="hasRole('MESTRE')">
+                                    <a class="dropdown-item text-warning" th:href="@{/mestre/ranking-nobres}">
+                                        <i class="fas fa-crown me-2"></i>Ranking Detalhado
+                                    </a>
+                                </li>
+                                <li sec:authorize="hasRole('MESTRE')">
+                                    <a class="dropdown-item text-warning" th:href="@{/mestre/relatorio-atividades}">
+                                        <i class="fas fa-scroll me-2"></i>Relatório de Atividades
+                                    </a>
+                                </li>
+                                <li sec:authorize="hasRole('MESTRE')"><hr class="dropdown-divider"></li>
+                                <!-- Opções normais -->
                                 <li><a class="dropdown-item" th:href="@{/aventureiro/inventario}"><i class="fas fa-box-open me-2"></i>Inventário</a></li>
                                 <li><a class="dropdown-item" th:href="@{/aventureiro/compras}"><i class="fas fa-shopping-bag me-2"></i>Minhas Compras</a></li>
                                 <li><a class="dropdown-item" th:href="@{/aventureiro/vendas}"><i class="fas fa-coins me-2"></i>Minhas Vendas</a></li>

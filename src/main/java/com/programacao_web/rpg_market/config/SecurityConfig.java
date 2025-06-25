@@ -38,9 +38,9 @@ public class SecurityConfig {
                 .requestMatchers("/checkout/**").authenticated() // Adicionar checkout
                 .requestMatchers("/aventureiro/**").authenticated()
                 .requestMatchers("/transacao/**").authenticated()
-                
-                // Páginas administrativas (apenas para role MESTRE)
+                  // Páginas administrativas (apenas para role MESTRE)
                 .requestMatchers("/admin/**").hasRole("MESTRE")
+                .requestMatchers("/mestre/**").hasRole("MESTRE")  // Novo controller de analytics
                 .anyRequest().authenticated()            )            .csrf(csrf -> csrf
                 .csrfTokenRepository(org.springframework.security.web.csrf.CookieCsrfTokenRepository.withHttpOnlyFalse())
             )

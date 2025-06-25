@@ -1,0 +1,820 @@
+/* CSS específico para páginas do Mestre - Melhor contraste e legibilidade */
+
+/* Banner do Mestre */
+.banner-mestre {
+    background: linear-gradient(135deg, #8B4513, #DAA520, #B8860B);
+    border-left: 6px solid #654321;
+    box-shadow: 0 8px 25px rgba(139, 69, 19, 0.5);
+    border-radius: 12px;
+    animation: pulse-gold 3s ease-in-out infinite;
+    color: #2C1810 !important;
+}
+
+.banner-mestre h4 {
+    color: #FFFFFF !important;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+.banner-mestre p {
+    color: #FFF8DC !important;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+}
+
+@keyframes pulse-gold {
+    0%, 100% { transform: scale(1); box-shadow: 0 8px 25px rgba(139, 69, 19, 0.5); }
+    50% { transform: scale(1.02); box-shadow: 0 12px 35px rgba(139, 69, 19, 0.7); }
+}
+
+/* Cards do Mestre */
+.card-mestre {
+    box-shadow: 0 15px 35px rgba(139, 69, 19, 0.4);
+    background: linear-gradient(135deg, #ffffff, #faf8f3);
+    border: 3px solid #8B4513;
+    transition: all 0.3s ease;
+}
+
+.card-mestre:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 45px rgba(139, 69, 19, 0.6);
+}
+
+.card-header-mestre {
+    background: linear-gradient(135deg, #654321, #8B4513) !important;
+    border-bottom: 3px solid #4A3728;
+    color: #FFD700 !important;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    font-weight: bold;
+}
+
+/* Avatar do Mestre */
+.avatar-mestre {
+    border: 4px solid #8B4513 !important;
+    box-shadow: 0 8px 20px rgba(139, 69, 19, 0.6) !important;
+    transition: all 0.3s ease;
+}
+
+.avatar-mestre:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 30px rgba(139, 69, 19, 0.8) !important;
+}
+
+/* Badge do Mestre */
+.badge-mestre {
+    background: linear-gradient(135deg, #654321, #8B4513) !important;
+    color: #FFD700 !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    border: 2px solid #4A3728;
+    font-weight: bold;
+}
+
+/* Botões do Mestre */
+.btn-mestre {
+    background: linear-gradient(135deg, #654321, #8B4513);
+    border: 2px solid #4A3728;
+    color: #FFD700 !important;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    transition: all 0.3s ease;
+}
+
+.btn-mestre:hover {
+    background: linear-gradient(135deg, #8B4513, #A0522D);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(139, 69, 19, 0.6);
+    color: #FFFFFF !important;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+}
+
+.btn-outline-mestre {
+    border: 3px solid #8B4513;
+    color: #654321 !important;
+    background: transparent;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+.btn-outline-mestre:hover {
+    background: linear-gradient(135deg, #654321, #8B4513);
+    color: #FFD700 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(139, 69, 19, 0.5);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+/* Ícones do Mestre */
+.icon-mestre {
+    color: #8B4513;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+    animation: glow-gold 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow-gold {
+    from { 
+        text-shadow: 1px 1px 2px rgba(255,255,255,0.8), 0 0 10px rgba(218, 165, 32, 0.8); 
+        color: #8B4513;
+    }
+    to { 
+        text-shadow: 1px 1px 2px rgba(255,255,255,0.8), 0 0 20px rgba(218, 165, 32, 1); 
+        color: #DAA520;
+    }
+}
+
+/* Cards de estatísticas do Analytics */
+.stats-card {
+    background: linear-gradient(135deg, #ffffff, #faf8f3);
+    border: 3px solid #8B4513;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, #654321, #8B4513, #DAA520);
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(139, 69, 19, 0.4);
+}
+
+.stats-card .card-body {
+    padding: 2rem;
+}
+
+.stats-number {
+    font-size: 2.8rem;
+    font-weight: bold;
+    color: #654321;
+    text-shadow: 2px 2px 4px rgba(255,255,255,0.8);
+}
+
+.stats-label {
+    color: #4A3728;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+}
+
+.stats-icon {
+    font-size: 3.5rem;
+    opacity: 0.9;
+    color: #8B4513;
+    text-shadow: 2px 2px 4px rgba(255,255,255,0.6);
+}
+
+/* Timeline de atividades */
+.timeline {
+    position: relative;
+    padding-left: 35px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 18px;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(to bottom, #654321, #8B4513, #DAA520);
+    border-radius: 2px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 2rem;
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 6px 20px rgba(139, 69, 19, 0.2);
+    border-left: 5px solid #8B4513;
+    border: 2px solid #e6ddd4;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -40px;
+    top: 25px;
+    width: 16px;
+    height: 16px;
+    background: #DAA520;
+    border-radius: 50%;
+    border: 4px solid white;
+    box-shadow: 0 0 0 3px #8B4513;
+}
+
+.timeline-item:hover {
+    transform: translateX(8px);
+    box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
+}
+
+.timeline-item h6 {
+    color: #654321;
+    font-weight: bold;
+}
+
+.timeline-item p {
+    color: #4A3728;
+    margin-bottom: 0;
+}
+
+/* Tabelas do ranking */
+.ranking-table {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(139, 69, 19, 0.3);
+    border: 2px solid #8B4513;
+}
+
+.ranking-table th {
+    background: linear-gradient(135deg, #654321, #4A3728);
+    color: #FFD700;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border: none;
+    padding: 1.2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    font-size: 0.95rem;
+}
+
+.ranking-table td {
+    padding: 1.2rem;
+    border-bottom: 2px solid #e6ddd4;
+    vertical-align: middle;
+    color: #2c1810;
+    font-weight: 600;
+}
+
+.ranking-table tbody tr:hover {
+    background-color: #faf8f3;
+    transform: scale(1.02);
+    transition: all 0.3s ease;
+}
+
+.ranking-position {
+    font-weight: bold;
+    font-size: 1.3rem;
+    color: #654321;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+}
+
+.ranking-position.first {
+    color: #FFD700;
+    font-size: 1.8rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.ranking-position.second {
+    color: #C0C0C0;
+    font-size: 1.6rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.ranking-position.third {
+    color: #CD7F32;
+    font-size: 1.4rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+/* Navegação entre análises */
+.analytics-nav {
+    background: linear-gradient(135deg, #faf8f3, #f0ede6);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 20px rgba(139, 69, 19, 0.2);
+    border: 3px solid #e6ddd4;
+}
+
+.analytics-nav .nav-link {
+    color: #4A3728;
+    font-weight: 700;
+    border-radius: 12px;
+    margin: 0 0.5rem;
+    transition: all 0.3s ease;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+}
+
+.analytics-nav .nav-link:hover,
+.analytics-nav .nav-link.active {
+    background: linear-gradient(135deg, #654321, #8B4513);
+    color: #FFD700;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(139, 69, 19, 0.5);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+/* Melhorias gerais de contraste */
+.text-mestre {
+    color: #2c1810 !important;
+    font-weight: 700;
+}
+
+.text-mestre-light {
+    color: #FFD700 !important;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.bg-mestre {
+    background: linear-gradient(135deg, #654321, #8B4513) !important;
+    color: #FFD700 !important;
+}
+
+.border-mestre {
+    border-color: #8B4513 !important;
+    border-width: 3px !important;
+}
+
+/* Títulos com melhor contraste */
+.title-mestre {
+    color: #654321 !important;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(255,255,255,0.8);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .stats-number {
+        font-size: 2.2rem;
+    }
+    
+    .stats-icon {
+        font-size: 2.5rem;
+    }
+    
+    .timeline {
+        padding-left: 25px;
+    }
+    
+    .timeline::before {
+        left: 12px;
+        width: 3px;
+    }
+    
+    .timeline-item::before {
+        left: -32px;
+        width: 12px;
+        height: 12px;
+    }
+    
+    .banner-mestre {
+        text-align: center;
+    }
+    
+    .banner-mestre .d-flex {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .banner-mestre .d-flex .gap-2 {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .ranking-table th,
+    .ranking-table td {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Animações suaves */
+.fade-in {
+    animation: fadeIn 0.6s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(25px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in {
+    animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-25px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Efeitos especiais para mestres */
+.crown-glow {
+    animation: crownGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes crownGlow {
+    from { 
+        color: #FFD700;
+        text-shadow: 0 0 10px #FFD700, 0 0 20px #DAA520;
+    }
+    to { 
+        color: #FFF8DC;
+        text-shadow: 0 0 20px #FFD700, 0 0 30px #DAA520;
+    }
+}
+
+@keyframes pulse-gold {
+    0%, 100% { transform: scale(1); box-shadow: 0 8px 25px rgba(139, 69, 19, 0.4); }
+    50% { transform: scale(1.02); box-shadow: 0 12px 35px rgba(139, 69, 19, 0.6); }
+}
+
+/* Cards do Mestre */
+.card-mestre {
+    box-shadow: 0 15px 35px rgba(139, 69, 19, 0.4);
+    background: linear-gradient(135deg, #FFF8DC, #FFFAF0);
+    border: 2px solid #8B4513;
+    transition: all 0.3s ease;
+}
+
+.card-mestre:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 45px rgba(139, 69, 19, 0.6);
+}
+
+.card-header-mestre {
+    background: linear-gradient(135deg, #8B4513, #A0522D) !important;
+    border-bottom: 3px solid #654321;
+    color: #FFD700 !important;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+/* Avatar do Mestre */
+.avatar-mestre {
+    border: 4px solid #8B4513 !important;
+    box-shadow: 0 8px 20px rgba(139, 69, 19, 0.5) !important;
+    transition: all 0.3s ease;
+}
+
+.avatar-mestre:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 30px rgba(139, 69, 19, 0.7) !important;
+}
+
+/* Badge do Mestre */
+.badge-mestre {
+    background: linear-gradient(135deg, #8B4513, #A0522D) !important;
+    color: #FFD700 !important;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    border: 2px solid #654321;
+    font-weight: bold;
+}
+
+/* Botões do Mestre */
+.btn-mestre {
+    background: linear-gradient(135deg, #8B4513, #A0522D);
+    border: 2px solid #654321;
+    color: #FFD700;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    transition: all 0.3s ease;
+}
+
+.btn-mestre:hover {
+    background: linear-gradient(135deg, #A0522D, #CD853F);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(139, 69, 19, 0.5);
+    color: #FFD700;
+}
+
+.btn-outline-mestre {
+    border: 2px solid #8B4513;
+    color: #8B4513;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-mestre:hover {
+    background: linear-gradient(135deg, #8B4513, #A0522D);
+    color: #FFD700;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(139, 69, 19, 0.5);
+}
+
+/* Ícones do Mestre */
+.icon-mestre {
+    color: #8B4513;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    animation: glow-gold 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow-gold {
+    from { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 10px rgba(139, 69, 19, 0.5); }
+    to { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(139, 69, 19, 0.8); }
+}
+
+/* Cards de estatísticas do Analytics */
+.stats-card {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border: 2px solid #dee2e6;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #ffc107, #ffad00, #d39e00);
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.stats-card .card-body {
+    padding: 2rem;
+}
+
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #495057;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.stats-label {
+    color: #6c757d;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stats-icon {
+    font-size: 3rem;
+    opacity: 0.8;
+    color: #ffc107;
+}
+
+/* Timeline de atividades */
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #ffc107, #ffad00, #d39e00);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 2rem;
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-left: 4px solid #ffc107;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -34px;
+    top: 20px;
+    width: 12px;
+    height: 12px;
+    background: #ffc107;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 3px #ffc107;
+}
+
+.timeline-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* Tabelas do ranking */
+.ranking-table {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.ranking-table th {
+    background: linear-gradient(135deg, #343a40, #495057);
+    color: #ffc107;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    padding: 1rem;
+}
+
+.ranking-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: middle;
+}
+
+.ranking-table tbody tr:hover {
+    background-color: #fff3cd;
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+}
+
+.ranking-position {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #ffc107;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.ranking-position.first {
+    color: #ffd700;
+    font-size: 1.5rem;
+}
+
+.ranking-position.second {
+    color: #c0c0c0;
+    font-size: 1.3rem;
+}
+
+.ranking-position.third {
+    color: #cd7f32;
+    font-size: 1.2rem;
+}
+
+/* Navegação entre análises */
+.analytics-nav {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 15px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.analytics-nav .nav-link {
+    color: #495057;
+    font-weight: 600;
+    border-radius: 10px;
+    margin: 0 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.analytics-nav .nav-link:hover,
+.analytics-nav .nav-link.active {
+    background: linear-gradient(135deg, #ffc107, #ffad00);
+    color: #664d00;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .stats-number {
+        font-size: 2rem;
+    }
+    
+    .stats-icon {
+        font-size: 2rem;
+    }
+    
+    .timeline {
+        padding-left: 20px;
+    }
+    
+    .timeline::before {
+        left: 10px;
+    }
+    
+    .timeline-item::before {
+        left: -28px;
+    }
+    
+    .banner-mestre {
+        text-align: center;
+    }
+    
+    .banner-mestre .d-flex {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .banner-mestre .d-flex .gap-2 {
+        flex-direction: column;
+        width: 100%;
+    }
+}
+
+/* Animações suaves */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* === MELHORIAS ADICIONAIS PARA GRÁFICOS E TABELAS === */
+
+/* Estilos específicos para gráficos e tabelas */
+.chart-container {
+    position: relative;
+    height: 350px;
+    padding: 10px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.metric-card {
+    background: linear-gradient(135deg, #8B4513 0%, #DAA520 50%, #B8860B 100%) !important;
+    border: 2px solid #654321 !important;
+    color: #ffffff !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    box-shadow: 0 8px 20px rgba(139, 69, 19, 0.4);
+    transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(139, 69, 19, 0.6);
+}
+
+.metric-value {
+    font-size: 2.8rem !important;
+    font-weight: bold !important;
+    color: #FFD700 !important;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+.metric-label {
+    font-size: 1rem !important;
+    color: #FFF8DC !important;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+}
+
+/* Tabelas com estilo do mestre */
+.table-mestre {
+    background: #ffffff;
+    border: 2px solid #8B4513;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(139, 69, 19, 0.3);
+}
+
+.table-mestre thead {
+    background: linear-gradient(135deg, #654321, #8B4513);
+    color: #FFD700;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.table-mestre tbody tr:nth-child(even) {
+    background-color: #faf8f3;
+}
+
+.table-mestre tbody tr:hover {
+    background-color: rgba(218, 165, 32, 0.1);
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+}
+
+/* Dashboard header específico */
+.dashboard-header {
+    background: linear-gradient(135deg, #8B4513 0%, #654321 100%) !important;
+    color: #FFD700 !important;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 4px 15px rgba(139, 69, 19, 0.5);
+}

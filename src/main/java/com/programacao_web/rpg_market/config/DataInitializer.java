@@ -2,13 +2,16 @@ package com.programacao_web.rpg_market.config;
 
 import com.programacao_web.rpg_market.model.Product;
 import com.programacao_web.rpg_market.model.User;
+import com.programacao_web.rpg_market.model.Transaction;
 import com.programacao_web.rpg_market.model.UserRole;
 import com.programacao_web.rpg_market.model.ProductCategory;
 import com.programacao_web.rpg_market.model.ProductType;
 import com.programacao_web.rpg_market.model.ProductStatus;
 import com.programacao_web.rpg_market.model.ItemRarity;
+import com.programacao_web.rpg_market.model.TransactionStatus;
 import com.programacao_web.rpg_market.repository.UserRepository;
 import com.programacao_web.rpg_market.repository.ProductRepository;
+import com.programacao_web.rpg_market.repository.TransactionRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,14 +19,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Configuration
 public class DataInitializer {
 
-    @Bean
-    CommandLineRunner init(UserRepository userRepository, 
+    @Bean    CommandLineRunner init(UserRepository userRepository, 
                           ProductRepository productRepository,
-                          PasswordEncoder passwordEncoder) {        return args -> {
+                          TransactionRepository transactionRepository,
+                          PasswordEncoder passwordEncoder) {return args -> {
             System.out.println("=== Inicializando dados do MongoDB ===");
             long userCount = userRepository.count();
             long productCount = productRepository.count();
@@ -86,39 +90,116 @@ public class DataInitializer {
             if (productRepository.count() == 0) {
                 System.out.println("Criando produtos iniciais...");
                 User admin = userRepository.findByUsername("admin").orElse(null);
-                if (admin != null) {
-                    // Create direct sale product
-                    Product product1 = new Product();
-                    product1.setName("Espada Longa Encantada");
-                    product1.setDescription("Uma espada longa e afiada, forjada pelos anões das montanhas. Aumenta +10 de ataque.");
-                    product1.setPrice(new BigDecimal("150.00"));
-                    product1.setCategory(ProductCategory.ARMAS);
-                    product1.setType(ProductType.DIRECT_SALE);
-                    product1.setStatus(ProductStatus.AVAILABLE);
-                    product1.setSeller(admin);
-                    product1.setRarity(ItemRarity.RARO);
-                    productRepository.save(product1);
 
-                    // Create auction product
-                    Product product2 = new Product();
-                    product2.setName("Poção de Vida Suprema");
-                    product2.setDescription("Restaura 100 pontos de vida instantaneamente. Feita com ervas raras da floresta élfica.");
-                    product2.setPrice(new BigDecimal("25.00")); // Starting bid
-                    product2.setBuyNowPrice(new BigDecimal("75.00"));
-                    product2.setMinBidIncrement(new BigDecimal("5.00"));
-                    product2.setCategory(ProductCategory.POCOES_ELIXIRES);
-                    product2.setType(ProductType.AUCTION);
-                    product2.setStatus(ProductStatus.AUCTION_ACTIVE);
-                    product2.setSeller(admin);                    product2.setRarity(ItemRarity.LENDARIO);
-                    product2.setAuctionEndDate(LocalDateTime.now().plusDays(7));
-                    productRepository.save(product2);
+                if (admin != null) {
+                    // Anúncio 1: Espada Longa de Aço Valiriano (Venda Direta)
+                    Product espada = new Product();
+                    espada.setName("Espada Longa de Aço Valiriano");
+                    espada.setDescription("Uma lâmina forjada nas profundezas das Montanhas da Perdição, reforçada com o lendário Aço Valiriano. Leve, incrivelmente afiada e resistente a qualquer magia sombria.");
+                    espada.setPrice(new BigDecimal("750.00")); // Preço para venda direta
+                    espada.setType(ProductType.DIRECT_SALE); // Tipo: Venda Direta
+                    espada.setCategory(ProductCategory.ARMAS); // Categoria: Armas
+                    espada.setStatus(ProductStatus.AVAILABLE); // Status: Disponível
+                    espada.setRarity(ItemRarity.MUITO_RARO); // Raridade: Épico
+                    espada.setImageUrl("/img/items/espada_valiriana.png"); // Caminho da imagem
+                    espada.setSeller(admin); // Vendedor
+                    productRepository.save(espada);
+
+                    // Anúncio 2: Arco Élfico de Lunária (Leilão)
+                    Product arco = new Product();
+                    arco.setName("Arco Élfico de Galhos de Lunária");
+                    arco.setDescription("Um arco graciosamente esculpido a partir de galhos da rara árvore Lunária, encontrada nas florestas encantadas de Eldoria. Incrivelmente preciso e silencioso.");
+                    arco.setPrice(new BigDecimal("300.00")); // Lance inicial do leilão
+                    arco.setBuyNowPrice(new BigDecimal("600.00")); // Preço de "Comprar Agora"
+                    arco.setMinBidIncrement(new BigDecimal("20.00")); // Incremento mínimo do lance
+                    arco.setType(ProductType.AUCTION); // Tipo: Leilão
+                    arco.setAuctionEndDate(LocalDateTime.now().plusDays(5)); // Data de fim do leilão
+                    arco.setCategory(ProductCategory.ARMAS); // Categoria: Armas
+                    arco.setStatus(ProductStatus.AUCTION_ACTIVE); // Status: Leilão ativo
+                    arco.setRarity(ItemRarity.RARO); // Raridade: Raro
+                    arco.setImageUrl("/img/items/arco_elfico.png");
+                    arco.setSeller(admin);
+                    productRepository.save(arco);
+
+                    // Anúncio 3: Poção de Cura Maior (Venda Direta)
+                    Product pocao = new Product();
+                    pocao.setName("Poção de Cura Maior");
+                    pocao.setDescription("Uma poderosa concoção alquímica capaz de curar ferimentos graves em instantes. Essencial para qualquer aventureiro que se preze.");
+                    pocao.setPrice(new BigDecimal("150.00"));
+                    pocao.setType(ProductType.DIRECT_SALE); // Tipo: Venda Direta
+                    pocao.setCategory(ProductCategory.POCOES_ELIXIRES); // Categoria: Poções e Elixires
+                    pocao.setStatus(ProductStatus.AVAILABLE); // Status: Disponível
+                    pocao.setRarity(ItemRarity.INCOMUM); // Raridade: Incomum
+                    pocao.setImageUrl("/img/items/pocao_cura.png");
+                    pocao.setSeller(admin);
+                    productRepository.save(pocao);
                     
-                    System.out.println("✅ Produtos criados:");
-                    System.out.println("   - Espada Longa Encantada (Venda Direta): R$ 150,00");
-                    System.out.println("   - Poção de Vida Suprema (Leilão): Lance inicial R$ 25,00");
+                    // Anúncio 4: Mochila de Couro de Ogro Encantada (Venda Direta)
+                    Product mochila = new Product();
+                    mochila.setName("Mochila de Couro de Ogro Encantada");
+                    mochila.setDescription("Uma mochila espaçosa feita de couro resistente de ogro, com um encantamento que permite carregar até o dobro do peso sem sentir o fardo.");
+                    mochila.setPrice(new BigDecimal("220.00"));
+                    mochila.setType(ProductType.DIRECT_SALE); // Tipo: Venda Direta
+                    mochila.setCategory(ProductCategory.DIVERSOS); // Categoria: Itens Diversos
+                    mochila.setStatus(ProductStatus.AVAILABLE); // Status: Disponível
+                    mochila.setRarity(ItemRarity.INCOMUM); // Raridade: Incomum
+                    mochila.setImageUrl("/img/items/mochila_ogro.png");
+                    mochila.setSeller(admin);
+                    productRepository.save(mochila);
+
+                    // Anúncio 5: Amuleto da Proteção Menor (Venda Direta)
+                    Product amuleto = new Product();
+                    amuleto.setName("Amuleto da Proteção Menor");
+                    amuleto.setDescription("Um amuleto de prata adornado com uma pequena pedra de jaspe. Oferece uma leve proteção contra energias negativas e pequenos golpes.");
+                    amuleto.setPrice(new BigDecimal("60.00"));
+                    amuleto.setType(ProductType.DIRECT_SALE); // Tipo: Venda Direta
+                    amuleto.setCategory(ProductCategory.JOIAS_ARTEFATOS); // Categoria: Jóias e Artefatos
+                    amuleto.setStatus(ProductStatus.AVAILABLE); // Status: Disponível
+                    amuleto.setRarity(ItemRarity.COMUM); // Raridade: Comum
+                    amuleto.setImageUrl("/img/items/amuleto_protecao.png");
+                    amuleto.setSeller(admin);
+                    productRepository.save(amuleto);
+                      System.out.println("✅ Produtos de exemplo criados com sucesso!");                    // Criar algumas transações de exemplo se não existirem
+                    if (transactionRepository.count() == 0) {
+                        System.out.println("Criando transações de exemplo...");
+                        
+                        // Buscar alguns usuários para as transações
+                        User aventureiro1 = userRepository.findByUsername("jogador1").orElse(null);
+                        User aventureiro2 = userRepository.findByUsername("aventureiro").orElse(null);
+                        
+                        // Buscar produtos existentes
+                        List<Product> produtos = productRepository.findAll();
+                        
+                        if (aventureiro1 != null && !produtos.isEmpty()) {
+                            Product produto1 = produtos.get(0);
+                            Transaction t1 = new Transaction();
+                            t1.setBuyer(aventureiro1);
+                            t1.setProduct(produto1);
+                            t1.setAmount(produto1.getPrice());
+                            t1.setStatus(TransactionStatus.COMPLETED);
+                            t1.setCreatedAt(LocalDateTime.now().minusDays(1));
+                            transactionRepository.save(t1);
+                        }
+                        
+                        if (aventureiro2 != null && produtos.size() > 1) {
+                            Product produto2 = produtos.get(1);
+                            Transaction t2 = new Transaction();
+                            t2.setBuyer(aventureiro2);
+                            t2.setProduct(produto2);
+                            t2.setAmount(produto2.getPrice());
+                            t2.setStatus(TransactionStatus.COMPLETED);
+                            t2.setCreatedAt(LocalDateTime.now().minusHours(6));
+                            transactionRepository.save(t2);
+                        }
+                        
+                        System.out.println("✅ Transações de exemplo criadas!");
+                    }
+
                 } else {
                     System.out.println("❌ Admin não encontrado para criar produtos!");
                 }
+            } else {
+                 System.out.println("Produtos já existem, pulando criação de dados de exemplo.");
             }
             
             System.out.println("=== Inicialização concluída ===");

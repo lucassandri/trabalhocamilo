@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-br" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Dashboard do Mestre - RPG Market</title>
+    <link rel="stylesheet" th:href="@{/css/master-panel.css}">
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container-fluid">
+            <!-- Navegação do Painel do Mestre -->
+            <div class="master-nav">
+                <div class="nav-title">
+                    <i class="fas fa-crown me-2"></i>Painel do Mestre
+                </div>
+                <div class="nav-buttons">
+                    <a th:href="@{/mestre/dashboard}" class="nav-btn active">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                    <a th:href="@{/mestre/ranking-nobres}" class="nav-btn">
+                        <i class="fas fa-trophy me-2"></i>Rankings
+                    </a>
+                    <a th:href="@{/mestre/relatorio-atividades}" class="nav-btn">
+                        <i class="fas fa-chart-line me-2"></i>Atividades
+                    </a>
+                </div>
+            </div>
+
+            <!-- Cabeçalho da Página -->
+            <div class="page-header">
+                <h1><i class="fas fa-tachometer-alt me-3"></i>Dashboard do Mestre</h1>
+                <p>Visão geral das métricas e estatísticas do mercado</p>
+                
+                <!-- Filtros de Período -->
+                <div class="period-filters">
+                    <label>Período de análise:</label>
+                    <div class="btn-group" role="group">
+                        <a th:href="@{/mestre/dashboard(periodo=7)}" 
+                           th:class="${periodoSelecionado == 7 ? 'btn btn-primary' : 'btn btn-outline-primary'}">
+                            7 dias
+                        </a>
+                        <a th:href="@{/mestre/dashboard(periodo=14)}" 
+                           th:class="${periodoSelecionado == 14 ? 'btn btn-primary' : 'btn btn-outline-primary'}">
+                            14 dias
+                        </a>
+                        <a th:href="@{/mestre/dashboard(periodo=30)}" 
+                           th:class="${periodoSelecionado == 30 ? 'btn btn-primary' : 'btn btn-outline-primary'}">
+                            30 dias
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Métricas Principais -->
+            <div class="metrics-grid">
+                <div class="metric-card primary">
+                    <div class="metric-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value" th:text="${analytics.totalUsuarios}">0</div>
+                        <div class="metric-label">Total de Aventureiros</div>
+                    </div>
+                </div>
+
+                <div class="metric-card success">
+                    <div class="metric-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value" th:text="${analytics.totalProdutos}">0</div>
+                        <div class="metric-label">Itens Cadastrados</div>
+                    </div>
+                </div>
+
+                <div class="metric-card info">
+                    <div class="metric-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value" th:text="${transacoesPeriodo}">0</div>
+                        <div class="metric-label">Transações (<span th:text="${periodoSelecionado}">7</span> dias)</div>
+                    </div>
+                </div>
+
+                <div class="metric-card warning">
+                    <div class="metric-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value" th:text="${analytics.taxaAtividade != null ? #numbers.formatDecimal(analytics.taxaAtividade, 1, 1) : '0.0'}">0.0</div>
+                        <div class="metric-label">Taxa Atividade/dia</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Métricas Financeiras -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-coins me-2"></i>Valor Médio Transação</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="big-metric gold" th:text="${analytics.valorMedioTransacao != null ? #numbers.formatDecimal(analytics.valorMedioTransacao, 0, 2) : '0.00'}">0.00</div>
+                            <small class="text-muted">moedas de ouro</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-treasure-chest me-2"></i>Volume Total de Vendas</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="big-metric gold" th:text="${analytics.volumeTotalVendas != null ? #numbers.formatDecimal(analytics.volumeTotalVendas, 0, 2) : '0.00'}">0.00</div>
+                            <small class="text-muted">moedas de ouro</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Análises Detalhadas -->
+            <div class="row">
+                <!-- Top Vendedores -->
+                <div class="col-lg-6 mb-4">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-trophy me-2"></i>Top 5 Vendedores</h5>
+                            <a th:href="@{/mestre/ranking-nobres}" class="btn btn-sm btn-outline-primary">Ver Todos</a>
+                        </div>
+                        <div class="card-body">
+                            <div th:if="${topVendedores != null and !topVendedores.isEmpty()}">
+                                <div th:each="seller, stat : ${topVendedores}" th:if="${stat.index < 5}" class="ranking-item">
+                                    <div class="rank-position" th:text="${stat.index + 1}">1</div>
+                                    <div class="rank-info">
+                                        <div class="rank-name" th:text="${seller.username}">Vendedor</div>
+                                        <div class="rank-details" th:text="${seller.characterClass + ' - Nível ' + seller.level}">Classe - Nível</div>
+                                    </div>
+                                    <div class="rank-value">
+                                        <span class="gold-text" th:text="${#numbers.formatDecimal(seller.goldCoins, 0, 0)}">0</span>
+                                        <small>moedas</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div th:if="${topVendedores == null or topVendedores.isEmpty()}" class="empty-state">
+                                <i class="fas fa-store fa-2x mb-2 text-muted"></i>
+                                <p>Nenhum vendedor encontrado</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produtos Mais Caros -->
+                <div class="col-lg-6 mb-4">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-gem me-2"></i>Produtos Mais Caros</h5>
+                            <a th:href="@{/mercado}" class="btn btn-sm btn-outline-primary">Ver Mercado</a>
+                        </div>
+                        <div class="card-body">
+                            <div th:if="${produtosMaisCaros != null and !produtosMaisCaros.isEmpty()}">
+                                <div th:each="produto, stat : ${produtosMaisCaros}" th:if="${stat.index < 5}" class="ranking-item">
+                                    <div class="rank-position" th:text="${stat.index + 1}">1</div>
+                                    <div class="rank-info">
+                                        <div class="rank-name" th:text="${produto.name ?: 'Produto Sem Nome'}">Nome do Produto</div>
+                                        <div class="rank-details" th:text="${produto.category ?: 'Categoria não definida'}">Categoria</div>
+                                    </div>
+                                    <div class="rank-value">
+                                        <span class="gold-text" th:text="${produto.price != null ? #numbers.formatDecimal(produto.price, 0, 2) : '0.00'}">0.00</span>
+                                        <small>moedas</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div th:if="${produtosMaisCaros == null or produtosMaisCaros.isEmpty()}" class="empty-state">
+                                <i class="fas fa-gem fa-2x mb-2 text-muted"></i>
+                                <p>Nenhum produto encontrado</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumo da Atividade -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-clock me-2"></i>Resumo de Atividade Recente</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-3">
+                                    <div class="activity-metric success">
+                                        <div class="activity-value" th:text="${produtos != null ? #lists.size(produtos) : 0}">0</div>
+                                        <div class="activity-label">Produtos Disponíveis</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="activity-metric info">
+                                        <div class="activity-value" th:text="${transacoesPeriodo ?: 0}">0</div>
+                                        <div class="activity-label">Transações no Período</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="activity-metric warning">
+                                        <div class="activity-value" th:text="${analytics.leiloesAtivos ?: 0}">0</div>
+                                        <div class="activity-label">Leilões Ativos</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="activity-metric primary">
+                                        <div class="activity-value" th:text="${analytics.totalUsuarios}">0</div>
+                                        <div class="activity-label">Usuários Cadastrados</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

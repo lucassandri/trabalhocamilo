@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-br" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Relatório de Atividades - RPG Market</title>
+    <link rel="stylesheet" th:href="@{/css/master-panel.css}">
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container-fluid">
+            <!-- Navegação do Painel do Mestre -->
+            <div class="master-nav">
+                <div class="nav-title">
+                    <i class="fas fa-crown me-2"></i>Painel do Mestre
+                </div>
+                <div class="nav-buttons">
+                    <a th:href="@{/mestre/dashboard}" class="nav-btn">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                    <a th:href="@{/mestre/ranking-nobres}" class="nav-btn">
+                        <i class="fas fa-trophy me-2"></i>Rankings
+                    </a>
+                    <a th:href="@{/mestre/relatorio-atividades}" class="nav-btn active">
+                        <i class="fas fa-chart-line me-2"></i>Atividades
+                    </a>
+                </div>
+            </div>
+
+            <!-- Cabeçalho -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="activity-card">
+                        <div class="card-body text-center">
+                            <h1 class="card-title mb-3">
+                                <i class="fas fa-chart-line me-3"></i>Relatório de Atividades
+                            </h1>
+                            <p class="card-text">Monitoramento das atividades recentes no mercado</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estatísticas Rápidas -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number" th:text="${totalUsuarios}">0</div>
+                        <div class="stat-label">Total de Usuários</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number" th:text="${vendasHoje}">0</div>
+                        <div class="stat-label">Vendas Recentes</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number" th:text="${totalLances}">0</div>
+                        <div class="stat-label">Lances Recentes</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number" th:text="${novosProdutosHoje}">0</div>
+                        <div class="stat-label">Produtos Recentes</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Atividades Recentes -->
+            <div class="row">
+                <!-- Transações Recentes -->
+                <div class="col-lg-4 mb-4">
+                    <div class="activity-card">
+                        <div class="card-body">
+                            <h5 class="section-title">
+                                <i class="fas fa-coins me-2"></i>Transações Recentes
+                            </h5>
+                            <div th:if="${transacoesRecentes != null and !transacoesRecentes.isEmpty()}">
+                                <div th:each="transacao : ${transacoesRecentes}" class="activity-item d-flex align-items-center">
+                                    <div class="activity-icon activity-transaction">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <strong th:text="${transacao.buyer != null ? transacao.buyer.username : 'Usuário Desconhecido'}">Comprador</strong>
+                                        <br>
+                                        <span th:text="${transacao.amount != null ? 'R$ ' + transacao.amount : 'Valor não informado'}">Valor</span>
+                                        <div class="activity-time" th:text="${transacao.createdAt != null ? #temporals.format(transacao.createdAt, 'dd/MM/yyyy HH:mm') : 'Data não informada'}">Data</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div th:if="${transacoesRecentes == null or transacoesRecentes.isEmpty()}" class="activity-item text-center">
+                                <i class="fas fa-info-circle me-2"></i>Nenhuma transação recente
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lances Recentes -->
+                <div class="col-lg-4 mb-4">
+                    <div class="activity-card">
+                        <div class="card-body">
+                            <h5 class="section-title">
+                                <i class="fas fa-gavel me-2"></i>Lances Recentes
+                            </h5>
+                            <div th:if="${lancesRecentes != null and !lancesRecentes.isEmpty()}">
+                                <div th:each="lance : ${lancesRecentes}" class="activity-item d-flex align-items-center">
+                                    <div class="activity-icon activity-bid">
+                                        <i class="fas fa-hammer"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <strong th:text="${lance.bidder != null ? lance.bidder.username : 'Licitante Desconhecido'}">Licitante</strong>
+                                        <br>
+                                        <span th:text="${lance.amount != null ? 'R$ ' + lance.amount : 'Valor não informado'}">Valor</span>
+                                        <div class="activity-time" th:text="${lance.bidTime != null ? #temporals.format(lance.bidTime, 'dd/MM/yyyy HH:mm') : 'Data não informada'}">Data</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div th:if="${lancesRecentes == null or lancesRecentes.isEmpty()}" class="activity-item text-center">
+                                <i class="fas fa-info-circle me-2"></i>Nenhum lance recente
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produtos Recentes -->
+                <div class="col-lg-4 mb-4">
+                    <div class="activity-card">
+                        <div class="card-body">
+                            <h5 class="section-title">
+                                <i class="fas fa-box me-2"></i>Produtos Recentes
+                            </h5>
+                            <div th:if="${produtosRecentes != null and !produtosRecentes.isEmpty()}">
+                                <div th:each="produto : ${produtosRecentes}" class="activity-item d-flex align-items-center">
+                                    <div class="activity-icon activity-product">
+                                        <i class="fas fa-gem"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <strong th:text="${produto.name ?: 'Produto Sem Nome'}">Nome do Produto</strong>
+                                        <br>
+                                        <span th:text="${produto.price != null ? 'R$ ' + produto.price : 'Preço não definido'}">Preço</span>
+                                        <div class="activity-time" th:text="${produto.createdAt != null ? #temporals.format(produto.createdAt, 'dd/MM/yyyy HH:mm') : 'Data não informada'}">Data</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div th:if="${produtosRecentes == null or produtosRecentes.isEmpty()}" class="activity-item text-center">
+                                <i class="fas fa-info-circle me-2"></i>Nenhum produto recente
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="row">
+                <div class="col-12 text-center">
+                    <a th:href="@{/mestre/dashboard}" class="btn btn-primary me-3">
+                        <i class="fas fa-dashboard me-2"></i>Voltar ao Dashboard
+                    </a>
+                    <a th:href="@{/mestre/ranking-nobres}" class="btn btn-info">
+                        <i class="fas fa-trophy me-2"></i>Ver Rankings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

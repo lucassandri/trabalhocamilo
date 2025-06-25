@@ -161,5 +161,50 @@ public class DebugController {
         }
         
         return debug;
+    }    @Autowired
+    private com.programacao_web.rpg_market.repository.UserRepository userRepository;
+
+    @GetMapping("/users")
+    @ResponseBody
+    public Map<String, Object> debugUsers() {
+        Map<String, Object> debug = new HashMap<>();
+        
+        try {
+            List<User> allUsers = userRepository.findAll();
+            
+            debug.put("totalUsers", allUsers.size());
+            debug.put("users", allUsers.stream().map(user -> {
+                Map<String, Object> userInfo = new HashMap<>();
+                userInfo.put("id", user.getId());
+                userInfo.put("username", user.getUsername());
+                userInfo.put("email", user.getEmail());
+                userInfo.put("role", user.getRole());
+                userInfo.put("characterClass", user.getCharacterClass());
+                userInfo.put("level", user.getLevel());
+                userInfo.put("goldCoins", user.getGoldCoins());
+                userInfo.put("passwordHash", user.getPassword() != null ? 
+                    user.getPassword().substring(0, Math.min(10, user.getPassword().length())) + "..." : null);
+                return userInfo;
+            }).toList());
+            
+            // Verificar especificamente o usuário admin
+            Optional<User> adminUser = userService.findByUsername("admin");
+            if (adminUser.isPresent()) {
+                debug.put("adminExists", true);
+                debug.put("adminRole", adminUser.get().getRole());
+                debug.put("adminPasswordHash", adminUser.get().getPassword().substring(0, Math.min(10, adminUser.get().getPassword().length())) + "...");
+            } else {
+                debug.put("adminExists", false);
+            }
+            
+            debug.put("status", "success");
+            
+        } catch (Exception e) {
+            debug.put("status", "error");
+            debug.put("message", e.getMessage());
+            log.error("Erro ao debugar usuários", e);
+        }
+        
+        return debug;
     }
 }

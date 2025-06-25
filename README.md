@@ -2,262 +2,257 @@
 
 Um marketplace medieval fantástico para compra e venda de itens RPG, desenvolvido com Spring Boot e MongoDB.
 
-## 🎯 **Novidades & Melhorias**
+## 🎯 **Funcionalidades Principais**
 
-✨ **Sistema de leilões aprimorado com:**
-- Auto-atualização de lances em tempo real
-- Animações e efeitos visuais modernos
-- Logs detalhados para depuração
-- Interface aprimorada com melhor usabilidade
+### 🧙‍♂️ **Painel do Mestre (Administração)**
+- 📊 **Dashboard Completo** - Métricas em tempo real com filtros de período (7, 14, 30 dias)
+- 🏆 **Ranking dos Nobres** - Rankings interativos de top vendedores, compradores e usuários mais ricos
+- 📈 **Relatório de Atividades** - Monitoramento de transações, lances e produtos recentes
+- 📋 **Análises Financeiras** - Volume de vendas, valor médio de transações e taxa de atividade
+- 🎯 **Interface unificada** - Layout consistente e responsivo em todas as páginas
 
-📖 **[Ver Resumo Completo das Melhorias](SOLUTION_SUMMARY.md)**
+### ⚔️ **Sistema de Mercado**
+- �️ **Mercado de Itens** - Navegação por categorias (armas, armaduras, poções, etc.)
+- 💰 **Sistema de Compra Direta** - Transações instantâneas
+- 🔨 **Sistema de Leilões** - Lances em tempo real com auto-atualização
+- 📦 **Gestão de Inventário** - Controle completo de produtos pessoais
+- 🏷️ **Upload de Imagens** - Suporte para imagens de produtos
 
-## 🚀 Instalação Rápida
+### 👤 **Sistema de Usuários**
+- 🔐 **Autenticação Segura** - Login/registro com Spring Security
+- 🎭 **Perfis RPG** - Classes de personagem, níveis e moedas de ouro
+- 📊 **Estatísticas Pessoais** - Histórico de compras, vendas e ranking
+- 🏠 **Sistema de Endereços** - Gerenciamento de endereços de entrega
 
-### Para usuários que querem começar rapidamente:
+## 🚀 **Instalação Rápida**
 
-**Windows:**
+### **Pré-requisitos**
+- ☕ **Java JDK 17+**
+- 🍃 **MongoDB 7.0+**
+- 🔧 **Git** (opcional)
+
+### **1. Clone e Configure**
 ```bash
-# Execute o script de instalação automática
-install.bat
-```
-
-**Linux/macOS:**
-```bash
-# Execute o script de instalação automática
-chmod +x install.sh
-./install.sh
-```
-
-### Para instalação manual detalhada:
-📖 **[Consulte o Guia Completo de Instalação](GUIA_INSTALACAO.md)**
-
-## 📋 Pré-requisitos (Resumo)
-
-- **Java JDK 17+** 
-- **MongoDB 7.0+**
-- **Git** (opcional)
-
-## ⚡ Execução Rápida
-
-Se você já tem as dependências instaladas:
-
-```bash
-# Clone o projeto
+# Clone o repositório
 git clone <url-do-repositorio>
 cd rpg_market
 
-# Execute
-./mvnw spring-boot:run
+# Inicie o MongoDB (se local)
+# Windows
+net start MongoDB
+# Linux/macOS
+sudo systemctl start mongod
 ```
 
-Acesse: `http://localhost:8080`
-4. Obtenha a string de conexão
-5. Atualize o `application.properties`:
+### **2. Configure o Banco de Dados**
+Edite `src/main/resources/application.properties`:
 ```properties
+# MongoDB Local
+spring.data.mongodb.uri=mongodb://localhost:27017/rpgmarket
+
+# MongoDB Atlas (nuvem)
 spring.data.mongodb.uri=mongodb+srv://username:password@cluster.mongodb.net/rpgmarket
 ```
 
-### 3. Configuração do Diretório de Upload
-Crie o diretório para upload de imagens:
-```bash
-# Windows
-mkdir uploads\images
-
-# Linux/Mac
-mkdir -p uploads/images
-```
-
-### 4. Configuração das Propriedades
-Edite o arquivo `src/main/resources/application.properties` se necessário:
-
-```properties
-# Configuração da Aplicação
-spring.application.name=rpg_market
-server.port=8080
-
-# MongoDB - Ajuste se necessário
-spring.data.mongodb.uri=mongodb://localhost:27017/rpgmarket
-
-# Upload de Arquivos - Ajuste o caminho se necessário  
-rpg.market.file.upload-dir=uploads/images
-```
-
-## 🛠️ Compilação e Execução
-
-### 1. Compilar o Projeto
+### **3. Execute a Aplicação**
 ```bash
 # Usando Maven Wrapper (recomendado)
-./mvnw clean compile
-
-# Ou usando Maven instalado
-mvn clean compile
-```
-
-### 2. Executar Testes
-```bash
-./mvnw test
-```
-
-### 3. Executar a Aplicação
-
-#### Opção A: Via Maven
-```bash
 ./mvnw spring-boot:run
-```
 
-#### Opção B: Via JAR
-```bash
+# Ou compile e execute
 ./mvnw clean package
 java -jar target/rpg_market-0.0.1-SNAPSHOT.jar
 ```
 
-#### Opção C: Via IDE
-1. Abra o projeto na sua IDE
-2. Execute a classe `RpgMarketApplication.java`
-
-### 4. Acesso à Aplicação
-- **URL**: http://localhost:8080
-- **Usuário Admin**: `admin` / `admin`
-- **Usuário Teste**: `testuser` / `password`
-
-## 📁 Estrutura do Projeto
+### **4. Acesse o Sistema**
+- 🌐 **URL**: http://localhost:8080
+- 👑 **Admin**: `admin` / `admin`
+- 🧙‍♂️ **Usuário Teste**: `testuser` / `password`
+## 📁 **Estrutura do Projeto**
 
 ```
 rpg_market/
-├── src/
-│   ├── main/
-│   │   ├── java/com/programacao_web/rpg_market/
-│   │   │   ├── config/          # Configurações (Security, MongoDB, etc.)
-│   │   │   ├── controller/      # Controllers MVC
-│   │   │   ├── dto/            # Data Transfer Objects
-│   │   │   ├── model/          # Entidades/Modelos
-│   │   │   ├── repository/     # Repositórios MongoDB
-│   │   │   ├── service/        # Lógica de negócio
-│   │   │   └── RpgMarketApplication.java
-│   │   └── resources/
-│   │       ├── static/         # CSS, JS, imagens estáticas
-│   │       ├── templates/      # Templates Thymeleaf
-│   │       └── application.properties
-│   └── test/                   # Testes unitários e integração
-├── uploads/                    # Upload de imagens (criado em runtime)
-├── pom.xml                     # Dependências Maven
-└── README.md                   # Este arquivo
+├── src/main/
+│   ├── java/com/programacao_web/rpg_market/
+│   │   ├── config/          # Configurações (Security, Web, etc.)
+│   │   ├── controller/      # Controllers REST e MVC
+│   │   │   ├── AnalyticsController.java  # Painel do Mestre
+│   │   │   ├── MarketController.java     # Mercado
+│   │   │   └── UserController.java       # Usuários
+│   │   ├── dto/            # Data Transfer Objects
+│   │   ├── model/          # Entidades (User, Product, Transaction, etc.)
+│   │   ├── repository/     # Repositórios MongoDB
+│   │   ├── service/        # Lógica de negócio
+│   │   │   ├── AnalyticsService.java     # Métricas e relatórios
+│   │   │   ├── ProductService.java       # Gestão de produtos
+│   │   │   └── TransactionService.java   # Transações
+│   │   └── RpgMarketApplication.java
+│   └── resources/
+│       ├── static/
+│       │   ├── css/
+│       │   │   ├── master-panel.css      # Estilos do Painel do Mestre
+│       │   │   ├── market.css            # Estilos do Mercado
+│       │   │   └── common.css            # Estilos gerais
+│       │   ├── js/             # Scripts JavaScript
+│       │   └── images/         # Imagens estáticas
+│       ├── templates/
+│       │   ├── analytics/      # Templates do Painel do Mestre
+│       │   │   ├── dashboard.html
+│       │   │   ├── ranking-nobres.html
+│       │   │   └── relatorio-atividades.html
+│       │   ├── market/         # Templates do Mercado
+│       │   ├── user/           # Templates de usuário
+│       │   └── layout/         # Layouts base
+│       └── application.properties
+├── uploads/images/             # Upload de imagens (criado automaticamente)
+└── pom.xml
 ```
 
-## 🎮 Funcionalidades
+## 🎮 **Guia de Uso**
 
-### Para Usuários (Aventureiros)
-- ✅ Registro e login de usuários
-- ✅ Navegação por categorias de itens
-- ✅ Sistema de compra direta
-- ✅ Sistema de leilão com lances
-- ✅ Gerenciamento de inventário pessoal
-- ✅ Histórico de compras e vendas
-- ✅ Perfil de usuário com estatísticas RPG
+### **👑 Painel do Mestre (Administradores)**
 
-### Para Administradores (Mestres)
-- ✅ Moderação de produtos
-- ✅ Gestão de usuários
-- ✅ Monitoramento de transações
+1. **Dashboard Principal**
+   - Acesse `/mestre/dashboard`
+   - Visualize métricas gerais do sistema
+   - Use filtros de período (7, 14, 30 dias)
+   - Monitore volume de vendas e transações
 
-### Recursos Técnicos
-- ✅ Interface responsiva com tema medieval
-- ✅ Upload de imagens para produtos
-- ✅ Sistema de endereços com geolocalização
-- ✅ Validação de formulários
-- ✅ Segurança com Spring Security
-- ✅ Auto-refresh em páginas de leilão
+2. **Rankings dos Nobres**
+   - Acesse `/mestre/ranking-nobres`
+   - Alterne entre rankings: vendedores, compradores, mais ricos
+   - Visualize estatísticas detalhadas dos usuários
 
-## 🐛 Solução de Problemas
+3. **Relatório de Atividades**
+   - Acesse `/mestre/relatorio-atividades`
+   - Monitore transações, lances e produtos recentes
+   - Acompanhe atividade em tempo real
 
-### Erro de Conexão MongoDB
+### **⚔️ Sistema de Mercado (Usuários)**
+
+1. **Navegação**
+   - Explore categorias de itens
+   - Use filtros de busca
+   - Visualize detalhes de produtos
+
+2. **Compras**
+   - Compra direta ou leilão
+   - Sistema de lances automático
+   - Confirmação de pagamento
+
+3. **Vendas**
+   - Cadastre novos produtos
+   - Upload de imagens
+   - Configure preços e leilões
+
+## 🛠️ **Tecnologias Utilizadas**
+
+### **Backend**
+- ⚡ **Spring Boot 3.2.4** - Framework principal
+- 🔐 **Spring Security** - Autenticação e autorização  
+- 🍃 **Spring Data MongoDB** - Persistência NoSQL
+- 📊 **MongoDB** - Banco de dados principal
+
+### **Frontend**
+- 🎨 **Thymeleaf** - Template engine
+- 🎯 **Bootstrap 5.3** - Framework CSS responsivo
+- ✨ **Font Awesome** - Biblioteca de ícones
+- 🎪 **JavaScript** - Interatividade e AJAX
+
+### **Recursos Especiais**
+- 📸 **Upload de Imagens** - Gestão de arquivos
+- 🔄 **Auto-refresh** - Atualizações em tempo real
+- 📱 **Design Responsivo** - Mobile-first
+- 🎭 **Tema Medieval** - Interface temática RPG
+
+## 🔧 **Configurações Avançadas**
+
+### **MongoDB Atlas (Nuvem)**
+```properties
+# Substitua no application.properties
+spring.data.mongodb.uri=mongodb+srv://username:password@cluster.mongodb.net/rpgmarket
 ```
-com.mongodb.MongoSocketException: Exception opening socket
+
+### **Configuração de Upload**
+```properties
+# Diretório personalizado para uploads
+rpg.market.file.upload-dir=C:/uploads/rpg-images
 ```
-**Solução**: Verifique se o MongoDB está executando:
+
+### **Configuração de Porta**
+```properties
+# Alterar porta padrão
+server.port=8081
+```
+
+## 🐛 **Solução de Problemas**
+
+### **MongoDB não conecta**
 ```bash
+# Verifique se está rodando
 # Windows
 net start MongoDB
-
-# Linux/Mac
+# Linux/macOS  
 sudo systemctl start mongod
 ```
 
-### Erro de Porta Ocupada
-```
-Web server failed to start. Port 8080 was already in use
-```
-**Solução**: 
-1. Mate o processo na porta 8080: `netstat -ano | findstr :8080`
-2. Ou altere a porta no `application.properties`: `server.port=8081`
-
-### Erro de JAVA_HOME
-```
-Error: JAVA_HOME is not defined correctly
-```
-**Solução**: Configure a variável de ambiente JAVA_HOME apontando para o diretório do JDK.
-
-### Erro de Permissão de Upload
-```
-Could not create directory: uploads/images
-```
-**Solução**: 
-1. Crie o diretório manualmente
-2. Verifique as permissões de escrita
-3. Execute a aplicação com privilégios apropriados
-
-## 📦 Dependências Principais
-
-- **Spring Boot 3.2.4** - Framework principal
-- **Spring Security** - Autenticação e autorização
-- **Spring Data MongoDB** - Persistência de dados
-- **Thymeleaf** - Template engine
-- **Bootstrap 5.3** - Framework CSS
-- **Font Awesome** - Ícones
-- **MongoDB** - Banco de dados NoSQL
-
-## 🔧 Configurações Avançadas
-
-### Configuração de Produção
-Para ambiente de produção, considere:
-
-1. **MongoDB com autenticação**:
-```properties
-spring.data.mongodb.uri=mongodb://username:password@localhost:27017/rpgmarket
-```
-
-2. **HTTPS e certificados SSL**
-3. **Configuração de proxy reverso (Nginx/Apache)**
-4. **Monitoramento com Spring Actuator**
-5. **Logging configurado**
-
-### Variáveis de Ambiente
-Para maior segurança, use variáveis de ambiente:
+### **Porta 8080 ocupada**
 ```bash
-export MONGODB_URI="mongodb://localhost:27017/rpgmarket"
-export UPLOAD_DIR="/var/uploads/images"
+# Encontre o processo
+netstat -ano | findstr :8080
+# Mate o processo ou altere a porta no application.properties
 ```
 
-## 🤝 Contribuição
+### **Erro de permissão de upload**
+```bash
+# Crie o diretório manualmente
+mkdir uploads/images
+# Verifique permissões (Linux/macOS)
+chmod 755 uploads/images
+```
 
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/NovaFuncionalidade`)
-3. Commit suas mudanças (`git commit -am 'Adiciona nova funcionalidade'`)
-4. Push para a branch (`git push origin feature/NovaFuncionalidade`)
+### **JAVA_HOME não configurado**
+```bash
+# Windows
+set JAVA_HOME=C:\Program Files\Java\jdk-17
+# Linux/macOS
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+```
+
+## 📊 **Dados de Demonstração**
+
+O sistema é inicializado automaticamente com:
+- 👤 **Usuários**: admin, testuser, e outros aventureiros
+- ⚔️ **Produtos**: Armaduras, armas, poções e artefatos
+- 💰 **Transações**: Histórico de compras e vendas
+- 🏆 **Rankings**: Dados para demonstração
+
+## 🚀 **Próximas Funcionalidades**
+
+- 🔔 **Sistema de Notificações** - Alertas em tempo real
+- 💬 **Chat entre Usuários** - Comunicação direta
+- 🎯 **Sistema de Reputação** - Avaliações e reviews
+- 📱 **API REST Completa** - Integração mobile
+- 🌍 **Internacionalização** - Múltiplos idiomas
+
+## 🤝 **Contribuição**
+
+1. Fork o projeto
+2. Crie uma branch (`git checkout -b feature/nova-funcionalidade`)
+3. Commit as mudanças (`git commit -am 'Adiciona nova funcionalidade'`)
+4. Push para branch (`git push origin feature/nova-funcionalidade`)
 5. Abra um Pull Request
 
-## 📄 Licença
+## 📄 **Licença**
 
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+Este projeto está sob a licença MIT. Consulte o arquivo LICENSE para detalhes.
 
-## 📞 Suporte
+## 📞 **Suporte**
 
-Para dúvidas e suporte:
-- Abra uma issue no repositório
-- Consulte a documentação do Spring Boot
-- Verifique os logs da aplicação em `logs/application.log`
+- 🐛 **Issues**: Reporte bugs no repositório
+- 📖 **Documentação**: Spring Boot e MongoDB
+- 📝 **Logs**: Consulte `logs/application.log`
 
 ---
 
-⚔️ **Que a sorte esteja com você, aventureiro!** ⚔️
+⚔️ **Que suas aventuras sejam épicas, nobre guerreiro!** ⚔️
