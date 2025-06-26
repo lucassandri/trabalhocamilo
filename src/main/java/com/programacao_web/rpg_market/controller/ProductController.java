@@ -282,21 +282,26 @@ public class ProductController {    private static final Logger log = LoggerFact
     public String editProduct(
             @PathVariable String id,
             @ModelAttribute Product product,
+            @RequestParam(value = "image", required = false) MultipartFile image,
             @AuthenticationPrincipal UserDetails currentUser,
             RedirectAttributes redirectAttributes) {
-        
         Optional<User> userOpt = userService.findByUsername(currentUser.getUsername());
         if (userOpt.isEmpty()) {
             return "error/403";
         }
-        
         try {
+            // Se uma nova imagem foi enviada, processa e atualiza o campo imageUrl
+            if (image != null && !image.isEmpty()) {
+                String imageFilename = fileStorageService.storeFile(image);
+                product.setImageUrl(imageFilename);
+            }
             productService.update(id, product, userOpt.get());
             redirectAttributes.addFlashAttribute("success", "Item atualizado com sucesso!");
+        } catch (IOException e) {
+            redirectAttributes.addFlashAttribute("error", "Erro ao fazer upload da imagem: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        
         return "redirect:/item/" + id;
     }
     
