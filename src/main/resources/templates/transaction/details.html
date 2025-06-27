@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-br" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Detalhes da Transação - RPG Market</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="rpg-font">
+                <i class="fas fa-exchange-alt me-2"></i>
+                Transação #<span th:text="${transaction.id}">123</span>
+            </h1>
+            <div class="d-flex gap-2">
+                <a th:href="@{/aventureiro/compras}" th:if="${#authentication.name == transaction.buyer.username}" class="btn btn-outline-dark">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar às Compras
+                </a>
+                <a th:href="@{/aventureiro/vendas}" th:if="${#authentication.name == transaction.seller.username}" class="btn btn-outline-dark">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar às Vendas
+                </a>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Informações da Transação -->
+            <div class="col-lg-8 mb-4">
+                <div class="card border-gold">
+                    <div class="card-header bg-dark text-light">
+                        <h3 class="rpg-font mb-0">
+                            <i class="fas fa-info-circle me-2"></i>Informações da Transação
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="rpg-font mb-3">Item Adquirido</h5>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3" style="width: 80px; height: 80px; overflow: hidden; border-radius: 4px;">
+                                                <img th:if="${transaction.product.imageUrl}" th:src="@{/images/{name}(name=${transaction.product.imageUrl})}" alt="Imagem do Produto" class="img-fluid">
+                                                <img th:unless="${transaction.product.imageUrl}" th:src="@{/images/default-product.jpg}" alt="Imagem Padrão" class="img-fluid">
+                                            </div>                                            <div>
+                                                <h6 class="mb-1"><a th:href="@{/item/{id}(id=${transaction.product.id})}" th:text="${transaction.product.name}" class="text-decoration-none">Nome do Item</a></h6>
+                                                <p class="mb-1 small text-muted" th:text="${transaction.product.category != null ? transaction.product.category.displayName : 'Sem categoria'}">Categoria</p>
+                                                <span class="product-price" th:text="${'$' + #numbers.formatDecimal(transaction.amount, 0, 'POINT', 2, 'COMMA')}">$99.99</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="rpg-font mb-3">Detalhes</h5>
+                                        <p class="mb-2"><strong>Data:</strong> <span th:text="${#temporals.format(transaction.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2023 14:30</span></p>
+                                        <p class="mb-2"><strong>Status:</strong> 
+                                            <span th:class="'badge ' + 
+                                                ${transaction.status.name() == 'COMPLETED' ? 'bg-success' : 
+                                                (transaction.status.name() == 'PENDING' ? 'bg-warning' : 
+                                                (transaction.status.name() == 'SHIPPED' ? 'bg-info' : 
+                                                (transaction.status.name() == 'DISPUTED' ? 'bg-danger' : 'bg-secondary')))}"
+                                                th:text="${transaction.status}">
+                                                Status
+                                            </span>
+                                        </p>
+                                        <p class="mb-2" th:if="${transaction.trackingCode}"><strong>Código de Rastreio:</strong> <span th:text="${transaction.trackingCode}">XYZ123456789</span></p>
+                                        <p class="mb-0" th:if="${transaction.completedAt}"><strong>Finalizada em:</strong> <span th:text="${#temporals.format(transaction.completedAt, 'dd/MM/yyyy HH:mm')}">10/01/2023 15:45</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="rpg-font mb-3">Vendedor</h5>
+                                        <p class="mb-1"><i class="fas fa-user me-2"></i><strong th:text="${transaction.seller.username}">Vendedor</strong></p>
+                                        <p class="mb-1"><i class="fas fa-hat-wizard me-2"></i><span th:text="${transaction.seller.characterClass}">Classe</span></p>
+                                        <p class="mb-0"><i class="fas fa-star me-2"></i>Nível <span th:text="${transaction.seller.level}">10</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="rpg-font mb-3">Comprador</h5>
+                                        <p class="mb-1"><i class="fas fa-user me-2"></i><strong th:text="${transaction.buyer.username}">Comprador</strong></p>
+                                        <p class="mb-1"><i class="fas fa-hat-wizard me-2"></i><span th:text="${transaction.buyer.characterClass}">Classe</span></p>
+                                        <p class="mb-0"><i class="fas fa-star me-2"></i>Nível <span th:text="${transaction.buyer.level}">5</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Ações -->
+            <div class="col-lg-4 mb-4">
+                <div class="card border-gold">
+                    <div class="card-header bg-dark text-light">
+                        <h3 class="rpg-font mb-0">
+                            <i class="fas fa-cogs me-2"></i>Ações
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Ações para o Vendedor -->
+                        <div th:if="${#authentication.name == transaction.seller.username}" class="mb-3">
+                            <h5 class="rpg-font mb-3">Ações do Vendedor</h5>
+                            
+                            <!-- Adicionar código de rastreio (se não estiver enviado) -->
+                            <form th:if="${transaction.status.name() == 'PENDING'}" th:action="@{/transacao/{id}/rastreio(id=${transaction.id})}" method="post" class="mb-3">
+                                <div class="input-group">
+                                    <input type="text" name="trackingCode" class="form-control" placeholder="Código de rastreio" required>
+                                    <button type="submit" class="btn btn-gold">
+                                        <i class="fas fa-truck me-1"></i>Enviar
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            <!-- Mostrar mensagem se já enviado -->
+                            <div th:if="${transaction.status.name() == 'SHIPPED'}" class="alert alert-info">
+                                <i class="fas fa-truck me-2"></i>Item enviado! Aguardando confirmação do comprador.
+                            </div>
+                            
+                            <!-- Mostrar mensagem se concluído -->
+                            <div th:if="${transaction.status.name() == 'COMPLETED'}" class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>Transação concluída com sucesso!
+                            </div>
+                            
+                            <!-- Mostrar mensagem se em disputa -->
+                            <div th:if="${transaction.status.name() == 'DISPUTED'}" class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Transação em disputa! Um mestre irá analisar.
+                            </div>
+                        </div>
+                        
+                        <!-- Ações para o Comprador -->
+                        <div th:if="${#authentication.name == transaction.buyer.username}" class="mb-3">
+                            <h5 class="rpg-font mb-3">Ações do Comprador</h5>
+                            
+                            <!-- Mostrar mensagem se pendente -->
+                            <div th:if="${transaction.status.name() == 'PENDING'}" class="alert alert-warning">
+                                <i class="fas fa-clock me-2"></i>Aguardando envio pelo vendedor...
+                            </div>
+                            
+                            <!-- Confirmar recebimento -->
+                            <form th:if="${transaction.status.name() == 'SHIPPED'}" th:action="@{/transacao/{id}/confirmar-recebimento(id=${transaction.id})}" method="post" class="mb-3">
+                                <button type="submit" class="btn btn-gold w-100">
+                                    <i class="fas fa-box-open me-2"></i>Confirmar Recebimento
+                                </button>
+                            </form>
+                            
+                            <!-- Abrir disputa -->
+                            <form th:if="${transaction.status.name() == 'SHIPPED'}" th:action="@{/transacao/{id}/abrir-disputa(id=${transaction.id})}" method="post" class="mb-3">
+                                <div class="mb-2">
+                                    <textarea name="reason" class="form-control" rows="3" placeholder="Descreva o motivo da disputa..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-danger w-100">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Abrir Disputa
+                                </button>
+                            </form>
+                            
+                            <!-- Mostrar mensagem se concluído -->
+                            <div th:if="${transaction.status.name() == 'COMPLETED'}" class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>Transação concluída com sucesso!
+                            </div>
+                            
+                            <!-- Mostrar mensagem se em disputa -->
+                            <div th:if="${transaction.status.name() == 'DISPUTED'}" class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>Disputa aberta! Um mestre irá analisar.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- end content fragment -->
+</body>
+</html>

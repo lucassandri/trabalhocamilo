@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-br" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso Negado - RPG Market</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container text-center py-5">
+            <h1 class="rpg-font display-1 text-danger">403</h1>
+            <p class="lead">Você não possui autorização mágica para acessar esta área.</p>
+            <a href="/mercado" class="btn btn-gold">
+                <i class="fas fa-home me-2"></i>Voltar ao Mercado
+            </a>
+        </div>
+    </div>
+</body>
+</html>

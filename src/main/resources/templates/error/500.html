@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-br" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Erro Interno - RPG Market</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container text-center py-5">
+            <h1 class="rpg-font display-1 text-danger">500</h1>
+            <p class="lead">O maná da nossa aplicação acabou temporariamente.</p>
+            <p>Nossa equipe de magos já está trabalhando para resolver o problema.</p>
+            <a href="/mercado" class="btn btn-gold">
+                <i class="fas fa-home me-2"></i>Voltar ao Mercado
+            </a>
+        </div>
+    </div>
+</body>
+</html>

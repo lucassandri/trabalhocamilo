@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title ?: 'RPG Market'}">RPG Market</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts - Medieval Sharp -->
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    
+    <!-- CSS files -->
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link th:href="@{/css/market.css}" rel="stylesheet">
+    <link th:href="@{/css/product.css}" rel="stylesheet">
+    <link th:href="@{/css/user.css}" rel="stylesheet">
+    
+    <!-- Espaço para CSS adicional específico por página -->
+    <th:block layout:fragment="styles">
+        <!-- CSS específico da página vai aqui -->
+    </th:block>
+</head>
+<body class="rpg-theme d-flex flex-column min-vh-100">
+    <!-- The header section -->
+    <header th:replace="~{fragments/header :: header}"></header>
+    
+    <main class="container py-4 flex-grow-1">
+        <!-- Conteúdo principal - substituído por cada página -->
+        <div layout:fragment="content">
+            <!-- Conteúdo padrão se não for fornecido -->
+            <p>Conteúdo padrão</p>
+        </div>
+    </main>
+    
+    <!-- The footer section -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/script.js}"></script>
+    
+    <!-- Scripts específicos da página -->
+    <th:block layout:fragment="pageScripts">
+        <!-- Scripts específicos vão aqui -->
+    </th:block>
+</body>
+</html>

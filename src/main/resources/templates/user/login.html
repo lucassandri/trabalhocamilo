@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar - RPG Market</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts - Medieval Sharp -->
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/user.css}">
+</head>
+<body class="rpg-theme">
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card border-gold shadow user-card">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4 user-hero">
+                            <div class="icon">
+                                <i class="fas fa-dungeon"></i>
+                            </div>
+                            <h2 class="rpg-font title">RPG Market</h2>
+                            <p class="mb-0">Entre no reino para comprar e vender itens mágicos!</p>
+                        </div>
+                        
+                        <div th:if="${param.error}" class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Nome de usuário ou senha inválidos.
+                        </div>
+                        
+                        <div th:if="${param.logout}" class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Você saiu com sucesso.
+                        </div>
+                        
+                        <form th:action="@{/login}" method="post">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Nome de Aventureiro</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                    <input type="text" name="username" id="username" class="form-control" 
+                                           required autofocus placeholder="Digite seu nome de aventureiro">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="password" class="form-label">Palavra-passe Mágica</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                                    <input type="password" name="password" id="password" class="form-control" 
+                                           required placeholder="Digite sua palavra-passe">
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-gold btn-lg">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Entrar no Reino
+                                </button>
+                                <a th:href="@{/aventureiro/registrar}" class="btn btn-dark btn-lg">
+                                    <i class="fas fa-user-plus me-2"></i>Criar Nova Conta
+                                </a>
+                            </div>
+                        </form>
+                        
+                        <div class="text-center mt-4">
+                            <a th:href="@{/mercado}" class="text-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Voltar ao Mercado
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

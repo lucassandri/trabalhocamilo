@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Inventário - RPG Market</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts - Medieval Sharp -->
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    
+    <!-- CSS arquivos -->
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link th:href="@{/css/market.css}" rel="stylesheet">
+    <link th:href="@{/css/product.css}" rel="stylesheet">
+    <link th:href="@{/css/user.css}" rel="stylesheet">
+</head>
+<body class="rpg-theme">
+    <!-- Include the header fragment directly -->
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <main class="container py-4 flex-grow-1">
+        <!-- Conteúdo direto da página, sem fragments aninhados -->
+        <h1 class="rpg-font mb-4"><i class="fas fa-box-open me-2"></i>Meu Inventário</h1>
+        
+        <!-- Botão de adicionar item -->
+        <div class="d-flex justify-content-end mb-4">
+            <a th:href="@{/item/novo}" class="btn btn-gold">
+                <i class="fas fa-plus-circle me-2"></i>Anunciar Item
+            </a>
+        </div>
+        
+        <!-- Tabs for filtering products -->
+        <ul class="nav nav-tabs inventory-tabs mb-4">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" id="tab-all">
+                    <i class="fas fa-list me-1"></i>Todos
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" id="tab-available">
+                    <i class="fas fa-tag me-1"></i>Disponíveis
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" id="tab-auctions">
+                    <i class="fas fa-gavel me-1"></i>Leilões
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" id="tab-sold">
+                    <i class="fas fa-check me-1"></i>Vendidos
+                </a>
+            </li>
+        </ul>
+        
+        <!-- Products List Container -->
+        <div class="row g-4">
+            <!-- Empty inventory message -->
+            <div th:if="${products == null || products.empty}" class="col-12 inventory-empty text-center py-5">
+                <div class="empty-inventory-container p-4 border-gold rounded">
+                    <i class="fas fa-box-open fa-4x mb-3 text-secondary"></i>
+                    <h4 class="rpg-font">Seu inventário está vazio</h4>
+                    <p class="text-muted mb-4">Comece a vender seus itens mágicos e equipamentos raros!</p>
+                    <a th:href="@{/item/novo}" class="btn btn-gold btn-lg">
+                        <i class="fas fa-plus-circle me-2"></i>Anunciar Item
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Product cards -->
+            <div th:unless="${products == null || products.empty}" 
+                th:each="product : ${products}" 
+                th:class="'col-md-6 col-lg-4 product-item ' + ${product.status.name()}" 
+                th:data-type="${product.type.name()}">
+                <div class="card h-100 product-card mb-4 border-gold">
+                    <!-- Product image and badges -->
+                    <div class="product-img-container">
+                        <img th:if="${product.imageUrl}" 
+                            th:src="@{/images/{name}(name=${product.imageUrl})}" 
+                            class="product-img" alt="Imagem do Produto">
+                        <img th:unless="${product.imageUrl}" 
+                            th:src="@{/images/default-product.jpg}" 
+                            class="product-img" alt="Imagem Padrão">
+                        
+                        <!-- Category badge -->
+                        <span class="badge product-category-badge bg-dark" th:text="${product.category != null ? product.category.displayName : 'Sem categoria'}">Categoria</span>
+                        
+                        <!-- Auction badge -->
+                        <span th:if="${product.type.name() == 'AUCTION'}" 
+                            class="badge bg-danger position-absolute start-0 top-0 m-2">
+                            <i class="fas fa-gavel me-1"></i>Leilão
+                        </span>
+                    </div>
+                    
+                    <!-- Product details -->
+                    <div class="card-body">
+                        <h5 class="card-title rpg-font" th:text="${product.name}">Nome do Produto</h5>
+                        <p class="card-text text-truncate" th:text="${product.description}">Descrição do produto...</p>
+                        
+                        <!-- Auction countdown timer -->
+                        <div th:if="${product.type.name() == 'AUCTION' && product.status.name() == 'AUCTION_ACTIVE'}" 
+                            class="auction-timer p-2 mb-3 rounded">
+                            <i class="fas fa-hourglass-half me-1"></i>
+                            <span>Termina em: 
+                                <span class="countdown fw-bold" 
+                                    th:data-end-date="${#temporals.format(product.auctionEndDate, 'yyyy-MM-dd''T''HH:mm:ss')}">
+                                    Calculando...
+                                </span>
+                            </span>
+                        </div>
+                        
+                        <!-- Price and action buttons -->
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="product-price fs-5" 
+                                th:text="${'$' + #numbers.formatDecimal(product.price, 0, 'POINT', 2, 'COMMA')}">
+                                $0.00
+                            </span>
+                            <div class="btn-group">
+                                <a th:href="@{/item/{id}(id=${product.id})}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye me-1"></i>Ver
+                                </a>
+                                <a th:href="@{/item/{id}/editar(id=${product.id})}" 
+                                class="btn btn-sm btn-outline-secondary" 
+                                th:if="${product.status.name() == 'AVAILABLE' || product.status.name() == 'AUCTION_ACTIVE'}">
+                                    <i class="fas fa-edit me-1"></i>Editar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer with status badge and date -->
+                    <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                        <span class="badge" 
+                            th:classappend="${product.status.name() == 'AVAILABLE' ? 'bg-success' : 
+                                            (product.status.name() == 'AUCTION_ACTIVE' ? 'bg-warning' : 
+                                            (product.status.name() == 'SOLD' || product.status.name() == 'AUCTION_ENDED' ? 'bg-secondary' : 'bg-info'))}" 
+                            th:text="${product.status.name() == 'AVAILABLE' ? 'Disponível' : 
+                                    (product.status.name() == 'AUCTION_ACTIVE' ? 'Leilão Ativo' : 
+                                    (product.status.name() == 'SOLD' ? 'Vendido' : 
+                                    (product.status.name() == 'AUCTION_ENDED' ? 'Leilão Finalizado' : 'Reservado')))}">
+                            Status
+                        </span>
+                        <small class="text-muted" th:text="${#temporals.format(product.createdAt, 'dd/MM/yyyy')}">
+                            01/01/2023
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Include the footer fragment directly -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/script.js}"></script>
+</body>
+</html>

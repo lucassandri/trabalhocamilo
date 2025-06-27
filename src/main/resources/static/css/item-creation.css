@@ -1,0 +1,207 @@
+/* Styles for the item creation form */
+
+/* Scroll header styling */
+.scroll-header {
+    background-image: url('../images/parchment-bg-light.jpg');
+    background-position: center;
+    background-size: cover;
+    padding: 1rem;
+    border-radius: 10px;
+    position: relative;
+    border: 2px solid var(--secondary-color);
+    text-align: center;
+    margin-bottom: 2rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.scroll-header h1 {
+    color: var(--primary-color);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    margin: 0;
+}
+
+/* Magic property cards */
+.magic-property-card {
+    padding: 0.75rem;
+    border: 1px solid #d2b48c;
+    border-radius: 8px;
+    background-image: linear-gradient(to bottom, #f8f5e6, #e8d8b5);
+    height: 100%;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.magic-property-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-color: var(--secondary-color);
+}
+
+.magic-property-card .form-check-input {
+    margin-top: 0.25rem;
+}
+
+.magic-property-card .property-name {
+    font-weight: 600;
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 0.25rem;
+    font-family: 'MedievalSharp', cursive;
+}
+
+.magic-property-card .property-desc {
+    display: block;
+    font-size: 0.8rem;
+}
+
+.magic-property-card input:checked ~ label {
+    color: var(--primary-color);
+}
+
+.magic-property-card input:checked ~ label .property-name {
+    color: var(--secondary-color);
+}
+
+.magic-properties-grid {
+    margin-top: 1rem;
+}
+
+/* Image preview */
+.item-image-preview {
+    height: 220px;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 2px dashed #d2b48c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f8f8;
+    position: relative;
+}
+
+.item-image-preview img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+/* Gold icon styling */
+.gold-icon {
+    background-color: #ffd700;
+    color: #442600;
+    border-color: #b8860b;
+}
+
+/* Durability slider */
+input[type="range"] {
+    height: 8px;
+    border-radius: 10px;
+    accent-color: var(--secondary-color);
+}
+
+#durabilityValue {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+/* Form validation styling */
+.form-control:focus, .form-select:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25);
+}
+
+.was-validated .form-control:valid:focus, 
+.was-validated .form-select:valid:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+}
+
+.was-validated .form-control:invalid:focus, 
+.was-validated .form-select:invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .col-md-4 {
+        margin-top: 1.5rem;
+    }
+}
+
+/* Auction fields animation */
+#auctionFields {
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+}
+
+#auctionFields.show {
+    max-height: 500px;
+    opacity: 1;
+}
+
+/* Preview card */
+.preview-card {
+    transition: all 0.3s ease;
+    border-width: 2px;
+}
+
+.product-img-container {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 8px;
+    background-color: #f8f8f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.product-img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.product-category-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.8rem;
+}
+
+.product-price {
+    font-weight: bold;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+/* Product rarity styling */
+.border-common {
+    border-color: #a0a0a0 !important;
+}
+
+.border-uncommon {
+    border-color: #1eff00 !important;
+}
+
+.border-rare {
+    border-color: #0070dd !important;
+}
+
+.border-epic {
+    border-color: #a335ee !important;
+}
+
+.border-legendary {
+    border-color: #ff8000 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .col-md-4 {
+        margin-top: 1.5rem;
+    }
+}

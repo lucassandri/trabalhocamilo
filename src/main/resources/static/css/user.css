@@ -1,0 +1,213 @@
+/* User-specific styling */
+
+/* Profile stat styling */
+.profile-stat {
+    border-left: 3px solid var(--secondary-color);
+    padding-left: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* User cards - login, register, profile */
+.user-card {
+    max-width: 500px;
+    margin: 0 auto;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.user-card .card-body {
+    padding: 2.5rem;
+}
+
+.user-card .form-label {
+    font-weight: 500;
+}
+
+.user-card .input-group-text {
+    background-color: #f8f9fa;
+}
+
+.user-hero {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.user-hero .icon {
+    font-size: 3rem;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+}
+
+.user-hero .title {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Character class selector */
+.character-class-selector {
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    overflow: hidden;
+}
+
+.character-class {
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.character-class:hover {
+    background-color: #f8f9fa;
+}
+
+.character-class.selected {
+    background-color: rgba(212, 175, 55, 0.2);
+    border-left: 3px solid var(--secondary-color);
+}
+
+.character-class-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Profile page styling */
+.avatar-placeholder {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid var(--secondary-color);
+}
+
+/* Achievement cards */
+.achievement-card {
+    background: linear-gradient(to bottom, #f7f3e3, #e8d8b5);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    border: 1px solid #d2b48c;
+    height: 100%;
+}
+
+.achievement-card.unlocked {
+    background: linear-gradient(to bottom, #fff9db, #f8e8a0);
+    border: 1px solid #d4af37;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.achievement-card.locked {
+    opacity: 0.7;
+    filter: grayscale(70%);
+}
+
+.achievement-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Inventory page styling */
+.product-img-container {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-category-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.8rem;
+    border-radius: 20px;
+}
+
+.auction-timer {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    font-size: 0.9rem;
+}
+
+/* Tab styling */
+.inventory-tabs .nav-link {
+    color: #555;
+    border-bottom: none;
+    font-family: 'MedievalSharp', cursive;
+}
+
+.inventory-tabs .nav-link.active {
+    color: var(--primary-color);
+    border-color: var(--secondary-color) var(--secondary-color) #fff;
+    font-weight: bold;
+}
+
+/* Adicionar ao final do arquivo */
+
+.profile-avatar-container {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.profile-avatar {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border: 3px solid var(--secondary-color);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.img-container {
+    max-height: 60vh;
+    background-color: #f0f0f0;
+    overflow: hidden;
+}
+
+.img-container img {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+}
+
+/* Estilo para o modal do cropper */
+#cropModal .modal-dialog {
+    max-width: 700px;
+}
+
+#cropModal .modal-body {
+    padding: 0;
+    background-color: #333;
+}
+
+/* Estilo para o botão de upload da imagem de perfil */
+.upload-avatar-btn {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.upload-avatar-btn:hover {
+    transform: scale(1.1);
+}

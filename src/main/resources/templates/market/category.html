@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-br" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title th:text="${currentCategory.displayName + ' - RPG Market'}">Categoria - RPG Market</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="rpg-font">
+                <i class="fas fa-tags me-2"></i>
+                <span th:text="${currentCategory.displayName}">Categoria</span>
+            </h1>
+            <div>
+                <a th:href="@{/mercado}" class="btn btn-outline-dark">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar ao Mercado
+                </a>
+            </div>
+        </div>
+        
+        <!-- Lista de categorias como breadcrumb -->
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            <a th:each="category : ${categories}" 
+               th:href="@{/mercado/categoria/{name}(name=${category})}" 
+               th:class="'badge ' + (${category == currentCategory ? 'bg-gold' : 'bg-secondary'}) + ' text-decoration-none'"
+               th:text="${category.displayName}">
+                Categoria
+            </a>
+        </div>
+        
+        <!-- Lista de Produtos -->
+        <div class="row g-4">
+            <!-- Se não houver produtos -->
+            <div th:if="${products.empty}" class="col-12 inventory-empty">
+                <i class="fas fa-box-open mb-3"></i>
+                <h4>Não há itens disponíveis nesta categoria</h4>
+                <p class="text-muted">Seja o primeiro a anunciar!</p>
+                <a th:href="@{/item/novo}" sec:authorize="isAuthenticated()" class="btn btn-gold mt-2">
+                    <i class="fas fa-plus-circle me-2"></i>Anunciar Item
+                </a>
+            </div>
+            
+            <!-- Lista de produtos -->
+            <div th:unless="${products.empty}" th:each="product : ${products}" class="col-md-6 col-lg-4">
+                <div class="card h-100 product-card">
+                    <div class="product-img-container">
+                        <img th:if="${product.imageUrl}" th:src="@{/images/{name}(name=${product.imageUrl})}" class="product-img" alt="Imagem do Produto">
+                        <img th:unless="${product.imageUrl}" th:src="@{/images/default-product.jpg}" class="product-img" alt="Imagem Padrão">
+                        <span class="badge product-category-badge bg-dark" th:text="${product.category != null ? product.category.displayName : 'Sem categoria'}">Categoria</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title rpg-font" th:text="${product.name}">Nome do Produto</h5>
+                        <p class="card-text text-truncate" th:text="${product.description}">Descrição do produto...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="product-price" th:text="${'$' + #numbers.formatDecimal(product.price, 0, 'POINT', 2, 'COMMA')}">$0.00</span>
+                            <a th:href="@{/item/{id}(id=${product.id})}" class="btn btn-sm btn-gold">
+                                <i class="fas fa-eye me-1"></i>Detalhes
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fas fa-user me-1"></i>
+                            <span th:text="${product.seller.username}">Vendedor</span>
+                        </small>
+                        <small class="text-muted" th:text="${#temporals.format(product.createdAt, 'dd/MM/yyyy')}">01/01/2023</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Paginação -->
+        <div th:if="${products.totalPages > 1}" class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination">
+                    <li th:class="${products.first ? 'page-item disabled' : 'page-item'}">
+                        <a class="page-link" th:href="@{/mercado/categoria/{name}(name=${currentCategory},page=${products.number - 1})}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    <li th:each="i : ${#numbers.sequence(0, products.totalPages - 1)}" 
+                        th:class="${products.number == i ? 'page-item active' : 'page-item'}">
+                        <a class="page-link" th:href="@{/mercado/categoria/{name}(name=${currentCategory},page=${i})}" th:text="${i + 1}">1</a>
+                    </li>
+                    <li th:class="${products.last ? 'page-item disabled' : 'page-item'}">
+                        <a class="page-link" th:href="@{/mercado/categoria/{name}(name=${currentCategory},page=${products.number + 1})}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</body>
+</html>

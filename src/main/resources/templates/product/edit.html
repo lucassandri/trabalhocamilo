@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Editar Anúncio - RPG Market</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <h1 class="rpg-font mb-4"><i class="fas fa-edit me-2"></i>Editar Anúncio</h1>
+        
+        <div class="card border-gold">
+            <div class="card-header bg-dark text-light d-flex justify-content-between align-items-center">
+                <h3 class="rpg-font mb-0">
+                    <i class="fas fa-scroll me-2"></i>Detalhes do Item
+                </h3>
+                <span class="badge bg-info" th:if="${product.type.name() == 'DIRECT_SALE'}">Venda Direta</span>
+                <span class="badge bg-danger" th:if="${product.type.name() == 'AUCTION'}">Leilão</span>
+            </div>
+            <div class="card-body p-4">
+                <form th:action="@{/item/{id}/editar(id=${product.id})}" th:object="${product}" method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Nome do Item*</label>
+                                <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="category" class="form-label">Categoria*</label>
+                                <select class="form-select" id="category" th:field="*{category}" required>
+                                    <option th:each="categoryOption : ${categories}" 
+                                            th:value="${categoryOption}" 
+                                            th:text="${categoryOption.displayName}"
+                                            th:selected="${categoryOption == product.category}">
+                                        Categoria
+                                    </option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Descrição*</label>
+                                <textarea class="form-control" id="description" th:field="*{description}" rows="5"></textarea>
+                            </div>
+                            
+                            <!-- Campos para Venda Direta -->
+                            <div th:if="${product.type.name() == 'DIRECT_SALE'}" class="mb-3">
+                                <label for="price" class="form-label">Preço (em moedas de ouro)*</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-coins text-warning"></i></span>
+                                    <input type="number" class="form-control" id="price" th:field="*{price}" min="1" step="0.01" required>
+                                </div>
+                            </div>
+                            
+                            <!-- Campos para Leilão -->
+                            <div th:if="${product.type.name() == 'AUCTION'}" id="auctionFields">
+                                <div class="mb-3">
+                                    <label for="currentPrice" class="form-label">Lance Atual</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-coins text-warning"></i></span>
+                                        <input type="number" class="form-control" id="currentPrice" th:value="${product.price}" disabled>
+                                    </div>
+                                    <div class="form-text">O lance atual não pode ser alterado.</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="minBidIncrement" class="form-label">Incremento Mínimo de Lance</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-coins text-warning"></i></span>
+                                        <input type="number" class="form-control" id="minBidIncrement" th:field="*{minBidIncrement}" 
+                                               min="0.1" step="0.1" th:value="${product.minBidIncrement != null ? product.minBidIncrement : 1.0}">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="auctionEndDate" class="form-label">Data de Término</label>
+                                    <input type="datetime-local" class="form-control" id="auctionEndDate" 
+                                           th:value="${product.auctionEndDate != null ? #temporals.format(product.auctionEndDate, 'yyyy-MM-dd HH:mm') : ''}"
+                                           disabled>
+                                    <div class="form-text">A data de término não pode ser alterada após a criação do leilão.</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="buyNowPrice" class="form-label">Preço de Compra Imediata (opcional)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-coins text-warning"></i></span>
+                                        <input type="number" class="form-control" id="buyNowPrice" th:field="*{buyNowPrice}" 
+                                               min="0" step="0.01" th:value="${product.buyNowPrice}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="image" class="form-label">Imagem do Item</label>
+                                <div class="card mb-2">
+                                    <div class="card-body text-center p-4">
+                                        <div id="imagePreview" class="mb-3">
+                                            <img th:if="${product.imageUrl}" th:src="@{/images/{name}(name=${product.imageUrl})}" alt="Preview" class="img-fluid rounded" style="max-height: 200px;">
+                                            <img th:unless="${product.imageUrl}" src="/images/default-product.jpg" alt="Preview" class="img-fluid rounded" style="max-height: 200px;">
+                                        </div>
+                                        <div class="input-group">
+                                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-text">Deixe em branco para manter a imagem atual.</div>
+                            </div>
+                            
+                            <div class="alert alert-warning">
+                                <h5 class="alert-heading rpg-font">Atenção</h5>
+                                <p class="mb-0">Alterações significativas nos detalhes do item podem afetar o interesse dos compradores.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a th:href="@{/item/{id}(id=${product.id})}" class="btn btn-outline-dark">
+                            <i class="fas fa-arrow-left me-2"></i>Voltar
+                        </a>
+                        <button type="submit" class="btn btn-gold">
+                            <i class="fas fa-save me-2"></i>Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <th:block layout:fragment="pageScripts">
+        <script>
+            // Preview da imagem
+            document.getElementById('image').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        document.querySelector('#imagePreview img').src = event.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        </script>
+    </th:block>
+</body>
+</html>

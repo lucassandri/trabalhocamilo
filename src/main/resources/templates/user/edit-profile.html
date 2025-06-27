@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-br" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Editar Perfil - RPG Market</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container">
+            <h1 class="rpg-font mb-4"><i class="fas fa-user-edit me-2"></i>Editar Perfil</h1>
+            
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <div class="card border-gold">
+                        <div class="card-header bg-dark text-light">
+                            <h3 class="rpg-font mb-0">Seus Dados</h3>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/aventureiro/editar-perfil}" method="post" enctype="multipart/form-data" th:object="${user}">
+                                <!-- Campo oculto para a imagem recortada -->
+                                <input type="hidden" id="croppedImage" name="croppedImage">
+                                
+                                <div class="row mb-4">
+                                    <div class="col-md-4 text-center">
+                                        <div class="profile-avatar-container mb-3">
+                                            <img th:if="*{profileImageUrl}" 
+                                                 th:src="@{/images/{img}(img=*{profileImageUrl})}"
+                                                 class="profile-avatar rounded-circle" 
+                                                 alt="Foto de perfil">
+                                            <img th:unless="*{profileImageUrl}" 
+                                                 th:src="@{/static/images/default-user.jpg}"
+                                                 class="profile-avatar rounded-circle" 
+                                                 alt="Foto de perfil padrão">
+                                                 
+                                            <!-- Botão de upload de imagem -->
+                                            <label for="profileImage" class="upload-avatar-btn">
+                                                <i class="fas fa-camera"></i>
+                                            </label>
+                                            <input type="file" id="profileImage" name="profileImage" 
+                                                   class="d-none" accept="image/*">
+                                        </div>
+                                        <small class="text-muted d-block">Clique no ícone da câmera para alterar sua foto</small>
+                                    </div>
+                                    
+                                    <div class="col-md-8">
+                                        <!-- Nome de usuário (somente leitura) -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Nome de Aventureiro</label>
+                                            <input type="text" class="form-control" th:value="*{username}" readonly>
+                                            <small class="text-muted">O nome de aventureiro não pode ser alterado</small>
+                                        </div>
+                                        
+                                        <!-- Email -->
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                                        </div>
+                                        
+                                        <!-- Classe do personagem -->
+                                        <div class="mb-3">
+                                            <label for="characterClass" class="form-label">Classe de Aventureiro</label>
+                                            <select class="form-select" id="characterClass" th:field="*{characterClass}">
+                                                <option value="GUERREIRO">Guerreiro</option>
+                                                <option value="MAGO">Mago</option>
+                                                <option value="LADINO">Ladino</option>
+                                                <option value="CLERIGO">Clérigo</option>
+                                                <option value="BARDO">Bardo</option>
+                                                <option value="RANGER">Ranger</option>
+                                                <option value="PALADINO">Paladino</option>
+                                                <option value="DRUIDA">Druida</option>
+                                                <option value="BARBARO">Bárbaro</option>
+                                                <option value="FEITICEIRO">Feiticeiro</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between">
+                                    <a th:href="@{/aventureiro/perfil}" class="btn btn-outline-dark">
+                                        <i class="fas fa-arrow-left me-2"></i>Voltar
+                                    </a>
+                                    <button type="submit" class="btn btn-gold">
+                                        <i class="fas fa-save me-2"></i>Salvar Alterações
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal para recorte de imagem -->
+        <div class="modal fade" id="cropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cropModalLabel">Recortar Imagem</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="img-container">
+                            <img id="imageToCrop" src="" alt="Imagem para recortar">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-gold" id="cropButton">Recortar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Script para Cropper.js -->
+    <th:block layout:fragment="pageScripts">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const profileImageInput = document.getElementById('profileImage');
+                const croppedImageInput = document.getElementById('croppedImage');
+                const cropModal = new bootstrap.Modal(document.getElementById('cropModal'));
+                const imageToCrop = document.getElementById('imageToCrop');
+                const cropButton = document.getElementById('cropButton');
+                let cropper;
+                
+                // Quando uma nova imagem é selecionada
+                profileImageInput.addEventListener('change', function(e) {
+                    const files = e.target.files;
+                    if (!files || !files[0]) return;
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imageToCrop.src = e.target.result;
+                        
+                        // Mostrar o modal
+                        cropModal.show();
+                        
+                        // Inicializar o cropper quando a imagem estiver carregada
+                        imageToCrop.onload = function() {
+                            if (cropper) {
+                                cropper.destroy();
+                            }
+                            
+                            cropper = new Cropper(imageToCrop, {
+                                aspectRatio: 1, // Quadrado 1:1
+                                viewMode: 1,    // Restringir ao tamanho do container
+                                minCropBoxWidth: 200,
+                                minCropBoxHeight: 200
+                            });
+                        };
+                    };
+                    reader.readAsDataURL(files[0]);
+                });
+                
+                // Quando o botão recortar é clicado
+                cropButton.addEventListener('click', function() {
+                    if (!cropper) return;
+                    
+                    // Obter a imagem recortada como base64
+                    const canvas = cropper.getCroppedCanvas({
+                        width: 200,
+                        height: 200
+                    });
+                    
+                    // Converter para base64
+                    const croppedImageData = canvas.toDataURL('image/jpeg');
+                    
+                    // Atualizar a imagem de preview
+                    const profileAvatar = document.querySelector('.profile-avatar');
+                    profileAvatar.src = croppedImageData;
+                    
+                    // Armazenar no input hidden para envio ao servidor
+                    croppedImageInput.value = croppedImageData;
+                    
+                    // Fechar o modal
+                    cropModal.hide();
+                });
+            });
+        </script>
+    </th:block>
+</body>
+</html>
