@@ -17,9 +17,4 @@ public class HealthController {
         status.put("service", "rpg-market");
         return ResponseEntity.ok(status);
     }
-
-    @GetMapping("/")
-    public String root() {
-        return "redirect:/mercado";
-    }
 }
