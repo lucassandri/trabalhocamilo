@@ -1,0 +1,116 @@
+# Referência da API: RPG Market
+
+> Este documento detalha todos os endpoints da aplicação RPG Market, incluindo rotas que servem páginas HTML e endpoints que retornam dados JSON.
+
+## Visão Geral
+
+* **Autenticação:** A maioria das rotas é protegida pelo Spring Security e requer uma sessão de usuário autenticada (login via formulário).
+* **Permissões:** O acesso é controlado por papéis, principalmente `ROLE_AVENTUREIRO` (usuário padrão) e `ROLE_MESTRE` (administrador).
+* **Tipos de Endpoint:**
+    * **`[PÁGINA]`**: Retorna uma página HTML completa, renderizada no servidor.
+    * **`[API/JSON]`**: Retorna dados no formato `application/json`, ideal para ser consumido por JavaScript (AJAX).
+
+---
+
+### Endpoints de Autenticação (`AuthController`)
+
+Endpoints responsáveis pelo processo de login e registro de usuários.
+
+| Endpoint | Tipo | Permissão | Descrição |
+| :--- | :--- | :--- | :--- |
+| `GET /login` | `[PÁGINA]` | Público | Exibe a página de login. Aceita os query params `?error` e `?logout` para exibir mensagens. |
+| `POST /login` | - | Público | Processado pelo Spring Security para autenticar o usuário a partir de um formulário. |
+| `GET /logout` | - | Autenticado | Processado pelo Spring Security para invalidar a sessão do usuário. |
+
+---
+
+### Endpoints de Usuário (`UserController`)
+
+Gerencia todas as ações relacionadas ao perfil, inventário e dados do aventureiro.
+
+| Endpoint | Tipo | Permissão | Descrição |
+| :--- | :--- | :--- | :--- |
+| `GET /aventureiro/registrar` | `[PÁGINA]` | Público | Exibe o formulário de registro de um novo aventureiro. |
+| `POST /aventureiro/registrar` | `[PÁGINA]` | Público | Processa o registro de um novo usuário. Espera dados de formulário (`multipart/form-data`) correspondentes ao modelo `User` e um campo `profileImage`. |
+| `GET /aventureiro/perfil` | `[PÁGINA]` | Aventureiro | Exibe a página de perfil do usuário logado, com suas estatísticas e itens. |
+| `GET /aventureiro/inventario` | `[PÁGINA]` | Aventureiro | Mostra o inventário de itens que o usuário logado possui e está vendendo. |
+| `GET /aventureiro/compras` | `[PÁGINA]` | Aventureiro | Lista o histórico de transações de compra do usuário logado. |
+| `GET /aventureiro/vendas` | `[PÁGINA]` | Aventureiro | Lista o histórico de transações de venda do usuário logado. |
+| `GET /aventureiro/senha` | `[PÁGINA]` | Aventureiro | Exibe o formulário para alteração de senha. |
+| `POST /aventureiro/senha` | `[PÁGINA]` | Aventureiro | Processa a alteração de senha a partir de um formulário com os campos de `PasswordChangeRequest`. |
+| `GET /aventureiro/editar-perfil` | `[PÁGINA]` | Aventureiro | Exibe o formulário para editar os dados do perfil. |
+| `POST /aventureiro/editar-perfil` | `[PÁGINA]` | Aventureiro | Processa a atualização do perfil. Espera dados do modelo `User` e um campo opcional `profileImage`. |
+| `GET /aventureiro/enderecos` | `[PÁGINA]` | Aventureiro | Lista todos os endereços de entrega cadastrados pelo usuário. |
+| `POST /aventureiro/enderecos/novo` | `[PÁGINA]` | Aventureiro | Cria um novo endereço de entrega. Espera dados do modelo `DeliveryAddress`. |
+| `POST /aventureiro/enderecos/{id}/deletar` | `[PÁGINA]` | Aventureiro | Remove um endereço de entrega específico. |
+| `POST /aventureiro/enderecos/{id}/padrao` | `[PÁGINA]` | Aventureiro | Define um endereço de entrega como o padrão do usuário. |
+
+---
+
+### Endpoints de Mercado e Produtos (`MarketController`, `ProductController`)
+
+Rotas para navegar no mercado, visualizar, criar, editar e interagir com produtos.
+
+| Endpoint | Tipo | Permissão | Descrição |
+| :--- | :--- | :--- | :--- |
+| `GET /mercado` | `[PÁGINA]` | Público | Página principal do mercado, exibindo vendas diretas e leilões. |
+| `GET /mercado/categoria/{category}` | `[PÁGINA]` | Público | Lista todos os produtos de uma categoria específica. |
+| `GET /mercado/buscar` | `[PÁGINA]` | Público | Retorna resultados de busca baseados no query param `keyword`. |
+| `GET /mercado/masmorra-dos-leiloes` | `[PÁGINA]` | Público | Página dedicada a listar todos os leilões, com filtros avançados via query params. |
+| `GET /mercado/vendas-diretas` | `[PÁGINA]` | Público | Página dedicada a listar itens de venda direta, com filtros. |
+| `GET /item/{id}` | `[PÁGINA]` | Público | Exibe a página de detalhes de um produto específico. |
+| `GET /item/novo` | `[PÁGINA]` | Aventureiro | Exibe o formulário para criar um novo produto. |
+| `POST /item/novo` | `[PÁGINA]` | Aventureiro | Processa a criação de um novo produto. Espera dados do modelo `Product` e um campo `image` (`multipart/form-data`). |
+| `GET /item/{id}/editar` | `[PÁGINA]` | Dono do Item | Exibe o formulário para editar um produto existente. |
+| `POST /item/{id}/editar` | `[PÁGINA]` | Dono do Item | Processa a atualização de um produto. |
+| `POST /item/{id}/excluir` | `[PÁGINA]` | Dono do Item | Remove um produto do mercado. |
+
+---
+
+### Endpoints de Lances e Compras (`BidController`, `CheckoutController`)
+
+Fluxo de lances em leilões e finalização de compras (checkout).
+
+| Endpoint | Tipo | Permissão | Descrição |
+| :--- | :--- | :--- | :--- |
+| `POST /lance/prepare` | `[API/JSON]`| Aventureiro | **AJAX.** Prepara os dados para o modal de confirmação de lance. Retorna um JSON com os detalhes do produto, do lance e validação de saldo. |
+| `POST /lance/confirm` | `[PÁGINA]` | Aventureiro | Processa e confirma um lance em um leilão após a validação. |
+| `GET /checkout/comprar/{productId}` | `[PÁGINA]` | Aventureiro | Inicia o processo de checkout para um item de venda direta. |
+| `GET /checkout/comprar-agora/{productId}`| `[PÁGINA]` | Aventureiro | Inicia o checkout para um item de leilão com opção de "Comprar Agora". |
+| `POST /checkout/confirmar` | `[PÁGINA]` | Aventureiro | Endpoint final que processa a compra. Espera dados do DTO `CheckoutRequest`. |
+| `GET /checkout/sucesso/{transactionId}`| `[PÁGINA]` | Comprador | Exibe a página de sucesso após uma compra, mostrando os detalhes da transação. |
+
+---
+
+### Endpoints de Transação (`TransactionController`)
+
+Gerencia o ciclo de vida de uma transação após a compra.
+
+| Endpoint | Tipo | Permissão | Descrição |
+| :--- | :--- | :--- | :--- |
+| `GET /transacao/{id}` | `[PÁGINA]` | Comprador/Vendedor | Exibe os detalhes de uma transação específica. |
+| `POST /transacao/{id}/atualizar` | `[PÁGINA]` | Comprador/Vendedor | Atualiza o status de uma transação (ex: para `SHIPPED`). |
+| `POST /transacao/{id}/rastreio` | `[PÁGINA]` | Vendedor | Adiciona um código de rastreio a uma transação. |
+| `POST /transacao/{id}/confirmar-recebimento` | `[PÁGINA]` | Comprador | Comprador confirma que recebeu o item, mudando o status para `COMPLETED`. |
+
+---
+
+### Endpoints do Mestre (`AnalyticsController`)
+
+Rotas administrativas para visualização de dados e relatórios.
+
+| Endpoint | Tipo | Permissão | Descrição |
+| :--- | :--- | :--- | :--- |
+| `GET /mestre/dashboard` | `[PÁGINA]` | `ROLE_MESTRE` | Exibe o painel principal de analytics com métricas gerais do sistema. Aceita o query param `periodo` (em dias). |
+| `GET /mestre/ranking-nobres`| `[PÁGINA]` | `ROLE_MESTRE` | Mostra rankings detalhados de melhores vendedores, compradores e usuários mais ricos. |
+| `GET /mestre/relatorio-atividades` | `[PÁGINA]` | `ROLE_MESTRE` | Exibe um feed com as atividades mais recentes na plataforma (transações, lances, novos produtos). |
+
+---
+
+### Endpoints de Utilitários e Saúde do Sistema (`FileController`, `HealthController`)
+
+| Endpoint | Tipo | Permissão | Descrição |
+| :--- | :--- | :--- | :--- |
+| `GET /images/{fileName}` | `[ARQUIVO]` | Público | Serve arquivos de imagem, tanto do diretório de uploads quanto imagens padrão do sistema. |
+| `GET /health` | `[API/JSON]`| Público | Endpoint de verificação de saúde. Retorna `{"status": "UP"}` se o serviço estiver no ar. |
+> **Nota:** O `DebugController` contém várias rotas sob `/debug` que são destinadas apenas para desenvolvimento e não foram listadas nesta documentação pública.
