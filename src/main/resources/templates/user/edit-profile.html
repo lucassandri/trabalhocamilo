@@ -28,11 +28,10 @@
                                             <img th:if="*{profileImageUrl}" 
                                                  th:src="@{/images/{img}(img=*{profileImageUrl})}"
                                                  class="profile-avatar rounded-circle" 
-                                                 alt="Foto de perfil">
-                                            <img th:unless="*{profileImageUrl}" 
-                                                 th:src="@{/static/images/default-user.jpg}"
-                                                 class="profile-avatar rounded-circle" 
-                                                 alt="Foto de perfil padrão">
+                                                 alt="Foto de perfil">                            <img th:unless="*{profileImageUrl}" 
+                                 th:src="@{/images/default-user.jpg}"
+                                 class="profile-avatar rounded-circle" 
+                                 alt="Foto de perfil padrão">
                                                  
                                             <!-- Botão de upload de imagem -->
                                             <label for="profileImage" class="upload-avatar-btn">

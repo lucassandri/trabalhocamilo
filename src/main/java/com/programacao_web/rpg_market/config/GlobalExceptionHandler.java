@@ -17,8 +17,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IOException.class)
     public ResponseEntity<String> handleIOException(IOException ex, HttpServletRequest request) {
-        logger.warn("IOException occurred on request {}: {}", request.getRequestURI(), ex.getMessage());
-        // Return empty response for broken pipe errors instead of error page
+        String message = ex.getMessage();
+        // log para broken pipe do Render
+        if (message != null && (message.contains("Broken pipe") || message.contains("Connection reset"))) {
+            logger.debug("Cliente desconectou durante requisição {}: {}", request.getRequestURI(), message);
+        } else {
+            logger.warn("IOException occurred on request {}: {}", request.getRequestURI(), message);
+        }
+        // Retornar resposta vazia para erros de broken pipe em vez de página de erro
         return ResponseEntity.ok().build();
     }
 

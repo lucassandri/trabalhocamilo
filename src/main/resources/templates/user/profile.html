@@ -60,7 +60,7 @@
                                      alt="Imagem de Perfil"
                                      style="width: 150px; height: 150px; object-fit: cover;">
                                 <img th:unless="${user.profileImageUrl}" 
-                                     th:src="@{/static/images/default-avatar.png}" 
+                                     th:src="@{/images/default-user.jpg}" 
                                      class="avatar-image rounded-circle" 
                                      th:classappend="${user.role.name() == 'ROLE_MESTRE'} ? 'avatar-mestre' : ''"
                                      alt="Imagem de Perfil"

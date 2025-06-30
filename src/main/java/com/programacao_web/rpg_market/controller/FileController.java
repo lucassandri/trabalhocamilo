@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -33,9 +32,10 @@ public class FileController {
     private FileStorageService fileStorageService;    @GetMapping("/{fileName:.+}")
     public ResponseEntity<Resource> serveFile(@PathVariable String fileName) {
         try {
-            if ("default-product.jpg".equals(fileName)) {
+            // Caso especial: imagem padrão de produto
+            if ("default-product.jpg".equals(fileName) || "default-user.jpg".equals(fileName)) {
                 try {
-                    Resource resource = new UrlResource(getClass().getClassLoader().getResource("static/images/default-product.jpg"));
+                    Resource resource = new UrlResource(getClass().getClassLoader().getResource("static/images/" + fileName));
                     if (resource.exists()) {
                         return ResponseEntity.ok()
                             .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
@@ -43,13 +43,14 @@ public class FileController {
                             .body(resource);
                     }
                 } catch (Exception e) {
-                    log.error("Erro ao carregar imagem padrão: {}", e.getMessage());
+                    log.error("Erro ao carregar imagem padrão {}: {}", fileName, e.getMessage());
                 }
             }
             
+            // Tentar carregar de arquivos estáticos primeiro
             try {
                 Resource staticResource = new UrlResource(getClass().getClassLoader().getResource("static/images/" + fileName));
-                if (staticResource != null && staticResource.exists()) {
+                if (staticResource.exists()) {
                     MediaType mediaType = determineMediaType(fileName);
                     return ResponseEntity.ok()
                         .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + staticResource.getFilename() + "\"")
@@ -60,6 +61,7 @@ public class FileController {
                 log.debug("Arquivo estático não encontrado: {}", fileName);
             }
             
+            // Tentar carregar de uploads
             try {
                 Path filePath = fileStorageService.getFilePath(fileName);
                 Resource resource = new UrlResource(filePath.toUri());
@@ -72,24 +74,27 @@ public class FileController {
                         .body(resource);
                 }
             } catch (Exception e) {
-                log.error("Erro ao carregar arquivo de upload: {}", e.getMessage());
+                log.debug("Arquivo de upload não encontrado: {}", fileName);
             }
             
             // Fallback para imagem padrão em arquivos UUID não encontrados
-            if (fileName.matches("^[a-f0-9-]{36}\\.(jpg|jpeg|png|gif|webp)$")) {
+            if (fileName.matches("^[a-f0-9-]{36}\\.(jpg|jpeg|png|gif|webp)$") || 
+                fileName.startsWith("profile-") || 
+                (!fileName.equals("default-product.jpg") && !fileName.equals("default-user.jpg"))) {
                 try {
                     Resource defaultResource = new UrlResource(getClass().getClassLoader().getResource("static/images/default-product.jpg"));
-                    if (defaultResource != null && defaultResource.exists()) {
+                    if (defaultResource.exists()) {
                         return ResponseEntity.ok()
                             .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"default-product.jpg\"")
                             .contentType(MediaType.IMAGE_JPEG)
                             .body(defaultResource);
                     }
                 } catch (Exception e) {
-                    log.error("Erro ao carregar imagem padrão: {}", e.getMessage());
+                    log.error("Erro ao carregar imagem padrão como fallback: {}", e.getMessage());
                 }
             }
             
+            log.debug("Arquivo não encontrado: {}", fileName);
             return ResponseEntity.notFound().build();
             
         } catch (Exception e) {
