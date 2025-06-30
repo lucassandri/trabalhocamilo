@@ -18,14 +18,34 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IOException.class)
     public ResponseEntity<String> handleIOException(IOException ex, HttpServletRequest request) {
         String message = ex.getMessage();
-        // log para broken pipe do Render
-        if (message != null && (message.contains("Broken pipe") || message.contains("Connection reset"))) {
-            logger.debug("Cliente desconectou durante requisição {}: {}", request.getRequestURI(), message);
+        String requestURI = request.getRequestURI();
+        
+        // Tratar IOExceptions específicas de conexão cancelada/interrompida
+        if (message != null && (message.contains("Broken pipe") || 
+                               message.contains("Connection reset") ||   
+                               message.contains("connection was cancelled") ||
+                               message.contains("conexão anulada pelo software no computador host") ||
+                               message.contains("An existing connection was forcibly closed") ||
+                               message.contains("Connection aborted"))) {
+            
+            // Log apenas como DEBUG para conexões canceladas - comportamento esperado
+            logger.debug("Cliente desconectou durante requisição {}: {}", requestURI, message);
+            
+            // Para imagens e recursos estáticos, retornar resposta vazia
+            if (requestURI.contains("/images/") || requestURI.contains("/css/") || requestURI.contains("/js/")) {
+                return ResponseEntity.ok().build();
+            }
         } else {
-            logger.warn("IOException occurred on request {}: {}", request.getRequestURI(), message);
+            // Para outros tipos de IOException, manter como WARN
+            logger.warn("IOException em requisição {}: {}", requestURI, message);
         }
-        // Retornar resposta vazia para erros de broken pipe em vez de página de erro
-        return ResponseEntity.ok().build();
+        
+        // Retornar resposta adequada baseada no tipo de requisição
+        if (requestURI.contains("/images/") || requestURI.contains("/css/") || requestURI.contains("/js/")) {
+            return ResponseEntity.ok().build(); // Recursos estáticos retornam vazio
+        } else {
+            return ResponseEntity.status(500).body("Erro interno do servidor");
+        }
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)

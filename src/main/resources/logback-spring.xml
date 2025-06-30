@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    
+    <!-- Console Appender com padrão limpo -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %cyan(%logger{36}) - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- Configurações específicas por logger para balancear performance e visibilidade -->
+    
+    <!-- Logs da aplicação - mantém INFO para ver funcionamento -->
+    <logger name="com.programacao_web.rpg_market" level="INFO"/>
+    
+    <!-- FileController com nível INFO para ver problemas importantes -->
+    <logger name="com.programacao_web.rpg_market.controller.FileController" level="WARN"/>
+    
+    <!-- Reduz drasticamente logs do Spring, mas mantém ERRORs -->
+    <logger name="org.springframework.security" level="ERROR"/>
+    <logger name="org.springframework.web" level="ERROR"/>
+    <logger name="org.springframework.web.servlet.DispatcherServlet" level="ERROR"/>
+    <logger name="org.springframework.security.web.FilterChainProxy" level="ERROR"/>
+    <logger name="org.springframework.web.servlet.mvc.method.annotation" level="ERROR"/>
+    
+    <!-- Silencia recursos estáticos, mas mantém ERRORs críticos -->
+    <logger name="org.springframework.web.servlet.resource" level="ERROR"/>
+    <logger name="org.springframework.web.servlet.handler" level="ERROR"/>
+    
+    <!-- Outros frameworks -->
+    <logger name="org.mongodb" level="WARN"/>
+    <logger name="org.springframework.data.mongodb" level="WARN"/>
+    <logger name="org.springframework.boot" level="WARN"/>
+    
+    <!-- Configuração raiz -->
+    <root level="WARN">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+    
+</configuration>
