@@ -160,24 +160,26 @@ public class ProductService {
     }
       /**
      * Verifica periodicamente leilões que terminaram
-     * Desabilitado em produção para evitar problemas de inicialização
+     * Executa apenas se a aplicação estiver em desenvolvimento
      */
-    @Scheduled(fixedRate = 60000) // Executa a cada minuto
+    @Scheduled(fixedRate = 300000) // Executa a cada 5 minutos (menos frequente)
     @Transactional
     @org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(
-        name = "spring.task.scheduling.enabled", 
-        havingValue = "true", 
-        matchIfMissing = false
+        name = "spring.profiles.active", 
+        havingValue = "dev", 
+        matchIfMissing = true
     )
     public void checkEndedAuctions() {
         try {
             List<Product> endedAuctions = productRepository.findByStatusAndAuctionEndDateLessThanEqual(
                 ProductStatus.AUCTION_ACTIVE, LocalDateTime.now());
                 
-            log.debug("Verificando leilões terminados. Encontrados: {}", endedAuctions.size());
+            if (!endedAuctions.isEmpty()) {
+                log.info("Verificando leilões terminados. Encontrados: {}", endedAuctions.size());
                 
-            for (Product auction : endedAuctions) {
-                endAuction(auction);
+                for (Product auction : endedAuctions) {
+                    endAuction(auction);
+                }
             }
         } catch (Exception e) {
             log.error("Erro ao verificar leilões terminados: {}", e.getMessage(), e);
