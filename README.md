@@ -2,6 +2,19 @@
 
 Um marketplace medieval fantástico para compra e venda de itens RPG, desenvolvido com Spring Boot e MongoDB.
 
+## 📝 **Informações do Trabalho**
+
+### 👥 **Membros do Grupo**
+- **[Kalel Gomes de Freitas]** - Matrícula: [24102982]
+- **[Davi Turnes Vieira]** - Matrícula: [24100904]
+- **[Lucas Andre Sandri]** - Matrícula: [24100916]
+- **[Igor Velmud Bandero]** - Matrícula: [24102980]
+- **[Uriel Jaloto Machado Santos de Castro]** - Matrícula: [24100899]
+
+### 🔗 **Links do Projeto**
+- **📂 Repositório**: [https://github.com/lucassandri/trabalhocamilo](https://github.com/lucassandri/trabalhocamilo)
+- **🌐 Aplicação Web**: [https://rpg-market.onrender.com](https://rpg-market.onrender.com)
+
 ## 🎯 **Funcionalidades Principais**
 
 ### 🧙‍♂️ **Painel do Mestre (Administração)**
